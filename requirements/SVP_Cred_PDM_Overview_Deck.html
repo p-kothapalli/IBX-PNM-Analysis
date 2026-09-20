@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Provider Network Management — SVP Briefing</title>
+<style>
+:root {
+  --sf-blue: #0176D3;
+  --sf-blue-dark: #014486;
+  --sf-navy: #032D60;
+  --sf-sky: #1B96FF;
+  --sf-sea: #04E1CB;
+  --sf-health: #00A1DF;
+  --text: #181818;
+  --text-muted: #747474;
+  --bg: #FFFFFF;
+  --surface: #F4F6F9;
+  --border: #E5E5E5;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  font-family: "Salesforce Sans", "Helvetica Neue", Arial, sans-serif;
+  background: #1a1a1a;
+  color: var(--text);
+  height: 100%;
+  overflow: hidden;
+}
+.deck {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  background: var(--bg);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+.slide-inner {
+  position: relative;
+  width: min(100vw, calc(100vh * 16 / 9));
+  height: min(100vh, calc(100vw * 9 / 16));
+  margin: auto;
+  padding: 56px 80px 64px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+.slide.cover .slide-inner,
+.slide.section .slide-inner,
+.slide.close .slide-inner { padding: 0; }
+.brand-footer {
+  position: absolute;
+  left: 32px;
+  bottom: 24px;
+  font-size: 9pt;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.brand-footer .pipe { margin: 0 6px; opacity: 0.6; }
+.page-num {
+  position: absolute;
+  right: 32px;
+  bottom: 24px;
+  font-size: 9pt;
+  color: var(--text-muted);
+}
+.brand-mark {
+  position: absolute;
+  top: 32px;
+  right: 40px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--sf-navy);
+  font-weight: 700;
+  font-size: 11pt;
+  letter-spacing: 0.04em;
+}
+.cloud {
+  width: 28px;
+  height: 20px;
+  display: inline-block;
+}
+h1.slide-title {
+  font-size: 32pt;
+  font-weight: 700;
+  color: var(--sf-navy);
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+h1.slide-title .accent-bar {
+  display: block;
+  width: 64px;
+  height: 4px;
+  background: var(--sf-blue);
+  margin-bottom: 18px;
+}
+.body { flex: 1; display: flex; flex-direction: column; gap: 14px; min-height: 0; }
+ul.bullets {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 15pt;
+  line-height: 1.45;
+  color: var(--text);
+}
+ul.bullets li {
+  position: relative;
+  padding-left: 22px;
+}
+ul.bullets li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  background: var(--sf-blue);
+  border-radius: 1px;
+}
+ul.bullets li strong { color: var(--sf-navy); font-weight: 700; }
+.subtle { color: var(--text-muted); }
+
+/* Cover slide */
+.slide.cover .slide-inner {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  background: var(--bg);
+}
+.cover-left {
+  padding: 80px 64px 80px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.cover-eyebrow {
+  font-size: 11pt;
+  letter-spacing: 0.15em;
+  color: var(--sf-blue);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.cover-title {
+  font-size: 44pt;
+  font-weight: 700;
+  color: var(--sf-navy);
+  letter-spacing: -0.015em;
+  line-height: 1.05;
+  margin-top: 24px;
+}
+.cover-sub {
+  font-size: 16pt;
+  color: var(--text);
+  margin-top: 24px;
+  max-width: 32em;
+  line-height: 1.4;
+}
+.cover-meta {
+  font-size: 11pt;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+.cover-right {
+  background: var(--sf-navy);
+  position: relative;
+  overflow: hidden;
+}
+.cover-right .accent {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60%;
+  height: 6px;
+  background: var(--sf-blue);
+}
+.cover-right .cloud-large {
+  position: absolute;
+  right: -40px;
+  bottom: 60px;
+  opacity: 0.18;
+  width: 360px;
+}
+.cover-right .sky-bar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  background: var(--sf-sky);
+}
+
+/* Section divider */
+.slide.section .slide-inner {
+  background: var(--sf-navy);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 100px;
+  position: relative;
+}
+.slide.section .accent-bar {
+  width: 80px;
+  height: 5px;
+  background: var(--sf-sky);
+  margin-bottom: 28px;
+}
+.slide.section h2 {
+  font-size: 40pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.slide.section .sub {
+  font-size: 18pt;
+  font-weight: 400;
+  margin-top: 18px;
+  max-width: 30em;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.4;
+}
+.slide.section .brand-footer { color: rgba(255, 255, 255, 0.6); }
+.slide.section .page-num { color: rgba(255, 255, 255, 0.6); }
+.slide.section .brand-mark { color: #fff; }
+
+/* Stats grid (slide 3) */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin: 16px 0 8px;
+}
+.stat {
+  background: var(--surface);
+  border-left: 4px solid var(--sf-blue);
+  padding: 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stat .num {
+  font-size: 30pt;
+  font-weight: 700;
+  color: var(--sf-navy);
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+.stat .label {
+  font-size: 11pt;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+.stat-foot {
+  font-size: 13pt;
+  color: var(--text);
+  margin-top: 18px;
+  line-height: 1.5;
+}
+.stat-foot strong { color: var(--sf-navy); }
+.stack-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.pill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--sf-navy);
+  font-size: 11pt;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+/* Lifecycle diagram (slide 4) */
+.lifecycle {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 8px;
+}
+.lane {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 16px;
+  align-items: center;
+}
+.lane-label {
+  font-size: 11pt;
+  font-weight: 700;
+  color: var(--sf-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.lane-flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.lane-flow .step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--sf-blue);
+  color: var(--sf-navy);
+  font-size: 11pt;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.lane.b .lane-label { color: var(--sf-health); }
+.lane.b .lane-flow .step { border-left-color: var(--sf-health); }
+.lane-flow .arrow {
+  color: var(--text-muted);
+  font-size: 12pt;
+  margin: 0 2px;
+}
+.lifecycle-note {
+  font-size: 12pt;
+  color: var(--text-muted);
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+/* Two-column layout (slides 5, 6, 7) */
+.cols-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+  flex: 1;
+  min-height: 0;
+}
+.col-card {
+  background: var(--surface);
+  padding: 24px 26px;
+  border-top: 4px solid var(--sf-blue);
+}
+.col-card.b { border-top-color: var(--sf-health); }
+.col-card h3 {
+  font-size: 14pt;
+  font-weight: 700;
+  color: var(--sf-navy);
+  margin-bottom: 12px;
+  letter-spacing: -0.005em;
+}
+.col-card ul.bullets li { font-size: 13pt; }
+
+/* Stages list (slide 5) */
+.stages {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.stage {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 14px;
+  align-items: baseline;
+  font-size: 13pt;
+  line-height: 1.4;
+}
+.stage .step-num {
+  font-size: 15pt;
+  font-weight: 700;
+  color: var(--sf-blue);
+  letter-spacing: -0.01em;
+}
+.stage .step-text strong { color: var(--sf-navy); }
+.stage .step-meta { color: var(--text-muted); font-size: 11pt; }
+
+/* Table (slides 8, 11) */
+table.flow-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13pt;
+  margin-top: 4px;
+}
+table.flow-table th {
+  background: var(--sf-blue);
+  color: #fff;
+  text-align: left;
+  padding: 10px 14px;
+  font-weight: 700;
+  font-size: 12pt;
+  letter-spacing: 0.02em;
+}
+table.flow-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+table.flow-table tr:nth-child(even) td { background: rgba(1, 118, 211, 0.04); }
+table.flow-table td.code {
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11pt;
+  color: var(--sf-blue-dark);
+  white-space: nowrap;
+}
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+.chip {
+  background: var(--bg);
+  border: 1px solid var(--sf-blue);
+  color: var(--sf-blue-dark);
+  font-size: 10.5pt;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 3px;
+}
+
+/* Pain points (slide 10) */
+.pain-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  flex: 1;
+  align-content: start;
+}
+.pain {
+  background: var(--surface);
+  padding: 22px 22px 24px;
+  border-top: 4px solid var(--sf-blue);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pain .num {
+  font-size: 32pt;
+  font-weight: 700;
+  color: var(--sf-blue);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.pain h3 {
+  font-size: 14pt;
+  font-weight: 700;
+  color: var(--sf-navy);
+  line-height: 1.25;
+}
+.pain p {
+  font-size: 12pt;
+  color: var(--text);
+  line-height: 1.5;
+}
+.pain p .quant {
+  display: inline-block;
+  background: rgba(1, 118, 211, 0.1);
+  color: var(--sf-blue-dark);
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 2px;
+}
+
+/* Integration map (slide 11) */
+.integ-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 8px;
+}
+.integ {
+  background: var(--surface);
+  padding: 18px 18px 20px;
+  border-left: 4px solid var(--sf-sky);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.integ .name {
+  font-size: 14pt;
+  font-weight: 700;
+  color: var(--sf-navy);
+  letter-spacing: 0.02em;
+}
+.integ .role {
+  font-size: 11pt;
+  color: var(--text);
+  line-height: 1.45;
+}
+.integ-foot {
+  font-size: 13pt;
+  color: var(--text);
+  margin-top: 22px;
+  line-height: 1.5;
+  background: var(--surface);
+  border-left: 4px solid var(--sf-blue);
+  padding: 16px 22px;
+}
+
+/* Roadmap (slide 12) */
+.roadmap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+.road-row {
+  display: grid;
+  grid-template-columns: 36px 1fr 180px;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--surface);
+  border-left: 3px solid var(--sf-blue);
+  font-size: 12.5pt;
+  line-height: 1.4;
+}
+.road-row .rank {
+  font-weight: 700;
+  color: var(--sf-blue);
+  font-size: 16pt;
+}
+.road-row .what strong { color: var(--sf-navy); }
+.road-row .what .why { display: block; color: var(--text-muted); font-size: 11pt; margin-top: 2px; }
+.road-row .effort {
+  font-size: 11pt;
+  color: var(--sf-navy);
+  font-weight: 600;
+  text-align: right;
+}
+.road-row.shipped { border-left-color: var(--sf-sea); }
+.road-row.shipped .rank { color: var(--sf-sea); }
+.road-row.next { border-left-color: var(--sf-blue); }
+.road-row.bet { border-left-color: var(--sf-health); }
+.road-row.bet .rank { color: var(--sf-health); }
+
+/* Close slide (13) */
+.slide.close .slide-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: var(--bg);
+}
+.close-left, .close-right { padding: 72px 56px 80px; display: flex; flex-direction: column; }
+.close-left { background: var(--surface); }
+.close-right { background: var(--sf-navy); color: #fff; }
+.close-eyebrow {
+  font-size: 11pt;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+.close-left .close-eyebrow { color: var(--sf-blue); }
+.close-right .close-eyebrow { color: var(--sf-sky); }
+.close-h {
+  font-size: 30pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-bottom: 22px;
+  line-height: 1.1;
+}
+.close-left .close-h { color: var(--sf-navy); }
+.close-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  font-size: 13pt;
+  line-height: 1.45;
+}
+.close-list li {
+  position: relative;
+  padding-left: 22px;
+}
+.close-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  background: var(--sf-blue);
+}
+.close-right .close-list li::before { background: var(--sf-sky); }
+.close-tag {
+  font-size: 11pt;
+  color: var(--text-muted);
+  margin-top: auto;
+  padding-top: 24px;
+  letter-spacing: 0.02em;
+}
+.close-right .close-tag { color: rgba(255, 255, 255, 0.6); }
+
+/* Nav UI */
+.nav {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(3, 45, 96, 0.85);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 999px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  font-size: 11pt;
+  z-index: 50;
+  user-select: none;
+  letter-spacing: 0.02em;
+}
+.nav button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11pt;
+  cursor: pointer;
+  font-family: inherit;
+}
+.nav button:hover { background: rgba(255,255,255,0.15); }
+.nav .counter { min-width: 60px; text-align: center; }
+.nav .help { opacity: 0.7; font-size: 10pt; }
+
+/* Print: 1 slide per page, letterboxing off, deck colors preserved */
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0; }
+  html, body { background: #fff; height: auto; overflow: visible; }
+  .deck { width: auto; height: auto; }
+  .slide {
+    display: flex !important;
+    position: relative;
+    inset: auto;
+    width: 13.333in;
+    height: 7.5in;
+    page-break-after: always;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .slide-inner { width: 13.333in; height: 7.5in; }
+  .nav { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- ============================================================ -->
+<!-- SLIDE 1 — COVER                                                -->
+<!-- ============================================================ -->
+<section class="slide cover" data-title="Title">
+  <div class="slide-inner">
+    <div class="cover-left">
+      <div>
+        <div class="cover-eyebrow">IBX &times; Salesforce &middot; SVP Briefing</div>
+        <h1 class="cover-title">Provider Network Management</h1>
+        <p class="cover-sub">Credentialing &amp; Provider Data Management &mdash; Platform Overview</p>
+      </div>
+      <div class="cover-meta">May 2026 &middot; IBX PNM &middot; Salesforce Architecture</div>
+    </div>
+    <div class="cover-right">
+      <svg class="cloud-large" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path fill="#FFFFFF" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/>
+      </svg>
+      <span class="sky-bar"></span>
+      <span class="accent"></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 2 — WHY THIS MATTERS                                     -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Why this matters">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>Why this matters to IBX</h1>
+    <div class="body">
+      <ul class="bullets">
+        <li><strong>Speed to network</strong> &mdash; faster credentialing means providers billing earlier and lower abrasion with practices.</li>
+        <li><strong>Data accuracy</strong> &mdash; PDM directly drives directory accuracy, claims routing, and CMS / NCQA compliance posture.</li>
+        <li><strong>Operational cost</strong> &mdash; every stuck application or silent failure burns case-manager hours and erodes provider satisfaction.</li>
+        <li><strong>Audit readiness</strong> &mdash; credentialing decisions must be traceable, layered, and defensible to internal audit and external regulators.</li>
+      </ul>
+    </div>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">02</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 3 — PLATFORM AT A GLANCE                                 -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Platform at a glance">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>One Salesforce-native platform for the full provider lifecycle</h1>
+    <div class="stack-pills">
+      <span class="pill">Health Cloud</span>
+      <span class="pill">OmniStudio</span>
+      <span class="pill">Lightning Web Components</span>
+      <span class="pill">Apex</span>
+      <span class="pill">Salesforce Flow</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><span class="num">100</span><span class="label">OmniScripts</span></div>
+      <div class="stat"><span class="num">533</span><span class="label">Apex Classes</span></div>
+      <div class="stat"><span class="num">402</span><span class="label">Integration Procedures</span></div>
+      <div class="stat"><span class="num">1,327</span><span class="label">DataRaptors</span></div>
+      <div class="stat"><span class="num">165</span><span class="label">Lightning Web Components</span></div>
+    </div>
+    <p class="stat-foot">Plus <strong>46 batch jobs</strong>, <strong>21 platform flows</strong>, and <strong>10 FlexCards</strong> &mdash; <strong>~2,588 production artifacts</strong> spanning credentialing, PDM, termination, reinstatement, and ancillary providers. Mature, in steady state, and actively extended every quarter. <span class="subtle">No off-platform runtime; every integration is a managed Salesforce callout.</span></p>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">03</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 4 — END-TO-END LIFECYCLE                                 -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Lifecycle">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>End-to-end provider lifecycle</h1>
+    <div class="lifecycle">
+      <div class="lane a">
+        <div class="lane-label">Onboarding<br/>(Credentialing)</div>
+        <div class="lane-flow">
+          <span class="step">PAR Application</span><span class="arrow">&rarr;</span>
+          <span class="step">App Review</span><span class="arrow">&rarr;</span>
+          <span class="step">PSV</span><span class="arrow">&rarr;</span>
+          <span class="step">PDA</span><span class="arrow">&rarr;</span>
+          <span class="step">QC Review</span><span class="arrow">&rarr;</span>
+          <span class="step">HACAC Committee</span><span class="arrow">&rarr;</span>
+          <span class="step">Activation</span>
+        </div>
+      </div>
+      <div class="lane b">
+        <div class="lane-label">Ongoing<br/>(PDM)</div>
+        <div class="lane-flow">
+          <span class="step">Provider Change</span><span class="arrow">&rarr;</span>
+          <span class="step">PDM Manual Update</span><span class="arrow">&rarr;</span>
+          <span class="step">Re-Credentialing</span><span class="arrow">&rarr;</span>
+          <span class="step">Termination</span><span class="arrow">&rarr;</span>
+          <span class="step">Reinstatement</span>
+        </div>
+      </div>
+    </div>
+    <p class="lifecycle-note">Initial credentialing is a <strong>once-per-provider event</strong>. PDM is the <strong>daily-ops layer</strong> that keeps directory and claims data correct. Reinstatement loops back into App Review &mdash; every stage is backed by a guided flow and an audit-ready case record.</p>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">04</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 5 — CREDENTIALING: INITIAL CRED                          -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Initial Credentialing">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>Credentialing &mdash; Initial Cred</h1>
+    <div class="cols-2">
+      <div>
+        <div class="stages">
+          <div class="stage"><span class="step-num">1</span><span class="step-text"><strong>PAR Form submission</strong> &mdash; single intake drives downstream record creation <span class="step-meta">PRM_PractitionerParticipationForm</span></span></div>
+          <div class="stage"><span class="step-num">2</span><span class="step-text"><strong>Application Review</strong> &mdash; case manager triages, requests info, or denies <span class="step-meta">PRM_InitialCredentialAppReview</span></span></div>
+          <div class="stage"><span class="step-num">3</span><span class="step-text"><strong>Primary Source Verification</strong> &mdash; independent check vs NPDB, license boards, education sources</span></div>
+          <div class="stage"><span class="step-num">4</span><span class="step-text"><strong>PDA</strong> &mdash; Professional Development Activities; captures soft credential data</span></div>
+          <div class="stage"><span class="step-num">5</span><span class="step-text"><strong>QC checkpoint</strong> &mdash; every cred decision passes through QC <span class="step-meta">PRM_InitialCredPDAQC</span></span></div>
+          <div class="stage"><span class="step-num">6</span><span class="step-text"><strong>HACAC Committee</strong> &mdash; non-routine cases only</span></div>
+          <div class="stage"><span class="step-num">7</span><span class="step-text"><strong>Activation</strong> &mdash; cascading record creation, BCBSA sync, network and taxonomy records</span></div>
+        </div>
+      </div>
+      <div class="col-card b">
+        <h3>Backing capabilities</h3>
+        <ul class="bullets">
+          <li><strong>14 OmniScripts</strong> in the Cred &amp; QC group</li>
+          <li><strong>~25 Apex classes</strong> orchestrating cred workflow</li>
+          <li><strong>5 termination / reinstatement batches</strong> interlock with cred</li>
+          <li><strong>CAQH</strong> drives demographic pre-fill and attestation</li>
+          <li><strong>NPDB</strong> runs as a sub-OmniScript inside PSV</li>
+          <li>Adverse action logs auto-generated and routed to compliance</li>
+        </ul>
+      </div>
+    </div>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">05</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 6 — RECRED & OFF-CYCLE                                   -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Re-Cred & Off-Cycle">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>Two more cred motions: cyclical recred + on-demand off-cycle</h1>
+    <div class="cols-2">
+      <div class="col-card">
+        <h3>Re-Credentialing &mdash; cyclical, every 2&ndash;3 years</h3>
+        <ul class="bullets">
+          <li><strong>3 OmniScripts</strong> &mdash; ReCredUpdate, ReCredQCUpdate, RecredQC</li>
+          <li>Driven by <strong>4 scheduled batches</strong> &mdash; due-date check, CAQH access check, notification email, letter generation</li>
+          <li><strong>CAQH re-validation</strong> is a hard gate &mdash; record cannot advance without a valid attestation</li>
+          <li>Failure path recently hardened &mdash; letter fallback &amp; silent-failure monitoring shipped</li>
+          <li><strong>Drives the bulk of cred volume</strong> &mdash; the engine that keeps the network compliant</li>
+        </ul>
+      </div>
+      <div class="col-card b">
+        <h3>Off-Cycle Credentialing &mdash; event-driven</h3>
+        <ul class="bullets">
+          <li><strong>3 OmniScripts</strong> &mdash; OffCycleCredentialing, OffCycleVerification, OffCycleQCReview</li>
+          <li>Abbreviated PSV and accelerated QC for exception circumstances</li>
+          <li>Lower volume but high importance &mdash; the &ldquo;exception lane&rdquo; for special situations</li>
+          <li>Same audit trail as initial cred &mdash; no compliance shortcuts</li>
+        </ul>
+      </div>
+    </div>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">06</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 7 — PSV, QC, COMMITTEE                                   -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="PSV / QC / Committee">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>Three layers of review keep credential decisions defensible</h1>
+    <div class="body">
+      <div class="col-card" style="border-top-color: var(--sf-blue);">
+        <h3>1 &middot; Primary Source Verification (PSV)</h3>
+        <ul class="bullets"><li>Independent verification against authoritative sources &mdash; NPDB, state license boards, education registrars. <strong>4 OmniScripts</strong> incl. dedicated NPDB sub-flow (PRM_PSVSubOsWSNPDB).</li></ul>
+      </div>
+      <div class="col-card" style="border-top-color: var(--sf-sky);">
+        <h3>2 &middot; Quality Control (QC)</h3>
+        <ul class="bullets"><li><strong>10 QC OmniScripts</strong> spanning manual updates, off-cycle, non-routine, HACAC, and delegated practitioners. Every cred and PDM decision passes through a QC checkpoint.</li></ul>
+      </div>
+      <div class="col-card b">
+        <h3>3 &middot; HACAC Committee Review</h3>
+        <ul class="bullets"><li>Non-routine cases land here (PRM_NonRoutineCommitteeReview, PRM_ReviewHACAC). Output flows back into cred records and adverse action logs &mdash; full audit trail by design.</li></ul>
+      </div>
+    </div>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">07</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 8 — SECTION DIVIDER: PDM                                 -->
+<!-- ============================================================ -->
+<section class="slide section" data-title="PDM Section">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#FFFFFF" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <span class="accent-bar"></span>
+    <h2>Provider Data Management</h2>
+    <p class="sub">How we keep the data correct after the cred decision</p>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">08</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 9 — PDM: THE 5 FLOWS                                     -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="PDM Flows">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>PDM &mdash; the ongoing data accuracy engine</h1>
+    <p style="font-size:13pt; color:var(--text); margin-bottom:14px; line-height:1.5;"><em>How we keep practitioner, practice-location, group, and ancillary data accurate <strong>after</strong> the initial cred decision &mdash; five guided flows plus a cross-reference and validation backbone.</em></p>
+    <table class="flow-table">
+      <thead>
+        <tr><th style="width:42%">Flow</th><th>What it changes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="code">PRM_PDMManualChanges</td><td>Demographic and association entry point</td></tr>
+        <tr><td class="code">PRM_PDMManualUpdatePractitioner</td><td>Practitioner-level updates &mdash; taxonomy, NPI, demographics</td></tr>
+        <tr><td class="code">PRM_PDMManualUpdate</td><td>Practice-location updates &mdash; billing/mailing address, networks, capitation</td></tr>
+        <tr><td class="code">PRM_PDMManualUpdateVendor</td><td>Vendor / ancillary updates</td></tr>
+        <tr><td class="code">PRM_PDMManualUpdateHCFAssociations</td><td>Healthcare facility &harr; network association updates</td></tr>
+      </tbody>
+    </table>
+    <div class="chip-row">
+      <span class="chip">Cross-Reference Validation</span>
+      <span class="chip">Precisely Address Validation</span>
+      <span class="chip">5-step QC Review chain</span>
+      <span class="chip">Capitated Bundle membership</span>
+      <span class="chip">Future-dated activation</span>
+    </div>
+    <p class="lifecycle-note" style="margin-top:14px;"><strong>PDM volume dwarfs cred volume.</strong> Most of what the network ops team does day-to-day lives here, not in credentialing.</p>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">09</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 10 — WHERE IT HURTS TODAY                                -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Pain Points">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>Where the platform hurts today</h1>
+    <div class="pain-grid">
+      <div class="pain">
+        <div class="num">01</div>
+        <h3>High-volume submissions hit governor limits</h3>
+        <p>Practitioners with 3+ practice locations &times; 3+ taxonomies &times; 15+ networks generate <span class="quant">54+ records</span> and routinely exceed Salesforce's 150-DML / 60s-CPU ceiling.</p>
+        <p><strong>Result:</strong> 5-min UI freezes, silent partial saves, <span class="quant">15&ndash;20 tickets/wk</span>, 2&ndash;3 hrs remediation per ticket.</p>
+      </div>
+      <div class="pain">
+        <div class="num">02</div>
+        <h3>Capitated Bundle search caps at 500</h3>
+        <p>Search returns at most <span class="quant">500 of 1,582 active bundles</span>. The validation rule "PL is in a capitated bundle" actually checks CAP program participation &mdash; wrong field, misleading message.</p>
+        <p>Blocks legitimate billing-address updates for affected HCFs.</p>
+      </div>
+      <div class="pain">
+        <div class="num">03</div>
+        <h3>Edit-in-flow not supported</h3>
+        <p>PSV / Cred reviewers see a wrong field (DOB, address, education) and have to <strong>exit the flow, edit the record, restart</strong>. Tied to a separate <span class="quant">4 MB</span> Save-for-Later payload limit.</p>
+        <p>Slow, error-prone, biggest hit on large practitioners.</p>
+      </div>
+    </div>
+    <p class="lifecycle-note">All three are <strong>quantified, root-caused, and actively being unwound</strong> &mdash; see slide 12 for the roadmap.</p>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">10</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 11 — INTEGRATIONS MAP                                    -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Integrations">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>The platform is a hub, not an island</h1>
+    <div class="integ-grid">
+      <div class="integ"><span class="name">CAQH</span><span class="role">Provider profile + attestation pre-fill, recred validation gate</span></div>
+      <div class="integ"><span class="name">NPDB</span><span class="role">Adverse-action verification &mdash; runs inside PSV as a sub-flow</span></div>
+      <div class="integ"><span class="name">Precisely API</span><span class="role">Address standardization &amp; validation across every flow</span></div>
+      <div class="integ"><span class="name">BCBSA</span><span class="role">Inter-Blue practitioner / role sync</span></div>
+      <div class="integ"><span class="name">UPHS Roster</span><span class="role">Penn Medicine roster reconciliation (batch)</span></div>
+      <div class="integ"><span class="name">UPenn Roster</span><span class="role">UPenn roster reconciliation (batch)</span></div>
+      <div class="integ"><span class="name">NCPDP</span><span class="role">Pharmacy provider data</span></div>
+      <div class="integ"><span class="name">RCAT</span><span class="role">Roster Compliance &amp; Attestation Tool &mdash; internal compliance feed</span></div>
+    </div>
+    <p class="integ-foot"><strong>Credentialing is a data-orchestration problem, not a data-entry problem.</strong> Every cred decision touches at least 2 external systems; recred touches 3+. This is why we invest in batch resilience and async patterns.</p>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">11</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 12 — RECENT WINS & ROADMAP                               -->
+<!-- ============================================================ -->
+<section class="slide content" data-title="Roadmap">
+  <div class="slide-inner">
+    <div class="brand-mark"><svg class="cloud" viewBox="0 0 200 120" aria-hidden="true"><path fill="#0176D3" d="M155 70a30 30 0 0 0-58-9 25 25 0 0 0-39 21 22 22 0 0 0 22 22h75a22 22 0 0 0 0-44 30 30 0 0 0 0 10z"/></svg>Salesforce</div>
+    <h1 class="slide-title"><span class="accent-bar"></span>Recent wins &amp; what's next</h1>
+    <div class="roadmap">
+      <div class="road-row shipped"><span class="rank">&#10004;</span><span class="what"><strong>Practitioner Creation async refactor (TX1/TX2/TX3 Queueable + Platform Event logging)</strong><span class="why">Eliminates governor-limit failures for delegated practitioners; framework reused across all subsequent high-volume flows</span></span><span class="effort">Shipped</span></div>
+      <div class="road-row shipped"><span class="rank">&#10004;</span><span class="what"><strong>Failed Record Staging + retry quick action; re-cred letter fallback &amp; silent-failure monitoring</strong><span class="why">Operations team can now see, triage, and retry failed submissions instead of opening tickets</span></span><span class="effort">Shipped</span></div>
+      <div class="road-row shipped"><span class="rank">&#10004;</span><span class="what"><strong>Reusable Address Group Manager (Phase 5)</strong><span class="why">4 reusable Apex services + LWC framework &mdash; drops cost of every subsequent address feature</span></span><span class="effort">Shipped</span></div>
+      <div class="road-row next"><span class="rank">1</span><span class="what"><strong>High-Volume PDM Performance &mdash; Practitioner &amp; Practice Location flows</strong><span class="why">Removes governor-limit failures across the busiest PDM flows; closes pain point #1</span></span><span class="effort">32&ndash;38 SP each</span></div>
+      <div class="road-row next"><span class="rank">2</span><span class="what"><strong>Mass Updates &mdash; add/remove practitioners, networks, PLs, taxonomies</strong><span class="why">Replaces manual roster work; ~30&ndash;60 hrs/week recovered</span></span><span class="effort">65 SP</span></div>
+      <div class="road-row next"><span class="rank">3</span><span class="what"><strong>Tile-Based Cred Edit Capability (LWC redesign)</strong><span class="why">Solves the 4 MB Save-for-Later cap; enables in-flow edit + pause/resume; closes pain point #3</span></span><span class="effort">~122 dev-days</span></div>
+      <div class="road-row bet"><span class="rank">&#9733;</span><span class="what"><strong>Provider Data Versioning &mdash; effective-dated history across 30 core objects</strong><span class="why">Strategic bet &mdash; foundation for audit-ready history, back-dated corrections, CMS-grade provider data lineage</span></span><span class="effort">5&ndash;7 months calendar</span></div>
+    </div>
+    <div class="brand-footer">Salesforce<span class="pipe">|</span>Health Cloud<span class="pipe">|</span>Confidential</div>
+    <div class="page-num">12</div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SLIDE 13 — METRICS & ASKS (CLOSE)                              -->
+<!-- ============================================================ -->
+<section class="slide close" data-title="Metrics & Asks">
+  <div class="slide-inner">
+    <div class="close-left">
+      <div class="close-eyebrow">How we know we're winning</div>
+      <h2 class="close-h">Health metrics</h2>
+      <ul class="close-list">
+        <li>Initial cred turnaround time <span class="subtle">(target &darr;)</span></li>
+        <li>Re-cred completion rate within window</li>
+        <li>PDM submission failure rate <span class="subtle">(target &rarr; 0)</span></li>
+        <li>Performance-related ticket volume <strong>15&ndash;20/wk</strong> &rarr; <strong>&lt;5/wk</strong> target</li>
+        <li>Avg case-manager remediation time <strong>2&ndash;3 hrs</strong> per failure</li>
+      </ul>
+      <div class="close-tag">May 2026 &middot; IBX PNM &middot; Salesforce Architecture</div>
+    </div>
+    <div class="close-right">
+      <div class="close-eyebrow">What we'd ask of you</div>
+      <h2 class="close-h">Asks</h2>
+      <ul class="close-list">
+        <li><strong>Sponsorship</strong> for the Provider Data Versioning initiative &mdash; multi-quarter; needs steady funding and protection from fire-drills.</li>
+        <li><strong>Business decision</strong> on the PDM Bundle validation &mdash; three options ready (see Bug Fix doc); needs Provider Contracting sign-off.</li>
+        <li><strong>UAT bandwidth</strong> for the Practitioner Creation async cutover &mdash; production cutover blocked on UAT cycles, not engineering.</li>
+      </ul>
+      <div class="close-tag">Credentialing &amp; PDM is a mature, high-leverage platform. We know where it hurts, we have the playbook, and the next 4 quarters compound.</div>
+    </div>
+  </div>
+</section>
+
+</div>
+<div class="nav" id="nav">
+  <button id="prev" aria-label="Previous slide">&larr;</button>
+  <span class="counter" id="counter">1 / 13</span>
+  <button id="next" aria-label="Next slide">&rarr;</button>
+  <span class="help">arrows · space · P print</span>
+</div>
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var counter = document.getElementById('counter');
+  var idx = 0;
+  function show(i) {
+    if (i < 0) i = 0;
+    if (i >= slides.length) i = slides.length - 1;
+    slides.forEach(function(s, n){ s.classList.toggle('active', n === i); });
+    counter.textContent = (i + 1) + ' / ' + slides.length;
+    idx = i;
+    if (history.replaceState) history.replaceState(null, '', '#' + (i + 1));
+  }
+  document.getElementById('prev').addEventListener('click', function(){ show(idx - 1); });
+  document.getElementById('next').addEventListener('click', function(){ show(idx + 1); });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); show(idx + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(idx - 1); }
+    else if (e.key === 'Home') { show(0); }
+    else if (e.key === 'End') { show(slides.length - 1); }
+    else if (e.key === 'p' || e.key === 'P') { window.print(); }
+  });
+  document.addEventListener('click', function(e){
+    if (e.target.closest('.nav')) return;
+    if (e.target.closest('a, button')) return;
+    show(idx + 1);
+  });
+  var hashIdx = parseInt((location.hash || '#1').slice(1), 10);
+  show(isNaN(hashIdx) ? 0 : hashIdx - 1);
+})();
+</script>
+</body>
+</html>

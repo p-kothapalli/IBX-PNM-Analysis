@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>prmAsyncJobProgress — Async Job Monitor (SLDS Mockup)</title>
+<style>
+  :root{
+    --brand:#0176d3; --brand-dark:#014486; --brand-100:#eef4ff;
+    --page-bg:#f3f3f3; --card:#fff; --border:#e5e5e5; --border-2:#c9c9c9;
+    --txt:#181818; --txt-2:#5c5c5c; --txt-3:#747474;
+    --green:#2e844a; --green-bg:#d7f1de; --green-bd:#91db8b;
+    --red:#ea001e;   --red-bg:#feded8;  --red-bd:#fe9a91;
+    --orange:#dd7a01;--orange-bg:#fef0e6;--orange-bd:#fec574;
+    --blue:#0176d3;  --blue-bg:#d8edff; --blue-bd:#90d0fe;
+    --radius:.25rem; --shadow:0 2px 2px rgba(0,0,0,.05),0 0 1px rgba(0,0,0,.12);
+    font-family:'Salesforce Sans','Segoe UI',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);color:var(--txt);font-size:13px;line-height:1.4;}
+  .wrap{max-width:1280px;margin:0 auto;padding:1rem;}
+
+  /* ---------- page header ---------- */
+  .page-header{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:.85rem 1rem;display:flex;align-items:flex-start;gap:.75rem;margin-bottom:1rem;}
+  .ph-icon{width:2.5rem;height:2.5rem;border-radius:var(--radius);background:var(--brand);
+    display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto;}
+  .ph-icon svg{width:1.4rem;height:1.4rem;fill:#fff;}
+  .ph-main{flex:1 1 auto;min-width:0;}
+  .ph-eyebrow{font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-3);}
+  .ph-title{font-size:1.2rem;font-weight:700;margin:.05rem 0;}
+  .ph-sub{color:var(--txt-2);font-size:.82rem;}
+  .ph-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+
+  /* ---------- buttons ---------- */
+  .btn{border:1px solid var(--border-2);background:#fff;color:var(--brand);border-radius:var(--radius);
+    padding:.32rem .75rem;font-size:.8rem;font-weight:600;cursor:pointer;display:inline-flex;
+    align-items:center;gap:.35rem;white-space:nowrap;transition:background .1s;}
+  .btn:hover{background:#f3f8ff;}
+  .btn svg{width:.9rem;height:.9rem;fill:currentColor;}
+  .btn--brand{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .btn--brand:hover{background:var(--brand-dark);}
+  .btn--neutral{color:var(--txt);}
+  .btn--icon{padding:.32rem .45rem;}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+
+  /* ---------- summary dashboard ---------- */
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:.75rem;margin-bottom:.5rem;}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:.7rem .85rem;position:relative;overflow:hidden;}
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand);}
+  .stat.completed::before{background:var(--green);} .stat.failed::before{background:var(--red);}
+  .stat.queued::before{background:var(--orange);} .stat.running::before{background:var(--blue);}
+  .stat.rate::before{background:#706e6b;}
+  .stat-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);
+    display:flex;align-items:center;gap:.3rem;}
+  .stat-num{font-size:1.7rem;font-weight:700;margin-top:.15rem;}
+  .stat.completed .stat-num{color:var(--green);} .stat.failed .stat-num{color:var(--red);}
+  .stat.queued .stat-num{color:var(--orange);} .stat.running .stat-num{color:var(--blue);}
+  .stat-foot{font-size:.7rem;color:var(--txt-3);margin-top:.1rem;}
+  .refreshed{font-size:.72rem;color:var(--txt-3);text-align:right;margin:0 0 1rem;}
+
+  /* overall progress */
+  .overall{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:.7rem 1rem;margin-bottom:1rem;}
+  .overall-top{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.4rem;}
+  .bar{height:.6rem;border-radius:.4rem;background:#eceb ea;background:#eef0f2;overflow:hidden;display:flex;}
+  .bar > span{display:block;height:100%;}
+  .bar .b-done{background:var(--green);} .bar .b-run{background:var(--blue);}
+  .bar .b-fail{background:var(--red);} .bar .b-queue{background:var(--orange);}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:flex;gap:.25rem;border-bottom:1px solid var(--border-2);margin-bottom:0;}
+  .tab{padding:.55rem .85rem;font-size:.82rem;font-weight:600;color:var(--txt-2);cursor:pointer;
+    border-bottom:3px solid transparent;display:flex;align-items:center;gap:.4rem;}
+  .tab .pill{background:#eef0f2;color:var(--txt-2);border-radius:10px;padding:0 .4rem;font-size:.68rem;font-weight:700;}
+  .tab.active{color:var(--brand);border-bottom-color:var(--brand);}
+  .tab.active .pill{background:var(--brand);color:#fff;}
+
+  /* ---------- table card ---------- */
+  .card{background:var(--card);border:1px solid var(--border);border-top:none;
+    border-radius:0 0 var(--radius) var(--radius);box-shadow:var(--shadow);}
+  .card-head{display:flex;justify-content:space-between;align-items:center;padding:.6rem .85rem;border-bottom:1px solid var(--border);}
+  .card-head h3{margin:0;font-size:.9rem;}
+  .table-scroll{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:.8rem;min-width:760px;}
+  thead th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);
+    font-weight:600;padding:.5rem .75rem;border-bottom:1px solid var(--border);background:#fafaf9;white-space:nowrap;}
+  tbody td{padding:.5rem .75rem;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+  tbody tr:hover{background:#f8fbff;}
+  .lk{color:var(--brand);font-weight:600;text-decoration:none;}
+  .lk:hover{text-decoration:underline;}
+  .muted{color:var(--txt-3);}
+  .mono{font-family:'SF Mono',Consolas,monospace;font-size:.74rem;color:var(--txt-2);}
+  .err{color:var(--red);max-width:320px;display:inline-block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;}
+
+  /* ---------- badges ---------- */
+  .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.12rem .5rem;border-radius:12px;
+    font-size:.72rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .badge .dot{width:.55rem;height:.55rem;border-radius:50%;display:inline-block;}
+  .b-completed{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);}
+  .b-completed .dot{background:var(--green);}
+  .b-failed{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+  .b-failed .dot{background:var(--red);}
+  .b-queued{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);}
+  .b-queued .dot{background:var(--orange);}
+  .b-running{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);}
+  .b-running .dot{background:var(--blue);animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%{opacity:1;}50%{opacity:.3;}100%{opacity:1;}}
+
+  .prio{font-weight:600;}
+  .prio.high{color:var(--red);} .prio.med{color:var(--orange);} .prio.low{color:var(--txt-2);}
+
+  .ok-ico{color:var(--green);font-weight:700;}
+  .dur{font-variant-numeric:tabular-nums;}
+
+  /* ---------- pagination ---------- */
+  .pager{display:flex;justify-content:space-between;align-items:center;padding:.55rem .85rem;font-size:.78rem;color:var(--txt-2);}
+  .pager .pages{display:flex;gap:.2rem;}
+  .pg{min-width:1.7rem;height:1.7rem;border:1px solid var(--border-2);background:#fff;border-radius:var(--radius);
+    display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-weight:600;color:var(--txt);}
+  .pg.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .pg[disabled]{opacity:.4;cursor:not-allowed;}
+
+  .section-only{display:none;}
+
+  .legend{margin-top:1.25rem;font-size:.74rem;color:var(--txt-3);background:#fbfbfa;border:1px dashed var(--border-2);
+    border-radius:var(--radius);padding:.75rem .9rem;}
+  .legend b{color:var(--txt-2);}
+  .legend code{background:#eef0f2;border-radius:3px;padding:0 .25rem;font-size:.72rem;}
+
+  /* ---------- responsive (tablet) ---------- */
+  @media (max-width:1024px){
+    .stats{grid-template-columns:repeat(3,1fr);}
+    .ph-actions{width:100%;}
+  }
+  @media (max-width:640px){
+    .stats{grid-template-columns:repeat(2,1fr);}
+    .page-header{flex-wrap:wrap;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ PAGE HEADER ============ -->
+  <div class="page-header">
+    <div class="ph-icon" title="Async Job">
+      <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>
+    </div>
+    <div class="ph-main">
+      <div class="ph-eyebrow">Async Job Monitor &middot; Practitioner Creation</div>
+      <div class="ph-title">Job Executions</div>
+      <div class="ph-sub">Case Manager: <a class="lk" href="#">IA-0001234 &middot; Dr. Maria Alvarez</a> &nbsp;|&nbsp; Parent Job: <span class="mono">AJ-0004821</span></div>
+    </div>
+    <div class="ph-actions">
+      <button class="btn btn--neutral"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>Refresh</button>
+      <button class="btn btn--brand"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>Retry Failed Jobs</button>
+    </div>
+  </div>
+
+  <!-- ============ SUMMARY DASHBOARD ============ -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Total Jobs</div>
+      <div class="stat-num">6</div>
+      <div class="stat-foot">across 1 process</div>
+    </div>
+    <div class="stat completed">
+      <div class="stat-label">&#10003; Completed</div>
+      <div class="stat-num">3</div>
+      <div class="stat-foot">50% of total</div>
+    </div>
+    <div class="stat failed">
+      <div class="stat-label">&#10007; Failed</div>
+      <div class="stat-num">1</div>
+      <div class="stat-foot">needs attention</div>
+    </div>
+    <div class="stat queued">
+      <div class="stat-label">&#9203; Queued</div>
+      <div class="stat-num">1</div>
+      <div class="stat-foot">pending dispatch</div>
+    </div>
+    <div class="stat running">
+      <div class="stat-label">&#10227; Running</div>
+      <div class="stat-num">1</div>
+      <div class="stat-foot">in progress</div>
+    </div>
+    <div class="stat rate">
+      <div class="stat-label">Success Rate</div>
+      <div class="stat-num" style="color:#2e844a;">75.0%</div>
+      <div class="stat-foot">of finished jobs</div>
+    </div>
+  </div>
+  <p class="refreshed">&#8635; Last refreshed: <b>Jun 15, 2026, 6:28 PM</b> &middot; auto-refresh off</p>
+
+  <!-- ============ OVERALL PROGRESS ============ -->
+  <div class="overall">
+    <div class="overall-top">
+      <span><b>Overall progress</b> — 4 of 6 finished</span>
+      <span class="muted">67%</span>
+    </div>
+    <div class="bar" title="Completed 3 · Running 1 · Failed 1 · Queued 1">
+      <span class="b-done"  style="width:50%"></span>
+      <span class="b-run"   style="width:16.7%"></span>
+      <span class="b-fail"  style="width:16.7%"></span>
+      <span class="b-queue" style="width:16.6%"></span>
+    </div>
+  </div>
+
+  <!-- ============ TABS ============ -->
+  <div class="tabs">
+    <div class="tab active" onclick="showTab(this,'all')">All Jobs <span class="pill">6</span></div>
+    <div class="tab" onclick="showTab(this,'failed')">Failed <span class="pill">1</span></div>
+    <div class="tab" onclick="showTab(this,'queued')">Queued <span class="pill">1</span></div>
+    <div class="tab" onclick="showTab(this,'completed')">Completed <span class="pill">3</span></div>
+    <div class="tab" onclick="showTab(this,'running')">Running <span class="pill">1</span></div>
+  </div>
+
+  <!-- ============ ALL JOBS GRID ============ -->
+  <div class="card" id="tab-all">
+    <div class="card-head">
+      <h3>All Job Executions</h3>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Job Name</th><th>Job ID</th><th>Type</th><th>Status</th>
+            <th>Triggered By</th><th>Sequence</th><th>Last Update</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a class="lk" href="#">License Network Creation</a></td>
+            <td class="mono">AJD-0009001</td><td>Network · Batch</td>
+            <td><span class="badge b-running"><span class="dot"></span>&#10227; Running</span></td>
+            <td>Practitioner Creation Flow</td><td>1</td>
+            <td class="muted">6:27 PM</td>
+            <td><button class="btn btn--icon" title="View"><svg viewBox="0 0 24 24"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8z"/></svg></button></td>
+          </tr>
+          <tr>
+            <td><a class="lk" href="#">Facility Affiliation Sync</a></td>
+            <td class="mono">AJD-0009002</td><td>Affiliation · Queueable</td>
+            <td><span class="badge b-failed"><span class="dot"></span>&#10007; Failed</span></td>
+            <td>Practitioner Creation Flow</td><td>2</td>
+            <td class="muted">6:25 PM</td>
+            <td><button class="btn btn--icon btn--brand" title="Retry"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg></button></td>
+          </tr>
+          <tr>
+            <td><a class="lk" href="#">Info Code Assignment</a></td>
+            <td class="mono">AJD-0009003</td><td>Info Code · Queueable</td>
+            <td><span class="badge b-completed"><span class="dot"></span>&#10003; Completed</span></td>
+            <td>Practitioner Creation Flow</td><td>3</td>
+            <td class="muted">6:22 PM</td>
+            <td><button class="btn btn--icon" title="View"><svg viewBox="0 0 24 24"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8z"/></svg></button></td>
+          </tr>
+          <tr>
+            <td><a class="lk" href="#">Provider Feature Setup</a></td>
+            <td class="mono">AJD-0009004</td><td>Feature · Queueable</td>
+            <td><span class="badge b-completed"><span class="dot"></span>&#10003; Completed</span></td>
+            <td>Practitioner Creation Flow</td><td>4</td>
+            <td class="muted">6:20 PM</td>
+            <td><button class="btn btn--icon" title="View"><svg viewBox="0 0 24 24"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8z"/></svg></button></td>
+          </tr>
+          <tr>
+            <td><a class="lk" href="#">Board Certification Load</a></td>
+            <td class="mono">AJD-0009005</td><td>Cert · Queueable</td>
+            <td><span class="badge b-queued"><span class="dot"></span>&#9203; Queued</span></td>
+            <td>Practitioner Creation Flow</td><td>5</td>
+            <td class="muted">—</td>
+            <td><button class="btn btn--icon" title="View"><svg viewBox="0 0 24 24"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8z"/></svg></button></td>
+          </tr>
+          <tr>
+            <td><a class="lk" href="#">Address Standardization</a></td>
+            <td class="mono">AJD-0009006</td><td>Address · Queueable</td>
+            <td><span class="badge b-completed"><span class="dot"></span>&#10003; Completed</span></td>
+            <td>Practitioner Creation Flow</td><td>6</td>
+            <td class="muted">6:18 PM</td>
+            <td><button class="btn btn--icon" title="View"><svg viewBox="0 0 24 24"><path d="M12 5c-7 0-10 7-10 7s3 7 10 7 10-7 10-7-3-7-10-7zm0 11a4 4 0 110-8 4 4 0 010 8z"/></svg></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span>Showing 1–6 of 6</span>
+      <div class="pages">
+        <span class="pg" disabled>&lsaquo;</span>
+        <span class="pg active">1</span>
+        <span class="pg" disabled>&rsaquo;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FAILED SECTION ============ -->
+  <div class="card section-only" id="tab-failed">
+    <div class="card-head">
+      <h3 style="color:var(--red);">&#10007; Failed Jobs (1)</h3>
+      <button class="btn btn--brand"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>Retry All Failed</button>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Job Name</th><th>Job ID</th><th>Error Message</th><th>Failed At</th><th style="text-align:right">Action</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a class="lk" href="#">Facility Affiliation Sync</a></td>
+            <td class="mono">AJD-0009002</td>
+            <td><span class="err" title="System.DmlException: INVALID_CROSS_REFERENCE_KEY — HealthcarePractitionerFacility.NetworkId">DmlException: INVALID_CROSS_REFERENCE_KEY — HealthcarePractitionerFacility.NetworkId</span></td>
+            <td class="muted">Jun 15, 6:25 PM</td>
+            <td style="text-align:right">
+              <button class="btn btn--brand"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>Retry</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ QUEUED SECTION ============ -->
+  <div class="card section-only" id="tab-queued">
+    <div class="card-head"><h3 style="color:var(--orange);">&#9203; Queued Jobs (1)</h3></div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Job Name</th><th>Job ID</th><th>Queue Position</th><th>Scheduled Execution</th><th>Est. Execution Time</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a class="lk" href="#">Board Certification Load</a></td>
+            <td class="mono">AJD-0009005</td><td><b>#1</b> in queue</td>
+            <td class="muted">Jun 15, 6:30 PM</td><td class="dur">~45 sec</td>
+            <td><span class="badge b-queued"><span class="dot"></span>Queued</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ COMPLETED SECTION ============ -->
+  <div class="card section-only" id="tab-completed">
+    <div class="card-head">
+      <h3 style="color:var(--green);">&#10003; Completed Jobs (3)</h3>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th>Job Name</th><th>Job ID</th><th>Completed At</th><th>Duration</th><th>Records</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><a class="lk" href="#">Info Code Assignment</a></td>
+            <td class="mono">AJD-0009003</td><td class="muted">Jun 15, 6:22 PM</td>
+            <td class="dur">38 sec</td><td>1,204</td>
+            <td><span class="ok-ico">&#10003;</span> <span class="badge b-completed"><span class="dot"></span>Success</span></td>
+          </tr>
+          <tr>
+            <td><a class="lk" href="#">Provider Feature Setup</a></td>
+            <td class="mono">AJD-0009004</td><td class="muted">Jun 15, 6:20 PM</td>
+            <td class="dur">52 sec</td><td>96</td>
+            <td><span class="ok-ico">&#10003;</span> <span class="badge b-completed"><span class="dot"></span>Success</span></td>
+          </tr>
+          <tr>
+            <td><a class="lk" href="#">Address Standardization</a></td>
+            <td class="mono">AJD-0009006</td><td class="muted">Jun 15, 6:18 PM</td>
+            <td class="dur">29 sec</td><td>148</td>
+            <td><span class="ok-ico">&#10003;</span> <span class="badge b-completed"><span class="dot"></span>Success</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <span>Showing 1–3 of 3</span>
+      <div class="pages">
+        <span class="pg" disabled>&lsaquo;</span>
+        <span class="pg active">1</span>
+        <span class="pg" disabled>&rsaquo;</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ RUNNING SECTION ============ -->
+  <div class="card section-only" id="tab-running">
+    <div class="card-head"><h3 style="color:var(--blue);">&#10227; Running Jobs (1)</h3></div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Job Name</th><th>Job ID</th><th>Started At</th><th>Records</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><a class="lk" href="#">License Network Creation</a></td>
+            <td class="mono">AJD-0009001</td><td class="muted">Jun 15, 6:27 PM</td>
+            <td class="muted">620 / 1,000 records</td>
+            <td><span class="badge b-running"><span class="dot"></span>&#10227; Running</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ============ FIELD MAPPING NOTE ============ -->
+  <div class="legend">
+    <b>Schema mapping &amp; notes (for the engineer):</b><br>
+    &bull; <b>Job Name / Type</b> &rarr; child <code>PRM_AsyncJobDetails__c.PRM_ProcessName__c</code> + <code>PRM_Mode__c</code> &nbsp;|&nbsp;
+    <b>Job ID</b> &rarr; record Auto-Number (<code>AJD-…</code>/<code>AJ-…</code>) &nbsp;|&nbsp;
+    <b>Status</b> &rarr; <code>PRM_Status__c</code> (Queued/Running/Completed/Failed) &nbsp;|&nbsp;
+    <b>Triggered By</b> &rarr; <code>CreatedBy</code> &nbsp;|&nbsp;
+    <b>Sequence</b> &rarr; <code>PRM_AsyncJobConfig__mdt.PRM_Sequence__c</code> &nbsp;|&nbsp;
+    <b>Last Update / Completed At / Failed At</b> &rarr; <code>LastModifiedDate</code>/<code>CreatedDate</code>.<br>
+    &bull; <b>Failed section</b> &rarr; <code>PRM_FailedRecordStaging__c.PRM_ErrorMessage__c</code> + linked <code>PRM_ExceptionLog__c</code>; <b>Retry</b> &rarr; <code>PRM_AsyncOrchestrator.retry()</code> (uncapped, manual).<br>
+    &bull; <b style="color:#dd7a01;">Not in current schema — needs new fields if required:</b>
+    <code>Queue Position</code> / <code>Estimated Execution Time</code> / <code>Scheduled Execution</code> (derived/computed, not stored),
+    <code>Duration</code> (compute = completed − started; needs a start-time field),
+    <code>Records</code> (would need a processed-count field). Confirm before build.<br>
+    &bull; <b>Notification:</b> finish alert is a <code>PRM_AsyncJobNotification</code> Custom Notification; this LWC loads on render + manual <b>Refresh</b> (no live streaming).
+  </div>
+
+</div>
+
+<script>
+  function showTab(el, id){
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab-all').style.display = (id==='all')?'block':'none';
+    ['failed','queued','completed','running'].forEach(s=>{
+      document.getElementById('tab-'+s).style.display = (id===s)?'block':'none';
+    });
+  }
+</script>
+</body>
+</html>

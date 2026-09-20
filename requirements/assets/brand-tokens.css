@@ -1,0 +1,112 @@
+/* =============================================================================
+   IBX / AmeriHealth Brand Tokens for Mockups
+   -----------------------------------------------------------------------------
+   Source of truth:
+     - Independence Blue Cross Brand Guidelines (Nov 2024 / Nov 2023), p.10 (color),
+       p.12 (typography)
+     - AmeriHealth Brand Guidelines (Apr 2023), p.16 (color), p.18 (typography)
+
+   How to use:
+     1) Link this file (or paste the :root + theme blocks inline for a self-
+        contained mockup).
+     2) Default theme is IBX. To render AmeriHealth, add  data-brand="amerihealth"
+        to the <html> or <body> element.
+     3) Build UI with the SEMANTIC tokens (--brand, --brand-dark, --success, etc.),
+        NOT the raw brand hexes, so a single attribute flip re-themes everything.
+
+   Companion doc: ../Mockup_Brand_Style_Guide.md
+   ============================================================================= */
+
+/* ---------------------------------------------------------------------------
+   RAW BRAND PALETTES (verbatim from the PDFs — do not edit values)
+   --------------------------------------------------------------------------- */
+:root {
+  /* ---- Independence Blue Cross (IBX) ---- */
+  --ibx-process-blue:        #008CCC; /* Pantone Process Blue — logo/brand primary */
+  --ibx-process-blue-access: #007DB6; /* WCAG 2.0 accessible variant (IBX-documented) */
+  --ibx-navy:                #024D76; /* Pantone 318 — deep blue */
+  --ibx-teal:                #00AEC7; /* Pantone 215 */
+  --ibx-aqua:                #8BD3DA; /* Pantone 3025 (light) */
+  --ibx-green:               #4D8B3F; /* Pantone 359 */
+  --ibx-orange:              #F16935; /* Orange (digital only) */
+  --ibx-yellow:              #FED962; /* Pantone 120 */
+  --ibx-red:                 #EA1D2C; /* Pantone 185 */
+  --ibx-purple:              #924799; /* Pantone 258 */
+  --ibx-magenta:             #B11E58; /* Pantone 3125 */
+  --ibx-ink:                 #37424A; /* neutral dark text used in IBX collateral */
+
+  /* ---- AmeriHealth (AH) ---- */
+  --ah-navy:    #012169; /* Pantone 280 — brand primary */
+  --ah-teal:    #008EAA; /* Pantone 3135 */
+  --ah-magenta: #AF1685; /* Pantone 241 */
+  --ah-slate:   #425563; /* Pantone 7545 */
+
+  /* ---- Shared neutrals (SLDS-aligned greys, brand-agnostic) ---- */
+  --n-text:        #181818;
+  --n-text-weak:   #444444;
+  --n-text-muted:  #747474;
+  --n-border:      #c9c9c9;
+  --n-border-light:#ecebea;
+  --n-bg:          #f3f3f3;
+  --n-surface:     #ffffff;
+  --n-surface-alt: #fafaf9;
+
+  /* ---- Fonts ---- */
+  --font-brand: "Alright Sans", "Alright V2 Normal LP", Arial, Helvetica, sans-serif; /* headings */
+  --font-body:  Arial, Helvetica, "Bell Gothic", sans-serif;                          /* body */
+}
+
+/* ---------------------------------------------------------------------------
+   SEMANTIC TOKENS — IBX (DEFAULT THEME)
+   Build all UI against these. Status colors reused from both palettes where the
+   brand has no dedicated UI status hue (success/warning/error are derived from
+   the brand's green/orange/red).
+   --------------------------------------------------------------------------- */
+:root,
+[data-brand="ibx"] {
+  --brand:        var(--ibx-process-blue-access); /* primary actions/links (accessible) */
+  --brand-pure:   var(--ibx-process-blue);        /* logo-true blue for non-text fills */
+  --brand-dark:   var(--ibx-navy);                /* hovers, headers, gradients */
+  --brand-darker: #013busy; /* overridden below */
+  --brand-light:  #e6f4fb;                        /* tints/selected rows */
+  --brand-accent: var(--ibx-teal);                /* secondary accent */
+
+  --success:    var(--ibx-green);  --success-bg: #e3f1dd;
+  --warning:    var(--ibx-orange); --warning-bg: #fde7dc; --warning-text: #9c3d18;
+  --error:      var(--ibx-red);    --error-bg:   #fde3e5;
+  --info:       var(--brand);      --info-bg:    var(--brand-light);
+  --qc-accent:  var(--ibx-purple); --qc-bg:      #f1e9f3; /* QC/verification surfaces */
+
+  --header-grad-from: var(--ibx-navy);
+  --header-grad-to:   var(--ibx-process-blue);
+
+  --font-heading: var(--font-brand);
+  --font-text:    var(--font-body);
+}
+/* fix: deepest brand shade (typo-safe) */
+:root, [data-brand="ibx"] { --brand-darker: #013a57; }
+
+/* ---------------------------------------------------------------------------
+   SEMANTIC TOKENS — AmeriHealth THEME
+   Activate with  <html data-brand="amerihealth">  or  <body data-brand="amerihealth">
+   --------------------------------------------------------------------------- */
+[data-brand="amerihealth"] {
+  --brand:        var(--ah-navy);
+  --brand-pure:   var(--ah-navy);
+  --brand-dark:   #00164a;          /* darker navy for hovers/headers */
+  --brand-darker: #000f33;
+  --brand-light:  #e6ebf3;          /* navy tint */
+  --brand-accent: var(--ah-teal);
+
+  --success:    #2e7d52; --success-bg: #e0f0e8;       /* AH has no green; neutral success */
+  --warning:    #c2691a; --warning-bg: #fbe9d8; --warning-text: #8a4a12;
+  --error:      #c1272d; --error-bg:   #fbe3e4;
+  --info:       var(--ah-teal); --info-bg: #e1f2f5;
+  --qc-accent:  var(--ah-magenta); --qc-bg: #f7e9f3;  /* QC surfaces use AH magenta */
+
+  --header-grad-from: var(--ah-navy);
+  --header-grad-to:   #0a3a8c;
+
+  --font-heading: var(--font-brand);
+  --font-text:    var(--font-body);
+}

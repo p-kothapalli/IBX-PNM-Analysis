@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Bulk Delegated Practitioner Creation – LWC Mockup</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  /* ---------- SLDS-inspired tokens (kept inline so the file is self-contained) ---------- */
+  :root {
+    --brand: #0176d3;
+    --brand-dark: #014486;
+    --brand-light: #eaf4fe;
+    --success: #2e844a;
+    --success-bg: #cdefc4;
+    --warning: #fe9339;
+    --warning-bg: #fff1cc;
+    --error: #ba0517;
+    --error-bg: #feded8;
+    --text: #181818;
+    --text-weak: #444444;
+    --text-muted: #747474;
+    --border: #c9c9c9;
+    --border-light: #ecebea;
+    --bg: #f3f3f3;
+    --surface: #ffffff;
+    --surface-alt: #fafaf9;
+    --row-hover: #f5fafd;
+    --row-selected: #eaf4fe;
+    --shadow: 0 2px 6px rgba(0,0,0,.08);
+    --radius: 4px;
+    --font: -apple-system, BlinkMacSystemFont, "Salesforce Sans", "Segoe UI", Roboto, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; font-family: var(--font); color: var(--text); background: var(--bg); font-size: 13px; }
+
+  /* ---------- Top app bar ---------- */
+  .appbar {
+    background: linear-gradient(180deg, #032d60 0%, #0b5cab 100%);
+    color: #fff; padding: 8px 16px; display: flex; align-items: center; gap: 12px;
+  }
+  .appbar .logo { font-weight: 700; letter-spacing: .5px; }
+  .appbar .crumbs { color: #d4e7fb; font-size: 12px; }
+  .appbar .spacer { flex: 1; }
+  .appbar .user { display: flex; align-items: center; gap: 8px; }
+  .appbar .avatar { width: 28px; height: 28px; border-radius: 50%; background: #fff; color: var(--brand-dark); display: grid; place-items: center; font-weight: 700; font-size: 12px; }
+
+  /* ---------- Sticky practitioner header ---------- */
+  .header {
+    background: var(--surface); padding: 12px 16px; border-bottom: 1px solid var(--border-light);
+    display: flex; align-items: center; gap: 24px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 5;
+  }
+  .header h1 { font-size: 18px; font-weight: 600; margin: 0; }
+  .header .meta { color: var(--text-muted); font-size: 12px; }
+  .header .pills { display: flex; gap: 8px; margin-left: auto; align-items: center; }
+  .pill { padding: 4px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+  .pill.success { background: var(--success-bg); color: var(--success); }
+  .pill.warning { background: var(--warning-bg); color: #8a4a04; }
+  .pill.error   { background: var(--error-bg); color: var(--error); }
+  .pill .dot    { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .btn { background: var(--surface); color: var(--brand); border: 1px solid var(--brand); padding: 6px 14px; border-radius: var(--radius); font-weight: 600; cursor: pointer; }
+  .btn:hover { background: var(--brand-light); }
+  .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+  .btn.primary:hover { background: var(--brand-dark); }
+  .btn.neutral { color: var(--text); border-color: var(--border); }
+  .btn.neutral:hover { background: var(--surface-alt); }
+  .btn.icon { padding: 6px 8px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* ---------- Wizard trail ---------- */
+  .trail { display: flex; gap: 2px; padding: 0 16px; background: var(--surface); border-bottom: 1px solid var(--border-light); }
+  .trail .step { padding: 10px 18px; color: var(--text-muted); font-size: 13px; border-bottom: 3px solid transparent; cursor: pointer; }
+  .trail .step.done { color: var(--text-weak); }
+  .trail .step.done::before { content: "✓ "; color: var(--success); font-weight: 700; }
+  .trail .step.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+  .trail .step .count { display: inline-block; margin-left: 6px; background: var(--brand-light); color: var(--brand); padding: 1px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+
+  /* ---------- Page layout: grid + side editor ---------- */
+  .layout { display: grid; grid-template-columns: 1fr 480px; height: calc(100vh - 92px); }
+  .layout.no-editor { grid-template-columns: 1fr 0; }
+  .grid-pane { display: flex; flex-direction: column; background: var(--surface); border-right: 1px solid var(--border-light); }
+  .editor-pane { background: var(--surface-alt); border-left: 1px solid var(--border-light); overflow-y: auto; transition: width .2s ease; }
+
+  /* ---------- Toolbar above grid ---------- */
+  .toolbar { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--border-light); flex-wrap: wrap; }
+  .toolbar .search { flex: 1; min-width: 220px; max-width: 320px; position: relative; }
+  .toolbar .search input { width: 100%; padding: 6px 10px 6px 30px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; }
+  .toolbar .search::before { content: "🔍"; position: absolute; left: 8px; top: 6px; font-size: 12px; }
+  .toolbar .divider { width: 1px; height: 22px; background: var(--border-light); margin: 0 4px; }
+  .toolbar .filter-chip { background: var(--surface-alt); border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; font-size: 12px; cursor: pointer; }
+  .toolbar .filter-chip.active { background: var(--brand-light); color: var(--brand); border-color: var(--brand); }
+  .toolbar .summary { margin-left: auto; color: var(--text-muted); font-size: 12px; }
+
+  /* ---------- Data grid ---------- */
+  .grid-scroll { flex: 1; overflow: auto; }
+  table.grid { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
+  table.grid thead th {
+    position: sticky; top: 0; z-index: 2;
+    background: var(--surface-alt); border-bottom: 1px solid var(--border);
+    padding: 8px 10px; text-align: left; font-weight: 600; color: var(--text-weak);
+    white-space: nowrap;
+  }
+  table.grid tbody td { padding: 6px 10px; border-bottom: 1px solid var(--border-light); vertical-align: top; }
+  table.grid tbody tr:hover { background: var(--row-hover); cursor: pointer; }
+  table.grid tbody tr.selected { background: var(--row-selected); }
+  table.grid tbody tr.error-row td:first-child { box-shadow: inset 3px 0 0 var(--error); }
+  table.grid tbody tr.warning-row td:first-child { box-shadow: inset 3px 0 0 var(--warning); }
+  table.grid tbody tr.ok-row td:first-child { box-shadow: inset 3px 0 0 var(--success); }
+  table.grid .row-status { font-weight: 700; font-size: 14px; }
+  table.grid .row-status.ok { color: var(--success); }
+  table.grid .row-status.warn { color: var(--warning); }
+  table.grid .row-status.err { color: var(--error); }
+  table.grid input.inline {
+    width: 100%; border: 1px solid transparent; background: transparent; padding: 4px 6px;
+    font-size: 12px; border-radius: var(--radius);
+  }
+  table.grid input.inline:hover { border-color: var(--border-light); }
+  table.grid input.inline:focus { border-color: var(--brand); background: #fff; outline: none; }
+  table.grid input.inline.invalid { border-color: var(--error); background: var(--error-bg); }
+  table.grid .badge { background: var(--surface-alt); border: 1px solid var(--border-light); padding: 2px 6px; border-radius: 3px; font-size: 11px; }
+  table.grid .badge.count { background: var(--brand-light); color: var(--brand); border-color: var(--brand-light); font-weight: 600; }
+  table.grid .ellipsis { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  /* ---------- Side editor ---------- */
+  .editor-pane h2 { font-size: 14px; margin: 0; padding: 14px 16px; border-bottom: 1px solid var(--border-light); background: var(--surface); position: sticky; top: 0; z-index: 1; display: flex; align-items: center; gap: 8px; }
+  .editor-pane h2 .close { margin-left: auto; cursor: pointer; color: var(--text-muted); font-size: 18px; }
+  .editor-pane h2 .close:hover { color: var(--text); }
+  .editor-pane .section { padding: 14px 16px; border-bottom: 1px solid var(--border-light); }
+  .editor-pane .section h3 { font-size: 12px; text-transform: uppercase; color: var(--text-muted); letter-spacing: .5px; margin: 0 0 10px; display: flex; align-items: center; gap: 6px; }
+  .editor-pane .section h3 .pill { font-size: 10px; padding: 1px 6px; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field-grid.full > * { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 11px; color: var(--text-weak); font-weight: 600; }
+  .field label .req { color: var(--error); }
+  .field input, .field select, .field textarea {
+    border: 1px solid var(--border); padding: 6px 8px; border-radius: var(--radius); font-size: 13px; font-family: inherit;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--brand); outline-offset: -1px; border-color: var(--brand); }
+  .field .hint { font-size: 11px; color: var(--text-muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { background: var(--brand-light); color: var(--brand); padding: 4px 8px; border-radius: 999px; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
+  .chip .x { cursor: pointer; opacity: .7; }
+  .chip .x:hover { opacity: 1; }
+  .chip-add { background: var(--surface); color: var(--brand); border: 1px dashed var(--brand); padding: 3px 8px; border-radius: 999px; font-size: 12px; cursor: pointer; }
+
+  /* ---------- Nested taxonomy / network rows in editor ---------- */
+  .tax-row { background: var(--surface); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 10px; margin-bottom: 8px; }
+  .tax-row header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .tax-row header .name { font-weight: 600; font-size: 13px; }
+  .tax-row header .actions { margin-left: auto; display: flex; gap: 6px; }
+  .tax-row .row-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+  /* ---------- Modal (paste / bulk apply) ---------- */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: none; align-items: center; justify-content: center; z-index: 20; }
+  .modal-bg.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 6px; box-shadow: 0 12px 30px rgba(0,0,0,.25); width: min(720px, 92vw); max-height: 84vh; display: flex; flex-direction: column; }
+  .modal header { padding: 14px 18px; border-bottom: 1px solid var(--border-light); display: flex; align-items: center; gap: 8px; }
+  .modal header h3 { margin: 0; font-size: 15px; }
+  .modal .body { padding: 18px; overflow-y: auto; }
+  .modal footer { padding: 12px 18px; border-top: 1px solid var(--border-light); display: flex; gap: 8px; justify-content: flex-end; }
+  .paste-area { width: 100%; min-height: 180px; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius); }
+  .modal .hint-row { background: var(--brand-light); color: var(--brand-dark); padding: 8px 12px; border-radius: var(--radius); font-size: 12px; margin-bottom: 12px; }
+
+  /* ---------- Side strip mini-trail (current step indicator within editor) ---------- */
+  .scope-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border-light); padding: 0 12px; background: var(--surface); }
+  .scope-tabs .tab { padding: 10px 14px; font-size: 13px; color: var(--text-muted); border-bottom: 3px solid transparent; cursor: pointer; }
+  .scope-tabs .tab.active { color: var(--brand); border-bottom-color: var(--brand); font-weight: 600; }
+
+  /* ---------- Footer / action bar ---------- */
+  .action-bar { background: #f7f7f7; border-top: 1px solid var(--border-light); padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+  .action-bar .left { color: var(--text-muted); font-size: 12px; }
+  .action-bar .spacer { flex: 1; }
+
+  /* ---------- Tooltip / inline error ---------- */
+  .err-tip { color: var(--error); font-size: 11px; margin-top: 2px; }
+
+  /* ---------- Selection summary banner ---------- */
+  .selection-banner { background: var(--brand-light); color: var(--brand-dark); padding: 8px 14px; border-bottom: 1px solid var(--brand); display: none; align-items: center; gap: 12px; }
+  .selection-banner.open { display: flex; }
+  .selection-banner strong { font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- =================== APP BAR =================== -->
+<div class="appbar">
+  <div class="logo">IBX • PRM</div>
+  <div class="crumbs">Cases &nbsp;›&nbsp; Practitioner Credentialing &nbsp;›&nbsp; New Delegated Practitioner (Bulk)</div>
+  <div class="spacer"></div>
+  <div class="user">
+    <span style="font-size:12px;">Pavan K.</span>
+    <span class="avatar">PK</span>
+  </div>
+</div>
+
+<!-- =================== STICKY PRACTITIONER HEADER =================== -->
+<div class="header">
+  <div>
+    <h1>Dr. Jane M. Smith, MD</h1>
+    <div class="meta">NPI <strong>1234567890</strong> &nbsp;·&nbsp; Tax ID <strong>23-4567890</strong> &nbsp;·&nbsp; Effective <strong>06/01/2026 – 05/31/2029</strong> &nbsp;·&nbsp; Form type <strong>Delegated Credentialing</strong></div>
+  </div>
+  <div class="pills">
+    <span class="pill success"><span class="dot"></span>47 valid</span>
+    <span class="pill warning"><span class="dot"></span>2 warnings</span>
+    <span class="pill error"><span class="dot"></span>3 errors</span>
+    <button class="btn neutral">Save draft</button>
+    <button class="btn primary" id="submitBtn">Submit (async)</button>
+  </div>
+</div>
+
+<!-- =================== WIZARD TRAIL =================== -->
+<div class="trail">
+  <div class="step done">1. Practitioner</div>
+  <div class="step done">2. Group lookup</div>
+  <div class="step active">3. Practice locations <span class="count">52</span></div>
+  <div class="step">4. Taxonomies &amp; networks <span class="count">156 rows</span></div>
+  <div class="step">5. Provider information</div>
+  <div class="step">6. Files</div>
+  <div class="step">7. Review &amp; submit</div>
+</div>
+
+<!-- =================== SELECTION BANNER =================== -->
+<div class="selection-banner" id="selectionBanner">
+  <strong id="selCount">5</strong> locations selected
+  <span>·</span>
+  <button class="btn icon">⚙ Bulk apply ▾</button>
+  <button class="btn icon">🌐 Add networks…</button>
+  <button class="btn icon">📋 Copy taxonomies from row…</button>
+  <button class="btn icon">🗑 Delete</button>
+  <span class="spacer"></span>
+  <button class="btn neutral" onclick="clearSelection()">Clear selection</button>
+</div>
+
+<!-- =================== MAIN LAYOUT =================== -->
+<div class="layout" id="layout">
+
+  <!-- ========== GRID PANE ========== -->
+  <div class="grid-pane">
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="btn primary" onclick="addRow()">+ Add location</button>
+      <button class="btn neutral" onclick="openModal('pasteModal')">📋 Paste from Excel</button>
+      <button class="btn neutral">⬆ Import CSV</button>
+      <button class="btn neutral">🔎 Lookup by NPI batch</button>
+      <button class="btn neutral">📑 Apply template…</button>
+      <span class="divider"></span>
+      <div class="search"><input type="text" placeholder="Search 52 locations (NPI, name, city, taxonomy, network)…" /></div>
+      <span class="divider"></span>
+      <span class="filter-chip">All</span>
+      <span class="filter-chip active">Has errors (3)</span>
+      <span class="filter-chip">Pending validation (8)</span>
+      <span class="filter-chip">Missing taxonomy (5)</span>
+      <span class="filter-chip">Closed network (2)</span>
+      <span class="summary">Showing <strong>52</strong> of 52 · 47 valid</span>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid-scroll">
+      <table class="grid">
+        <colgroup>
+          <col style="width:28px"><col style="width:36px"><col style="width:36px"><col style="width:110px"><col style="width:220px"><col style="width:200px"><col style="width:70px"><col style="width:70px"><col style="width:120px"><col style="width:90px"><col style="width:90px"><col style="width:80px"><col style="width:80px"><col style="width:60px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th><input type="checkbox" onclick="toggleAll(this)" /></th>
+            <th></th>
+            <th>#</th>
+            <th>Location NPI</th>
+            <th>Practice / Vendor</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>ST</th>
+            <th>Zip</th>
+            <th>Phone</th>
+            <th>Billing type</th>
+            <th>Tax.</th>
+            <th>Net.</th>
+            <th>Detail</th>
+          </tr>
+        </thead>
+        <tbody id="gridBody">
+          <!-- Rows are injected by JS below -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Action bar -->
+    <div class="action-bar">
+      <div class="left">Auto-saved 12 seconds ago · Draft ID <code>DPC-2026-000487</code></div>
+      <div class="spacer"></div>
+      <button class="btn neutral">Validate all addresses</button>
+      <button class="btn neutral">Re-validate all NPIs</button>
+      <button class="btn primary">Next: Taxonomies &amp; networks →</button>
+    </div>
+  </div>
+
+  <!-- ========== EDITOR PANE (slide-in) ========== -->
+  <aside class="editor-pane" id="editorPane">
+    <h2>
+      📍 Location <span id="editLocNo" style="color: var(--brand);">#4</span>
+      &nbsp;<span class="pill error"><span class="dot"></span>2 errors</span>
+      <span class="close" onclick="closeEditor()">✕</span>
+    </h2>
+
+    <div class="scope-tabs">
+      <div class="tab active">Address &amp; Contact</div>
+      <div class="tab">Taxonomies &amp; Networks</div>
+      <div class="tab">Info codes</div>
+      <div class="tab">Assistive aids</div>
+      <div class="tab">Billing &amp; Mailing</div>
+    </div>
+
+    <!-- Address & contact -->
+    <div class="section">
+      <h3>Group &amp; NPI</h3>
+      <div class="field-grid">
+        <div class="field">
+          <label>Vendor account <span class="req">*</span></label>
+          <input value="Center City Medical Group" />
+        </div>
+        <div class="field">
+          <label>Group NPI</label>
+          <input value="1234567890" />
+        </div>
+        <div class="field">
+          <label>Location billing NPI <span class="req">*</span></label>
+          <input value="98765432" class="invalid" />
+          <div class="err-tip">NPI must be 10 digits</div>
+        </div>
+        <div class="field">
+          <label>Doing business as</label>
+          <input value="Center City Med – Walnut St." />
+        </div>
+        <div class="field">
+          <label>Vendor type</label>
+          <select><option>Group</option><option>Solo</option><option>Hospital</option></select>
+        </div>
+        <div class="field">
+          <label>Tax ID</label>
+          <input value="23-4567890" />
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Address</h3>
+      <div class="field-grid">
+        <div class="field" style="grid-column: 1/-1;">
+          <label>Address line 1 <span class="req">*</span></label>
+          <input value="1735 Walnut Street, Suite 400" />
+          <div class="hint">Precisely validated · USPS standardized</div>
+        </div>
+        <div class="field" style="grid-column: 1/-1;">
+          <label>Address line 2</label>
+          <input />
+        </div>
+        <div class="field"><label>City <span class="req">*</span></label><input value="Philadelphia" /></div>
+        <div class="field"><label>State <span class="req">*</span></label><select><option>PA</option></select></div>
+        <div class="field"><label>Zip <span class="req">*</span></label><input value="19103" /></div>
+        <div class="field"><label>Zip +4</label><input value="2912" /></div>
+        <div class="field"><label>County</label><input value="Philadelphia" /></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Contact</h3>
+      <div class="field-grid">
+        <div class="field"><label>Phone <span class="req">*</span></label><input value="(215) 555-0190" /></div>
+        <div class="field"><label>Ext.</label><input value="411" /></div>
+        <div class="field"><label>Fax</label><input value="(215) 555-0191" /></div>
+        <div class="field"><label>Office email</label><input value="walnut@centercitymed.com" /></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Demographics &amp; scope</h3>
+      <div class="field-grid">
+        <div class="field">
+          <label>Billing type <span class="req">*</span></label>
+          <div class="chips">
+            <span class="chip">Billing<span class="x">×</span></span>
+            <span class="chip">Service<span class="x">×</span></span>
+            <span class="chip-add">+ Add</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Closed network</label>
+          <select><option>No</option><option>Yes</option></select>
+        </div>
+        <div class="field"><label>Patient min age</label><input value="0" /></div>
+        <div class="field"><label>Patient max age</label><input value="120" /></div>
+        <div class="field"><label>Telehealth</label><select><option>No</option><option>Yes</option></select></div>
+        <div class="field"><label>Practice closed</label><select><option>No</option><option>Yes</option></select></div>
+      </div>
+    </div>
+
+    <!-- Taxonomy / network rows for this location -->
+    <div class="section">
+      <h3>Taxonomies at this location <span class="pill success" style="font-size:10px;padding:1px 6px;">2</span>
+        <button class="btn icon" style="margin-left:auto; padding:2px 8px; font-size: 12px;">+ Add taxonomy</button>
+      </h3>
+
+      <div class="tax-row">
+        <header>
+          <span class="name">207R00000X — Internal Medicine</span>
+          <span class="badge count">3 networks</span>
+          <div class="actions">
+            <button class="btn icon" title="Apply same taxonomy to other locations…">⬇</button>
+            <button class="btn icon" title="Remove">🗑</button>
+          </div>
+        </header>
+        <div class="row-fields">
+          <div class="field">
+            <label>Role <span class="req">*</span></label>
+            <div class="chips">
+              <span class="chip">Treating<span class="x">×</span></span>
+              <span class="chip">Admitting<span class="x">×</span></span>
+              <span class="chip-add">+ Add</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Networks <span class="req">*</span></label>
+            <div class="chips">
+              <span class="chip">Keystone HMO<span class="x">×</span></span>
+              <span class="chip">Personal Choice PPO<span class="x">×</span></span>
+              <span class="chip">Direct POS<span class="x">×</span></span>
+              <span class="chip-add">+ Add</span>
+            </div>
+            <div class="hint">Server-search picker (catalog &gt; 400 networks)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tax-row">
+        <header>
+          <span class="name">207RC0000X — Cardiovascular Disease</span>
+          <span class="badge count">2 networks</span>
+          <div class="actions">
+            <button class="btn icon">⬇</button>
+            <button class="btn icon">🗑</button>
+          </div>
+        </header>
+        <div class="row-fields">
+          <div class="field">
+            <label>Role</label>
+            <div class="chips">
+              <span class="chip">Treating<span class="x">×</span></span>
+              <span class="chip-add">+ Add</span>
+            </div>
+          </div>
+          <div class="field">
+            <label>Networks</label>
+            <div class="chips">
+              <span class="chip">Keystone HMO<span class="x">×</span></span>
+              <span class="chip">Personal Choice PPO<span class="x">×</span></span>
+              <span class="chip-add">+ Add</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Info codes</h3>
+      <div class="chips">
+        <span class="chip">B1<span class="x">×</span></span>
+        <span class="chip">N3<span class="x">×</span></span>
+        <span class="chip-add">+ Add info code</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Assistive aids / accessibility</h3>
+      <div class="chips">
+        <span class="chip">Wheelchair accessible<span class="x">×</span></span>
+        <span class="chip">ASL interpretation<span class="x">×</span></span>
+        <span class="chip-add">+ Add</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Billing &amp; mailing address (location override)</h3>
+      <div class="field" style="margin-bottom:10px;">
+        <label><input type="checkbox" checked /> Same as practice address</label>
+      </div>
+      <div class="hint">Uncheck to enter separate billing / mailing for this location.</div>
+    </div>
+
+    <div class="section" style="display:flex; gap:8px; justify-content:flex-end;">
+      <button class="btn neutral">Validate this location</button>
+      <button class="btn primary">Save &amp; next →</button>
+    </div>
+  </aside>
+</div>
+
+<!-- =================== PASTE MODAL =================== -->
+<div class="modal-bg" id="pasteModal" onclick="if(event.target===this) closeModal('pasteModal')">
+  <div class="modal">
+    <header>
+      <h3>📋 Paste locations from Excel</h3>
+      <span class="spacer"></span>
+      <span class="close" onclick="closeModal('pasteModal')" style="cursor:pointer;color:var(--text-muted);">✕</span>
+    </header>
+    <div class="body">
+      <div class="hint-row">
+        Copy a block from Excel with columns: <strong>NPI, Practice name, Address 1, Address 2, City, State, Zip, Zip4, Phone, Phone Ext, Fax, Email, Billing types (comma-separated)</strong>. The first row may be a header — it will be auto-detected.
+      </div>
+      <textarea class="paste-area" placeholder="1234567890&#9;Center City Medical&#9;1735 Walnut St&#9;Suite 400&#9;Philadelphia&#9;PA&#9;19103&#9;2912&#9;(215) 555-0190&#9;411&#9;&#9;walnut@…&#9;Billing,Service&#10;9876543210&#9;Northeast Family Practice&#9;…">
+1234567890	Center City Medical	1735 Walnut St	Suite 400	Philadelphia	PA	19103	2912	(215) 555-0190	411		walnut@centercitymed.com	Billing,Service
+9876543210	Northeast Family Practice	88 Roosevelt Blvd	—	Philadelphia	PA	19152	—	(215) 555-7733	—	(215) 555-7734	ne@centercitymed.com	Billing
+5566778899	Bryn Mawr Cardiology Suite	1011 Lancaster Ave	Suite 200	Bryn Mawr	PA	19010	1342	(610) 555-2310	202	(610) 555-2311	bmcardio@centercitymed.com	Billing,Service
+…
+      </textarea>
+      <div style="margin-top:14px;">
+        <strong>Preview · 50 rows detected</strong>
+        <div class="hint">Click "Validate &amp; import" to run a single batched NPI + address validation, then load rows into the grid.</div>
+      </div>
+    </div>
+    <footer>
+      <button class="btn neutral" onclick="closeModal('pasteModal')">Cancel</button>
+      <button class="btn neutral">Use template</button>
+      <button class="btn primary" onclick="closeModal('pasteModal')">Validate &amp; import 50 rows →</button>
+    </footer>
+  </div>
+</div>
+
+<!-- =================== SUBMIT PROGRESS MODAL =================== -->
+<div class="modal-bg" id="submitModal" onclick="if(event.target===this) closeModal('submitModal')">
+  <div class="modal" style="width: min(520px, 92vw);">
+    <header>
+      <h3>🚀 Submitting…</h3>
+    </header>
+    <div class="body">
+      <p><strong>52 locations · 156 taxonomy/network rows</strong> queued for asynchronous creation.</p>
+      <ul style="line-height:1.8;">
+        <li>✅ Practitioner record created — <code>Acc-0000xxx</code></li>
+        <li>✅ Case Manager opened — <code>IA-0000150602</code></li>
+        <li>⏳ <code>PRM_AddressCreationBatch</code> queued (52 chunks of 1)</li>
+        <li>⏳ <code>PRM_NetworkCreationBatch</code> queued (156 rows in 8 chunks)</li>
+        <li>⏳ File attachments processing (3 files)</li>
+      </ul>
+      <p>You'll be redirected to the <strong>Case Manager</strong> in 2 seconds. Progress will continue in the background; you'll see a green check on each location once it finishes.</p>
+    </div>
+    <footer>
+      <button class="btn primary" onclick="closeModal('submitModal')">Go to Case Manager now</button>
+    </footer>
+  </div>
+</div>
+
+<script>
+  // ---------- Sample data ----------
+  const SAMPLE_PRACTICES = [
+    "Center City Medical Group", "Northeast Family Practice", "Bryn Mawr Cardiology",
+    "Main Line Health Partners", "Jefferson Medical Associates", "Penn Medicine — Walnut",
+    "Temple Pulmonary Group", "Lankenau Internal Medicine", "Doylestown Cardiology",
+    "Abington Primary Care", "Wills Eye Associates", "Rothman Orthopaedics"
+  ];
+  const SAMPLE_STREETS = ["1735 Walnut St", "88 Roosevelt Blvd", "1011 Lancaster Ave", "230 N Broad St", "111 S 11th St", "100 E Lancaster Ave", "3401 N Broad St", "100 Lancaster Ave", "595 W State St", "1245 Highland Ave"];
+  const SAMPLE_CITIES = ["Philadelphia","Bryn Mawr","Doylestown","Abington","Wynnewood","Bala Cynwyd","King of Prussia","Newtown","Media","Norristown"];
+  const SAMPLE_ZIPS = ["19103","19010","18901","19001","19096","19004","19406","18940","19063","19401"];
+  const BILLING_TYPES = ["Billing", "Service", "Mailing"];
+
+  function pad(n,len=10){ return String(n).padStart(len,"0"); }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function buildRow(i) {
+    const errIdx = [4, 17, 31];                // 3 errors
+    const warnIdx = [9, 22];                   // 2 warnings
+    const status = errIdx.includes(i) ? "err" : warnIdx.includes(i) ? "warn" : "ok";
+    const npi = pad(1000000000 + i * 31);
+    const practice = pick(SAMPLE_PRACTICES);
+    const street = pick(SAMPLE_STREETS);
+    const city = pick(SAMPLE_CITIES);
+    const zip = pick(SAMPLE_ZIPS);
+    const taxCount = 1 + (i % 4);
+    const netCount = 2 + (i % 5);
+    const phone = `(215) 555-${pad(100 + i*7, 4)}`;
+    const billing = i % 3 === 0 ? "Billing,Service" : "Billing";
+
+    const cls = status === "err" ? "error-row" : status === "warn" ? "warning-row" : "ok-row";
+    const npiInvalid = status === "err" ? "invalid" : "";
+
+    return `
+      <tr class="${cls}" data-row="${i}" onclick="openEditor(${i}, event)">
+        <td onclick="event.stopPropagation()"><input type="checkbox" class="rowchk" onchange="updateSelection()"/></td>
+        <td class="row-status ${status}">${status==='ok'?'●':status==='warn'?'▲':'✕'}</td>
+        <td>${i+1}</td>
+        <td><input class="inline ${npiInvalid}" value="${npi}"/></td>
+        <td><input class="inline" value="${practice} #${i+1}"/></td>
+        <td><input class="inline" value="${street}"/></td>
+        <td><input class="inline" value="${city}"/></td>
+        <td><input class="inline" value="PA"/></td>
+        <td><input class="inline" value="${zip}"/></td>
+        <td><input class="inline" value="${phone}"/></td>
+        <td><span class="badge">${billing}</span></td>
+        <td><span class="badge count">${taxCount}</span></td>
+        <td><span class="badge count">${netCount}</span></td>
+        <td><button class="btn icon" onclick="event.stopPropagation(); openEditor(${i})">›</button></td>
+      </tr>`;
+  }
+
+  function render() {
+    const body = document.getElementById("gridBody");
+    let html = "";
+    for (let i = 0; i < 52; i++) html += buildRow(i);
+    body.innerHTML = html;
+  }
+  render();
+
+  function openEditor(i, ev) {
+    if (ev && ev.target.tagName === "INPUT") return;
+    document.querySelectorAll("table.grid tbody tr").forEach(r => r.classList.remove("selected"));
+    const row = document.querySelector(`[data-row="${i}"]`);
+    if (row) row.classList.add("selected");
+    document.getElementById("editLocNo").textContent = "#" + (i + 1);
+    document.getElementById("layout").classList.remove("no-editor");
+    document.getElementById("editorPane").style.display = "block";
+  }
+  function closeEditor() {
+    document.getElementById("layout").classList.add("no-editor");
+    document.getElementById("editorPane").style.display = "none";
+    document.querySelectorAll("table.grid tbody tr").forEach(r => r.classList.remove("selected"));
+  }
+  function toggleAll(cb) {
+    document.querySelectorAll(".rowchk").forEach(c => c.checked = cb.checked);
+    updateSelection();
+  }
+  function updateSelection() {
+    const n = document.querySelectorAll(".rowchk:checked").length;
+    const banner = document.getElementById("selectionBanner");
+    document.getElementById("selCount").textContent = n;
+    banner.classList.toggle("open", n > 0);
+  }
+  function clearSelection() {
+    document.querySelectorAll(".rowchk").forEach(c => c.checked = false);
+    updateSelection();
+  }
+  function addRow() {
+    const body = document.getElementById("gridBody");
+    const n = body.children.length;
+    body.insertAdjacentHTML("beforeend", buildRow(n));
+  }
+  function openModal(id){ document.getElementById(id).classList.add("open"); }
+  function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+
+  document.getElementById("submitBtn").onclick = () => openModal("submitModal");
+
+  // open editor on first error row by default for the screenshot
+  openEditor(4);
+</script>
+
+</body>
+</html>

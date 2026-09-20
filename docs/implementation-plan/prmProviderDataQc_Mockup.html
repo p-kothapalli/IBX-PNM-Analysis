@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>prmProviderDataQc — Provider Data QC Verification Workspace (grounded on QA-org data)</title>
+<style>
+  :root{
+    --brand:#0176d3; --brand-dark:#014486; --brand-100:#eef4ff;
+    --page-bg:#f3f3f3; --card:#fff; --border:#e5e5e5; --border-2:#c9c9c9;
+    --txt:#181818; --txt-2:#5c5c5c; --txt-3:#747474;
+    --green:#2e844a; --green-bg:#d7f1de; --green-bd:#91db8b;
+    --red:#ea001e;   --red-bg:#feded8;  --red-bd:#fe9a91;
+    --orange:#dd7a01;--orange-bg:#fef0e6;--orange-bd:#fec574;
+    --blue:#0176d3;  --blue-bg:#d8edff; --blue-bd:#90d0fe;
+    --purple:#730394;--purple-bg:#f6e0ff;--purple-bd:#e2abff;
+    --radius:.25rem; --shadow:0 2px 2px rgba(0,0,0,.05),0 0 1px rgba(0,0,0,.12);
+    font-family:'Salesforce Sans','Segoe UI',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);color:var(--txt);font-size:13px;line-height:1.4;}
+  .wrap{max-width:1400px;margin:0 auto;padding:1rem;}
+  a{color:var(--brand);text-decoration:none;font-weight:600;} a:hover{text-decoration:underline;}
+  .muted{color:var(--txt-3);} .mono{font-family:'SF Mono',Consolas,monospace;font-size:.72rem;color:var(--txt-2);}
+
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .modal-head{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;border-bottom:1px solid var(--border);}
+  .mh-icon{width:2.2rem;height:2.2rem;border-radius:var(--radius);background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto;}
+  .mh-icon svg{width:1.2rem;height:1.2rem;fill:#fff;}
+  .mh-main{flex:1 1 auto;min-width:0;}
+  .mh-eyebrow{font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-3);}
+  .mh-title{font-size:1.05rem;font-weight:700;}
+  .mh-close{border:none;background:none;color:var(--txt-3);font-size:1.3rem;cursor:pointer;line-height:1;}
+  .realtag{display:inline-flex;align-items:center;gap:.3rem;font-size:.66rem;font-weight:700;color:var(--green);background:var(--green-bg);border:1px solid var(--green-bd);border-radius:10px;padding:.05rem .5rem;}
+
+  .switcher{display:flex;gap:.4rem;flex-wrap:wrap;padding:.6rem 1.1rem;border-bottom:1px solid var(--border);background:#fafaf9;align-items:center;}
+  .switcher .lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);font-weight:700;margin-right:.2rem;}
+  .rtab{padding:.3rem .7rem;border:1px solid var(--border-2);border-radius:14px;background:#fff;color:var(--txt-2);cursor:pointer;font-weight:600;font-size:.78rem;display:inline-flex;align-items:center;gap:.35rem;}
+  .rtab:hover{background:#f3f8ff;}
+  .rtab.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .rtab .cnt{background:rgba(0,0,0,.08);border-radius:9px;padding:0 .4rem;font-size:.68rem;}
+  .rtab.active .cnt{background:rgba(255,255,255,.25);}
+
+  .ctxbar{display:flex;flex-wrap:wrap;gap:.5rem 1.2rem;padding:.7rem 1.1rem;border-bottom:1px solid var(--border);background:#fff;align-items:center;}
+  .ctx{display:flex;flex-direction:column;gap:.1rem;}
+  .ctx .k{font-size:.66rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);}
+  .ctx .v{font-size:.84rem;font-weight:600;}
+  .src{display:inline-flex;align-items:center;gap:.3rem;padding:.1rem .5rem;border-radius:12px;font-size:.72rem;font-weight:700;border:1px solid var(--purple-bd);background:var(--purple-bg);color:var(--purple);}
+
+  .modal-body{padding:1.1rem;min-height:460px;}
+  .modal-foot{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1.1rem;border-top:1px solid var(--border);background:#fafaf9;flex-wrap:wrap;gap:.5rem;}
+
+  .btn{border:1px solid var(--border-2);background:#fff;color:var(--brand);border-radius:var(--radius);padding:.4rem .9rem;font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;}
+  .btn:hover{background:#f3f8ff;}
+  .btn--brand{background:var(--brand);border-color:var(--brand);color:#fff;} .btn--brand:hover{background:var(--brand-dark);}
+  .btn--green{background:var(--green);border-color:var(--green);color:#fff;} .btn--green:hover{filter:brightness(.94);}
+  .btn--danger{color:var(--red);border-color:var(--red-bd);} .btn--danger:hover{background:var(--red-bg);}
+  .btn--neutral{color:var(--txt);}
+  .btn svg{width:.9rem;height:.9rem;fill:currentColor;}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+  .btn.sm{padding:.2rem .55rem;font-size:.76rem;}
+
+  .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.12rem .5rem;border-radius:12px;font-size:.72rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .badge .dot{width:.55rem;height:.55rem;border-radius:50%;display:inline-block;}
+  .b-verified{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);} .b-verified .dot{background:var(--green);}
+  .b-flagged{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);} .b-flagged .dot{background:var(--red);}
+  .b-pending{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);} .b-pending .dot{background:var(--orange);}
+  .b-auto{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);} .b-auto .dot{background:var(--blue);}
+
+  .op{display:inline-flex;align-items:center;gap:.25rem;padding:.1rem .45rem;border-radius:var(--radius);font-size:.7rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .op-create{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);}
+  .op-add{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);}
+  .op-remove{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+  .op-update{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);}
+
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:.6rem;margin:0 0 1rem;}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.6rem .75rem;position:relative;overflow:hidden;cursor:pointer;}
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand);}
+  .stat.verified::before{background:var(--green);} .stat.flagged::before{background:var(--red);}
+  .stat.pending::before{background:var(--orange);} .stat.auto::before{background:var(--blue);} .stat.fan::before{background:var(--purple);}
+  .stat.sel{outline:2px solid var(--brand);outline-offset:-1px;}
+  .stat-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);}
+  .stat-num{font-size:1.5rem;font-weight:700;margin-top:.1rem;}
+  .stat.verified .stat-num{color:var(--green);} .stat.flagged .stat-num{color:var(--red);}
+  .stat.pending .stat-num{color:var(--orange);} .stat.auto .stat-num{color:var(--blue);} .stat.fan .stat-num{color:var(--purple);}
+  .bar{height:.6rem;border-radius:.4rem;background:#eef0f2;overflow:hidden;display:flex;margin:.2rem 0 1rem;}
+  .bar > span{display:block;height:100%;}
+  .b-done{background:var(--green);} .b-fail{background:var(--red);} .b-queue{background:var(--orange);}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;gap:.5rem;flex-wrap:wrap;}
+  .tabs{display:flex;gap:.25rem;flex-wrap:wrap;align-items:center;}
+  .tab{padding:.35rem .7rem;font-size:.78rem;font-weight:600;color:var(--txt-2);cursor:pointer;border:1px solid var(--border-2);border-radius:12px;background:#fff;display:flex;align-items:center;gap:.35rem;}
+  .tab.active{color:#fff;background:var(--brand);border-color:var(--brand);}
+  .tab .pill{background:#eef0f2;border-radius:9px;padding:0 .4rem;font-size:.68rem;color:var(--txt-2);}
+  .tab.active .pill{background:rgba(255,255,255,.25);color:#fff;}
+  .search{border:1px solid var(--border-2);border-radius:var(--radius);padding:.35rem .6rem;font-size:.8rem;min-width:240px;}
+  .grouptoggle{display:inline-flex;align-items:center;gap:.35rem;font-size:.78rem;color:var(--txt-2);cursor:pointer;border:1px solid var(--border-2);border-radius:12px;padding:.35rem .7rem;background:#fff;}
+  .grouptoggle.on{background:var(--brand-100);border-color:var(--blue-bd);color:var(--brand-dark);}
+  .selbar{display:flex;align-items:center;gap:.5rem;font-size:.8rem;background:var(--brand-100);border:1px solid var(--blue-bd);border-radius:var(--radius);padding:.35rem .6rem;flex-wrap:wrap;margin-bottom:.5rem;}
+
+  .qc-wrap{display:grid;grid-template-columns:1fr;gap:0;}
+  .qc-wrap.open{grid-template-columns:1.35fr 1fr;}
+  .grid-pane{min-width:0;}
+  table{width:100%;border-collapse:collapse;font-size:.8rem;}
+  thead th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);font-weight:600;padding:.5rem .6rem;border-bottom:1px solid var(--border);background:#fafaf9;white-space:nowrap;position:sticky;top:0;z-index:1;}
+  tbody td{padding:.45rem .6rem;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+  tbody tr.item{cursor:pointer;} tbody tr.item:hover{background:#f8fbff;}
+  tr.sel{background:#eef4ff;}
+  tr.grp td{background:#f0f5ff;border-bottom:1px solid var(--blue-bd);border-top:1px solid var(--blue-bd);font-weight:700;color:var(--brand-dark);cursor:pointer;font-size:.78rem;}
+  tr.grp .chev{display:inline-block;width:.9rem;transition:transform .1s;} tr.grp.collapsed .chev{transform:rotate(-90deg);}
+  tr.grp .gcount{font-weight:600;color:var(--txt-3);font-size:.72rem;}
+  .chg{display:flex;flex-direction:column;gap:.1rem;}
+  .chg .line{font-size:.75rem;}
+  .chg .before{color:var(--red);text-decoration:line-through;}
+  .chg .after{color:var(--green);font-weight:600;}
+  .chg .arrow{color:var(--txt-3);}
+  .entity b{display:block;font-size:.78rem;} .entity .sub{font-size:.7rem;color:var(--txt-3);}
+  .autopill{display:inline-flex;align-items:center;gap:.25rem;font-size:.67rem;font-weight:700;padding:.05rem .4rem;border-radius:10px;white-space:nowrap;}
+  .autopill.ok{background:var(--green-bg);color:var(--green);}
+  .autopill.warn{background:var(--orange-bg);color:var(--orange);}
+
+  .drawer{border-left:1px solid var(--border);padding-left:1rem;display:none;max-height:640px;overflow:auto;}
+  .qc-wrap.open .drawer{display:block;}
+  .drawer-head{position:sticky;top:0;background:#fff;padding-bottom:.5rem;border-bottom:1px solid var(--border);margin-bottom:.6rem;z-index:2;}
+  .diff{width:100%;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin:.4rem 0 .8rem;}
+  .diff-head{display:grid;grid-template-columns:8.5rem 1fr 1fr;background:#fafaf9;font-size:.66rem;text-transform:uppercase;letter-spacing:.02em;color:var(--txt-3);font-weight:700;padding:.35rem .5rem;border-bottom:1px solid var(--border);}
+  .diff-row{display:grid;grid-template-columns:8.5rem 1fr 1fr;padding:.35rem .5rem;border-bottom:1px solid #f0f0f0;align-items:center;font-size:.76rem;}
+  .diff-row:last-child{border-bottom:none;}
+  .diff-row .fld{color:var(--txt-3);font-size:.7rem;text-transform:uppercase;}
+  .cell{padding:.15rem .35rem;border-radius:3px;}
+  .cell.old{background:var(--red-bg);color:#8a1500;}
+  .cell.new{background:var(--green-bg);color:#0a5a2a;font-weight:600;}
+  .cell.same{color:var(--txt-2);}
+  .cell.blank{color:var(--txt-3);font-style:italic;}
+  .sec-title{font-weight:700;font-size:.82rem;margin:.6rem 0 .3rem;display:flex;align-items:center;gap:.4rem;}
+  .evidence{background:#fbfdff;border:1px solid var(--blue-bd);border-radius:var(--radius);padding:.55rem .7rem;font-size:.76rem;}
+  .evidence .k{color:var(--txt-3);font-size:.68rem;text-transform:uppercase;}
+  .checks{display:flex;flex-direction:column;gap:.3rem;margin:.3rem 0 .6rem;}
+  .check{display:flex;align-items:center;gap:.45rem;font-size:.77rem;}
+  .check svg{width:.95rem;height:.95rem;flex:0 0 auto;}
+  .check.ok svg{fill:var(--green);} .check.warn svg{fill:var(--orange);} .check.bad svg{fill:var(--red);}
+  .drawer-actions{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--border);padding-top:.6rem;margin-top:.4rem;display:flex;gap:.4rem;flex-wrap:wrap;}
+  .notebox{width:100%;border:1px solid var(--border-2);border-radius:var(--radius);padding:.4rem .5rem;font-size:.8rem;min-height:2.4rem;font-family:inherit;}
+
+  .banner{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .85rem;border-radius:var(--radius);font-size:.8rem;margin-bottom:1rem;border:1px solid transparent;}
+  .banner.info{background:var(--blue-bg);border-color:var(--blue-bd);color:#014486;}
+  .banner.pain{background:var(--orange-bg);border-color:var(--orange-bd);color:#8a4b00;}
+  .banner svg{width:1rem;height:1rem;flex:0 0 auto;margin-top:.1rem;}
+  .legend{margin-top:1rem;font-size:.74rem;color:var(--txt-3);background:#fbfbfa;border:1px dashed var(--border-2);border-radius:var(--radius);padding:.75rem .9rem;}
+  .legend b{color:var(--txt-2);} .legend code{background:#eef0f2;border-radius:3px;padding:0 .25rem;font-size:.72rem;}
+  @media (max-width:1080px){ .stats{grid-template-columns:repeat(3,1fr);} .qc-wrap.open{grid-template-columns:1fr;} .drawer{border-left:none;padding-left:0;border-top:1px solid var(--border);padding-top:1rem;margin-top:1rem;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="modal">
+    <!-- HEAD -->
+    <div class="modal-head">
+      <div class="mh-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17l-3.88-3.88L4 13.41 9 18.41l11-11L18.59 6z"/></svg></div>
+      <div class="mh-main">
+        <div class="mh-eyebrow" id="eyebrow">Provider Network Management &middot; Network Management QC</div>
+        <div class="mh-title" id="title">Verify Submitted Changes</div>
+      </div>
+      <span class="realtag" title="Values below are real records from the qa-sandbox org">&#9679; live QA data</span>
+      <button class="mh-close" title="Close" style="margin-left:.6rem;">&times;</button>
+    </div>
+
+    <!-- REQUEST-TYPE SWITCHER (real PRM_RequestType__c values + real org counts) -->
+    <div class="switcher">
+      <span class="lbl">Request&nbsp;type:</span>
+      <div id="switcher"></div>
+    </div>
+
+    <!-- REQUEST CONTEXT BAR -->
+    <div class="ctxbar" id="ctxbar"></div>
+
+    <!-- BODY -->
+    <div class="modal-body">
+
+      <div class="banner pain" id="painbanner">
+        <svg viewBox="0 0 24 24" style="fill:#8a4b00"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+        <span id="painbanner-txt"></span>
+      </div>
+
+      <div class="banner info" id="autobanner">
+        <svg viewBox="0 0 24 24" style="fill:#014486"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        <span id="autobanner-txt"></span>
+      </div>
+
+      <div class="stats">
+        <div class="stat sel" data-f="all" onclick="filterStat(this,'all')"><div class="stat-label">Change items</div><div class="stat-num" id="s-total">0</div></div>
+        <div class="stat fan" data-f="all" onclick="filterStat(this,'all')"><div class="stat-label">&#9683; Fan-out / request</div><div class="stat-num" id="s-fan">0</div></div>
+        <div class="stat auto" data-f="auto" onclick="filterStat(this,'auto')"><div class="stat-label">&#9673; Auto-checked</div><div class="stat-num" id="s-auto">0</div></div>
+        <div class="stat verified" data-f="verified" onclick="filterStat(this,'verified')"><div class="stat-label">&#10003; Verified</div><div class="stat-num" id="s-verified">0</div></div>
+        <div class="stat pending" data-f="pending" onclick="filterStat(this,'pending')"><div class="stat-label">&#9203; Pending</div><div class="stat-num" id="s-pending">0</div></div>
+        <div class="stat flagged" data-f="flagged" onclick="filterStat(this,'flagged')"><div class="stat-label">&#9873; Flagged</div><div class="stat-num" id="s-flagged">0</div></div>
+      </div>
+      <div class="bar" id="progbar"></div>
+
+      <div class="toolbar">
+        <div class="tabs" id="optabs"></div>
+        <div style="display:flex;gap:.4rem;align-items:center;">
+          <div class="grouptoggle on" id="grpToggle" onclick="toggleGroup()">&#9635; Group by practitioner</div>
+          <input class="search" id="search" oninput="render()" placeholder="Search practitioner, network, facility, NPI…" />
+        </div>
+      </div>
+      <div class="selbar">
+        <b><span id="selcount">0</span> selected</b>
+        <button class="btn sm btn--green" onclick="bulk('verified')">&#10003; Verify selected</button>
+        <button class="btn sm btn--danger" onclick="bulk('flagged')">&#9873; Flag selected</button>
+        <span class="muted">|</span>
+        <button class="btn sm" onclick="verifyAuto()">&#10003; Verify all auto-passed</button>
+        <button class="btn sm" onclick="verifyGroupPrompt()">&#10003; Verify a whole practitioner group</button>
+      </div>
+
+      <div class="qc-wrap" id="qcwrap">
+        <div class="grid-pane">
+          <div style="overflow:auto;max-height:520px;border:1px solid var(--border);border-radius:var(--radius);">
+            <table>
+              <thead><tr>
+                <th style="width:1.4rem;"><input type="checkbox" onclick="selAllVisible(this)"></th>
+                <th>Status</th><th>Op</th><th>Target record</th><th>What changed</th><th>Auto-check</th><th></th>
+              </tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div class="muted" style="margin-top:.4rem;" id="gridfoot"></div>
+        </div>
+        <div class="drawer" id="drawer"></div>
+      </div>
+
+      <div class="legend">
+        <b>Grounded on real data.</b> Each row = one <code>PRM_CaseManagerAssociation__c</code> record (its <code>PRM_RequestType__c</code>, plus the affected <code>HealthcareFacilityNetwork</code> / <code>Address</code> / <code>HealthcareFacility</code> it points to). In the QA org a single <b>Terminate Current Office Information</b> request fans out to as many as <b>285</b> network rows, and <b>Remove Practitioner</b> up to <b>92</b> &mdash; so even one "individual" request is a mass-verification job. Today QC has no before&rarr;after view (the "New" and "Existing" records are separate rows with cryptic names). This one component adds the diff, grouping, auto-checks and bulk verify/flag &mdash; identical for every request type and for true mass jobs.
+      </div>
+    </div>
+
+    <!-- FOOT -->
+    <div class="modal-foot">
+      <div class="muted" id="footsummary"></div>
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn--neutral">Save &amp; Exit</button>
+        <button class="btn btn--danger" onclick="alert('Flagged items routed back to the submitting Provider Data Specialist with your notes.')">Send Flagged to PDA</button>
+        <button class="btn btn--green" id="approveBtn" onclick="approve()">Approve &amp; Close Case</button>
+      </div>
+    </div>
+
+  </div>
+  <p class="muted" style="text-align:center;margin-top:1rem;font-size:.75rem;">SLDS reference mockup for <b>prmProviderDataQc</b> &mdash; one reusable QC verification component, <b>grounded on real <code>PRM_CaseManagerAssociation__c</code> data pulled from the <code>qa-sandbox</code> org</b>. Switch request types (top) to see the same grid + diff drawer handle office terminations, practitioner removals, address changes, panel-status and add flows. Click any row for the before&rarr;after detail.</p>
+</div>
+<script>
+/* ============================================================
+   prmProviderDataQc — reusable QC verification workspace
+   Grounded on real PRM_CaseManagerAssociation__c data from qa-sandbox.
+   change item = { id, grp, status, op, object, entity, sub,
+     auto:{state,label}, diffs:[{fld,old,new,type}],
+     evidence:{source,detail}, checks:[{state,label}] }
+   op: create | add | remove | update
+   ============================================================ */
+function it(o){ return Object.assign({status:'pending',checks:[],diffs:[]}, o); }
+
+/* helpers to build repetitive network rows from real values */
+function netTerm(grp, entity, sub, netName, opts){opts=opts||{};
+  return it({grp:grp,op:'remove',object:'HealthcareFacilityNetwork',entity:netName,sub:sub,status:opts.status||'pending',
+    auto:opts.auto||{state:'ok',label:'Was active · end-dated'},
+    diffs:[{fld:'IsActive',old:'true',new:'false',type:'update'},
+           {fld:'Effective To',old:'(open)',new:'2026-07-06',type:'update'},
+           {fld:'Network status',old:'Active',new:'Terminated',type:'update'}],
+    evidence:{source:'PDM Manual Update (form)',detail:'Office termination end-dated this HealthcareFacilityNetwork. PRM_RequestType__c = "Terminate Current Office Information".'},
+    checks:opts.checks||[{state:'ok',label:'Membership was active before term'},{state:'ok',label:'End date not before effective-from'}]});
+}
+
+const REQUESTS = {
+  terminate:{
+    label:'Terminate Current Office Information', count:883, fanoutFull:285, group:true,
+    eyebrow:'Provider Network Management · Network Management QC',
+    title:'Verify Submitted Changes — Terminate Current Office Information',
+    ctx:[['Case Manager','IA-0000155346'],['Submitted by','Test Provider Data Specialist'],['Submitted','Jul 6, 2026'],
+         ['Source','PDM Manual Update'],['Facility','A to Z Total Health Care LLC (40 Morristown Rd Ste 1B-8684)']],
+    src:'PDM Form',
+    pain:'This one office termination fans out to <b>285</b> HealthcareFacilityNetwork rows in the org (across every practitioner at the facility). QC must confirm each was active and is now correctly end-dated — grouped by practitioner below.',
+    items:[
+      netTerm('Ashfaq Tirmizi · Physical Therapist (Specialist · 225100000X)','','Ashfaq Tirmizi · Specialist','AmeriHealth HMO'),
+      netTerm('Ashfaq Tirmizi · Physical Therapist (Specialist · 225100000X)','','Ashfaq Tirmizi · Specialist','Amerihealth PPO'),
+      netTerm('Ashfaq Tirmizi · Physical Therapist (Specialist · 225100000X)','','Ashfaq Tirmizi · Specialist','Amerihealth PPO Medicare'),
+      netTerm('Ashfaq Tirmizi · Physical Therapist (Specialist · 225100000X)','','Ashfaq Tirmizi · Specialist','Amerihealth Consumer Local Value PPO'),
+      netTerm('Ashfaq Tirmizi · Physical Therapist (Specialist · 225100000X)','','Ashfaq Tirmizi · Specialist','Amerihealth Consumer Local Value HMO'),
+      netTerm('Ashfaq Tirmizi · Physical Therapist (Specialist · 225100000X)','','Ashfaq Tirmizi · Specialist','Amerihealth Group Local Value PPO'),
+      netTerm('Ashfaq Tirmizi · Physical Therapist (Specialist · 225100000X)','','Ashfaq Tirmizi · Specialist','Amerihealth Group Local Value HMO',
+        {status:'flagged',auto:{state:'warn',label:'Open member panels'},
+         checks:[{state:'warn',label:'6 member panels still reference this network — confirm reassignment'},{state:'ok',label:'Membership active before term'}]}),
+      netTerm('Facility-level networks (all practitioners)','','A to Z Total Health Care LLC','AmeriHealth HMO'),
+      netTerm('Facility-level networks (all practitioners)','','A to Z Total Health Care LLC','Amerihealth PPO'),
+      netTerm('Facility-level networks (all practitioners)','','A to Z Total Health Care LLC','Amerihealth PPO Medicare'),
+      netTerm('Facility-level networks (all practitioners)','','A to Z Total Health Care LLC','Amerihealth Consumer Local Value PPO'),
+      netTerm('Facility-level networks (all practitioners)','','A to Z Total Health Care LLC','Amerihealth Consumer Local Value HMO'),
+      netTerm('Facility-level networks (all practitioners)','','A to Z Total Health Care LLC','Amerihealth Group Local Value PPO'),
+      netTerm('Facility-level networks (all practitioners)','','A to Z Total Health Care LLC','Amerihealth Group Local Value HMO',
+        {status:'flagged',auto:{state:'warn',label:'Term date in the past'},
+         checks:[{state:'warn',label:'Effective-to (2026-07-06) is before today — retro-term needs supervisor note'},{state:'ok',label:'Membership active before term'}]})
+    ]
+  },
+
+  remove:{
+    label:'Remove Practitioner', count:679, fanoutFull:92, group:true,
+    eyebrow:'Provider Network Management · Network Management QC',
+    title:'Verify Submitted Changes — Remove Practitioner',
+    ctx:[['Case Manager','IA-0000155039'],['Submitted by','srv_FZPIEPDS (integration)'],['Submitted','Jul 2, 2026'],
+         ['Source','Practitioner Termination'],['Facility','247 Heart And Vascular Specialists PC - New office 1 (100 Rawlins Dr-3300)']],
+    src:'Integration',
+    pain:'Removing one practitioner (Georges Al-helou) from this location end-dates <b>all</b> of that practitioner’s HealthcareFacilityNetwork rows here — in the org this request produced up to <b>92</b> rows. Verify each network is correctly terminated.',
+    items:[
+      netTerm('Georges Al-helou · Pulmonary Disease Physician (Specialist)','','Georges Al-helou · Specialist','Amerihealth Group Local Value PPO',{diffs:null}),
+      netTerm('Georges Al-helou · Pulmonary Disease Physician (Specialist)','','Georges Al-helou · Specialist','Amerihealth Group Local Value HMO'),
+      netTerm('Georges Al-helou · Pulmonary Disease Physician (Specialist)','','Georges Al-helou · Specialist','Amerihealth Consumer Local Value PPO'),
+      netTerm('Georges Al-helou · Pulmonary Disease Physician (Specialist)','','Georges Al-helou · Specialist','Amerihealth Consumer Local Value HMO'),
+      netTerm('Georges Al-helou · Pulmonary Disease Physician (Specialist)','','Georges Al-helou · Specialist','Amerihealth Behavioral Health Value PPO',
+        {status:'flagged',auto:{state:'warn',label:'Practitioner active elsewhere'},
+         checks:[{state:'warn',label:'Practitioner still active at 2 other locations — confirm scope is this location only'},{state:'ok',label:'Membership active before term'}]})
+    ].map(x=>{ x.diffs=[{fld:'IsActive',old:'true',new:'false',type:'update'},{fld:'Effective To',old:'(open)',new:'2026-07-02',type:'update'},{fld:'Network status',old:'Active',new:'Terminated',type:'update'}]; x.evidence={source:'Practitioner Termination',detail:'PRM_RequestType__c = "Remove Practitioner". Practitioner Georges Al-helou end-dated at this facility.'}; return x; })
+  },
+
+  address:{
+    label:'Update Billing / Mailing Address', count:171, fanoutFull:3, group:false,
+    eyebrow:'Provider Network Management · Network Management QC',
+    title:'Verify Submitted Changes — Update Billing / Mailing Address',
+    ctx:[['Case Manager','IA-0000155471'],['Submitted by','Test Provider Data Specialist'],['Submitted','Jul 7, 2026'],
+         ['Source','PDM Manual Update'],['Facility','12 MONTH SMILES LLC (1911 Oak Lane Rd-7469)']],
+    src:'PDM Form',
+    pain:'The submitted ("New") and current ("Existing") addresses are <b>separate Address records</b> with cryptic names — QC has no side-by-side today. The change splits one combined <i>Primary;Billing;Mailing</i> address into distinct Mailing + Billing records.',
+    items:[
+      it({grp:'12 MONTH SMILES LLC · Location',op:'update',object:'Address',entity:'Mailing address',sub:'Address type: Mailing',
+        auto:{state:'ok',label:'Standardized · Precisely'},
+        diffs:[{fld:'Address Type',old:'Primary;Billing;Mailing',new:'Mailing',type:'update'},
+               {fld:'Address Line 1',old:'1911 Oak Lane Rd',new:'1911 Oak Lane Rd',type:'same'},
+               {fld:'Address Line 2',old:'',new:'Test',type:'add'},
+               {fld:'City',old:'Wilmington',new:'Wilmington',type:'same'},
+               {fld:'State',old:'DE',new:'DE',type:'same'},
+               {fld:'ZIP',old:'19803-5237',new:'19803-5237',type:'same'},
+               {fld:'Effective From',old:'2026-05-18',new:'2026-09-05',type:'update'},
+               {fld:'Effective To',old:'2026-09-05',new:'2026-12-31',type:'update'}],
+        evidence:{source:'Address record (New)',detail:'New Address record type=Mailing links to the same Case Manager as the Existing combined record; PRM_RequestType__c = "Update Billing and/or Mailing address - New".'},
+        checks:[{state:'ok',label:'Address standardized (Precisely)'},{state:'ok',label:'Existing combined record will be end-dated 2026-09-05'}]}),
+      it({grp:'12 MONTH SMILES LLC · Location',op:'update',object:'Address',entity:'Billing address',sub:'Address type: Billing',status:'flagged',
+        auto:{state:'warn',label:'Line 2 differs from mailing'},
+        diffs:[{fld:'Address Type',old:'Primary;Billing;Mailing',new:'Billing',type:'update'},
+               {fld:'Address Line 1',old:'1911 Oak Lane Rd',new:'1911 Oak Lane Rd',type:'same'},
+               {fld:'Address Line 2',old:'',new:'Wire Test',type:'add'},
+               {fld:'City',old:'Wilmington',new:'Wilmington',type:'same'},
+               {fld:'State',old:'DE',new:'DE',type:'same'},
+               {fld:'ZIP',old:'19803-5237',new:'19803-5237',type:'same'},
+               {fld:'Effective From',old:'2026-05-18',new:'2026-09-05',type:'update'}],
+        evidence:{source:'Address record (New)',detail:'Separate Billing record. Line 2 "Wire Test" differs from the Mailing record’s "Test" — confirm intended.'},
+        checks:[{state:'warn',label:'Billing Line 2 ("Wire Test") ≠ Mailing Line 2 ("Test")'},{state:'ok',label:'Address standardized (Precisely)'}]})
+    ]
+  },
+
+  addOffice:{
+    label:'Add Current Office Information', count:101, fanoutFull:19, group:true,
+    eyebrow:'Provider Network Management · Network Management QC',
+    title:'Verify Submitted Changes — Add Current Office Information',
+    ctx:[['Case Manager','IA-0000155372'],['Submitted by','Test Provider Data Specialist'],['Submitted','Jul 7, 2026'],
+         ['Source','PDM Manual Update'],['Facility','3n Dental Group, P.c. (Brookfield Central Avenue 100-2222)']],
+    src:'PDM Form',
+    pain:'Adds practitioner→network memberships at an office. New HealthcareFacilityNetwork rows are created (IsActive = true) — QC confirms the network is open and the role/panel are valid.',
+    items:[
+      it({grp:'Aakruti Bhalja · Podiatrist',op:'add',object:'HealthcareFacilityNetwork',entity:'Accolade Care',sub:'Aakruti Bhalja · PCP',
+        auto:{state:'ok',label:'Open network · role valid'},
+        diffs:[{fld:'IsActive',old:'',new:'true',type:'add'},{fld:'Practitioner Role',old:'',new:'PCP',type:'add'},{fld:'Panel Status',old:'',new:'Open to New Patients',type:'add'},{fld:'Effective From',old:'',new:'2026-07-07',type:'add'}],
+        evidence:{source:'PDM Manual Update (form)',detail:'New HFN created for Aakruti Bhalja at 3n Dental Group. PRM_RequestType__c = "Add Current Office Information".'},
+        checks:[{state:'ok',label:'Network is OPEN'},{state:'ok',label:'Practitioner active at facility'},{state:'ok',label:'No duplicate network at this taxonomy × role'}]}),
+      it({grp:'Aakruti Bhalja · Podiatrist',op:'add',object:'HealthcareFacilityNetwork',entity:'1199C PHO',sub:'Aakruti Bhalja · Specialist',status:'flagged',
+        auto:{state:'warn',label:'CLOSED network — contracting'},
+        diffs:[{fld:'IsActive',old:'',new:'true',type:'add'},{fld:'Practitioner Role',old:'',new:'Specialist',type:'add'},{fld:'Panel Status',old:'',new:'Open to New Patients',type:'add'},{fld:'Effective From',old:'',new:'2026-07-07',type:'add'}],
+        evidence:{source:'PDM Manual Update (form)',detail:'1199C PHO is a limited/closed network — panel additions require Provider Contracting approval.'},
+        checks:[{state:'warn',label:'Network is CLOSED — contracting approval required'},{state:'ok',label:'Practitioner active at facility'}]}),
+      it({grp:'Aashish Desai · Family Medicine Physician',op:'add',object:'HealthcareFacilityNetwork',entity:'Accolade Care',sub:'Aashish Desai · PCP',
+        auto:{state:'ok',label:'Open network · role valid'},
+        diffs:[{fld:'IsActive',old:'',new:'true',type:'add'},{fld:'Practitioner Role',old:'',new:'PCP',type:'add'},{fld:'Panel Status',old:'',new:'Open to New Patients',type:'add'},{fld:'Effective From',old:'',new:'2026-07-06',type:'add'}],
+        evidence:{source:'PDM Manual Update (form)',detail:'New HFN for Aashish Desai. PRM_RequestType__c = "Add Current Office Information".'},
+        checks:[{state:'ok',label:'Network is OPEN'},{state:'ok',label:'Practitioner active at facility'}]})
+    ]
+  },
+
+  panel:{
+    label:'Patient Accept Status', count:126, fanoutFull:32, group:true,
+    eyebrow:'Provider Network Management · Network Management QC',
+    title:'Verify Submitted Changes — Patient Accept Status',
+    ctx:[['Case Manager','IA-0000155236'],['Submitted by','Test Provider Data Specialist'],['Submitted','Jul 3, 2026'],
+         ['Source','PDM Manual Update'],['Facility','Center for Healthy Living (300 Welsh Rd Ste 120, Bldg 3-6040)']],
+    src:'PDM Form',
+    pain:'Panel-status (Patient Accept Status) changes update PanelStatus on each affected HealthcareFacilityNetwork. In the org this request reached <b>32</b> rows — QC confirms each transition is valid.',
+    items:[
+      it({grp:'Olivia Anstey · Nurse Practitioner',op:'update',object:'HealthcareFacilityNetwork',entity:'CHOP PPO',sub:'Olivia Anstey · Specialist',
+        auto:{state:'ok',label:'Valid panel transition'},
+        diffs:[{fld:'Panel Status',old:'Open to New Patients',new:'Open to Existing Patients',type:'update'},{fld:'Panel Status Eff From',old:'',new:'2026-07-03',type:'add'}],
+        evidence:{source:'PDM Manual Update (form)',detail:'PRM_RequestType__c = "Patient Accept Status - New". PanelStatus changed on the HFN.'},
+        checks:[{state:'ok',label:'Transition New→Existing is allowed'},{state:'ok',label:'Network active'}]}),
+      it({grp:'Chelsea Mccabe · Family Medicine Physician',op:'update',object:'HealthcareFacilityNetwork',entity:'AmeriHealth HMO',sub:'Chelsea Mccabe · PCP',
+        auto:{state:'ok',label:'Valid panel transition'},
+        diffs:[{fld:'Panel Status',old:'Open to New Patients',new:'Open to Existing Patients',type:'update'},{fld:'Panel Status Eff From',old:'',new:'2026-07-04',type:'add'}],
+        evidence:{source:'PDM Manual Update (form)',detail:'Einstein Community Health Associates-Primary Care Chalfont. PanelStatus updated.'},
+        checks:[{state:'ok',label:'Transition allowed'},{state:'ok',label:'Network active'}]}),
+      it({grp:'Vani Gayam · Pediatrics Physician',op:'update',object:'HealthcareFacilityNetwork',entity:'AmeriHealth Advantage',sub:'Vani Gayam · PCP',status:'flagged',
+        auto:{state:'warn',label:'Closing a PCP panel'},
+        diffs:[{fld:'Panel Status',old:'Open to New Patients',new:'Closed to All Patients',type:'update'},{fld:'Panel Status Eff From',old:'',new:'2026-07-04',type:'add'}],
+        evidence:{source:'PDM Manual Update (form)',detail:'Advocare Kids Care Pediatrics. Closing a PCP panel affects member assignment — confirm.'},
+        checks:[{state:'warn',label:'Closing an open PCP panel — member-assignment impact'},{state:'ok',label:'Network active'}]})
+    ]
+  },
+
+  addPractitioner:{
+    label:'Add Practitioner', count:51, fanoutFull:12, group:true,
+    eyebrow:'Provider Network Management · Network Management QC',
+    title:'Verify Submitted Changes — Add Practitioner',
+    ctx:[['Case Manager','IA-0000155309'],['Submitted by','Test Provider Data Specialist'],['Submitted','Jul 5, 2026'],
+         ['Source','PDM Manual Update'],['Facility','Capital Health Primary Care Richboro (130 Almshouse Rd Ste 600-0731)']],
+    src:'PDM Form',
+    pain:'Adds a practitioner and their network memberships at a facility. New HFN rows created (IsActive = true) — QC confirms the affiliation and networks.',
+    items:[
+      it({grp:'Aatish Garg · Acupuncturist',op:'create',object:'HealthcareFacilityNetwork',entity:'Amerihealth Behavioral Health Value HMO',sub:'Aatish Garg · PCP',
+        auto:{state:'ok',label:'Open network · role valid'},
+        diffs:[{fld:'IsActive',old:'',new:'true',type:'add'},{fld:'Practitioner Role',old:'',new:'PCP',type:'add'},{fld:'Panel Status',old:'',new:'Open to New Patients',type:'add'},{fld:'Effective From',old:'',new:'2026-07-05',type:'add'}],
+        evidence:{source:'PDM Manual Update (form)',detail:'PRM_RequestType__c = "Add Practitioner". New affiliation + network for Aatish Garg.'},
+        checks:[{state:'ok',label:'Network is OPEN'},{state:'ok',label:'New affiliation created (HCPF)'},{state:'warn',label:'Acupuncturist as PCP — confirm role is intended'}]})
+    ]
+  }
+};
+
+/* ---------- state + engine ---------- */
+let CUR='terminate', statusFilter='all', opFilter='all', grouped=true;
+let selected=new Set(), openId=null, collapsed=new Set();
+
+const OP_META={create:['op-create','&#43; Create'],add:['op-add','&#43; Add'],remove:['op-remove','&#10006; Terminate'],update:['op-update','&#9998; Update']};
+const ST_META={verified:['b-verified','Verified'],flagged:['b-flagged','Flagged'],pending:['b-pending','Pending']};
+
+function items(){ return REQUESTS[CUR].items; }
+function q(){ return (document.getElementById('search').value||'').toLowerCase(); }
+function match(x){ const s=q(); if(!s) return true; return (x.entity+' '+x.sub+' '+x.grp+' '+x.object).toLowerCase().includes(s); }
+function visible(){ return items().filter(x=>
+   (statusFilter==='all' || (statusFilter==='auto'? x.auto&&x.auto.state==='ok' : x.status===statusFilter)) &&
+   (opFilter==='all' || x.op===opFilter) && match(x)); }
+
+function buildSwitcher(){
+  const order=['terminate','remove','address','addOffice','panel','addPractitioner'];
+  document.getElementById('switcher').innerHTML = order.map(k=>
+    `<button class="rtab ${k===CUR?'active':''}" onclick="loadReq('${k}',this)">${REQUESTS[k].label} <span class="cnt">${REQUESTS[k].count}</span></button>`).join(' ');
+}
+
+function loadReq(key,el){
+  CUR=key; statusFilter='all'; opFilter='all'; selected.clear(); openId=null; collapsed.clear();
+  const r=REQUESTS[key]; grouped=r.group;
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active')); if(el) el.classList.add('active');
+  document.querySelectorAll('.stat').forEach((s,i)=>s.classList.toggle('sel',i===0));
+  document.getElementById('qcwrap').classList.remove('open');
+  document.getElementById('eyebrow').innerHTML=r.eyebrow;
+  document.getElementById('title').textContent=r.title;
+  document.getElementById('search').value='';
+  document.getElementById('grpToggle').classList.toggle('on',grouped);
+  document.getElementById('grpToggle').style.display = r.group? 'inline-flex':'none';
+  document.getElementById('ctxbar').innerHTML = r.ctx.map(c=>
+    `<div class="ctx"><span class="k">${c[0]}</span><span class="v">${c[0]==='Source'?('<span class="src">'+c[1]+'</span>'):c[1]}</span></div>`).join('');
+  document.getElementById('painbanner-txt').innerHTML = r.pain;
+  renderOpTabs(); render();
+}
+
+function renderOpTabs(){
+  const counts={all:items().length}; items().forEach(x=>counts[x.op]=(counts[x.op]||0)+1);
+  const order=['all','create','add','update','remove'];
+  document.getElementById('optabs').innerHTML = order.filter(o=>o==='all'||counts[o]).map(o=>{
+    const lbl=o==='all'?'All ops':OP_META[o][1];
+    return `<div class="tab ${o===opFilter?'active':''}" onclick="setOp('${o}',this)">${lbl} <span class="pill">${counts[o]||0}</span></div>`;
+  }).join('');
+}
+function setOp(o,el){ opFilter=o; render(); renderOpTabs(); }
+function filterStat(el,f){ statusFilter=f; document.querySelectorAll('.stat').forEach(s=>s.classList.remove('sel')); el.classList.add('sel'); render(); }
+function toggleGroup(){ grouped=!grouped; document.getElementById('grpToggle').classList.toggle('on',grouped); render(); }
+
+function render(){
+  const all=items();
+  const c={total:all.length,auto:0,verified:0,pending:0,flagged:0};
+  all.forEach(x=>{ if(x.auto&&x.auto.state==='ok')c.auto++; c[x.status]=(c[x.status]||0)+1; });
+  set('s-total',c.total); set('s-fan',REQUESTS[CUR].fanoutFull); set('s-auto',c.auto);
+  set('s-verified',c.verified); set('s-pending',c.pending); set('s-flagged',c.flagged);
+  const done=Math.round(c.verified/c.total*100)||0, fail=Math.round(c.flagged/c.total*100)||0;
+  document.getElementById('progbar').innerHTML=`<span class="b-done" style="width:${done}%"></span><span class="b-fail" style="width:${fail}%"></span><span class="b-queue" style="width:${100-done-fail}%"></span>`;
+  document.getElementById('autobanner-txt').innerHTML =
+    `<b>${c.auto} of ${c.total}</b> shown change items passed automated checks. Focus on the <b>${c.flagged||0} flagged</b> exception${c.flagged===1?'':'s'}; bulk-verify the rest.`;
+
+  const vis=visible();
+  let html='';
+  if(grouped){
+    const groups={};
+    vis.forEach(x=>{ (groups[x.grp]=groups[x.grp]||[]).push(x); });
+    Object.keys(groups).forEach(g=>{
+      const gi=groups[g]; const isC=collapsed.has(g);
+      const gv=gi.filter(x=>x.status==='verified').length, gf=gi.filter(x=>x.status==='flagged').length;
+      html+=`<tr class="grp ${isC?'collapsed':''}"><td colspan="7" onclick="toggleCollapse('${enc(g)}')">
+        <span class="chev">&#9660;</span> ${g}
+        <span class="gcount">&nbsp;·&nbsp;${gi.length} change${gi.length===1?'':'s'} &nbsp;<span class="badge b-verified" style="padding:0 .4rem;">${gv}&#10003;</span> <span class="badge b-flagged" style="padding:0 .4rem;">${gf}&#9873;</span></span>
+        <button class="btn sm" style="float:right;" onclick="event.stopPropagation();verifyGroup('${enc(g)}')">Verify group</button>
+      </td></tr>`;
+      if(!isC) gi.forEach(x=> html+=rowHtml(x));
+    });
+  } else {
+    vis.forEach(x=> html+=rowHtml(x));
+  }
+  document.getElementById('rows').innerHTML = html || '<tr><td colspan="7" class="muted" style="padding:1.2rem;text-align:center;">No changes match this filter.</td></tr>';
+  document.getElementById('gridfoot').innerHTML = `Showing ${vis.length} of ${all.length} change item${all.length===1?'':'s'}${REQUESTS[CUR].fanoutFull>all.length?` &nbsp;·&nbsp; representative sample of <b>${REQUESTS[CUR].fanoutFull}</b> in the full request`:''}`;
+  document.getElementById('selcount').textContent=selected.size;
+  document.getElementById('footsummary').innerHTML = `${c.verified}/${c.total} verified · ${c.flagged} flagged · <b>${c.total-c.verified-c.flagged}</b> remaining`;
+  document.getElementById('approveBtn').disabled = (c.verified+c.flagged)!==c.total;
+  if(openId) renderDrawer(openId);
+}
+function set(id,v){ document.getElementById(id).textContent=v; }
+function enc(s){ return s.replace(/'/g,"\\'"); }
+
+function rowHtml(x){
+  const [oc,ol]=OP_META[x.op]; const [sc,sl]=ST_META[x.status];
+  const ap = x.auto? `<span class="autopill ${x.auto.state==='ok'?'ok':'warn'}">${x.auto.state==='ok'?'&#10003;':'&#9888;'} ${x.auto.label}</span>`:'';
+  const chg = x.diffs.filter(d=>d.type!=='same').slice(0,2).map(d=>
+      d.type==='add' ? `<div class="line"><span class="after">+ ${d.new||'—'}</span> <span class="muted">${d.fld}</span></div>`
+      : `<div class="line"><span class="before">${d.old||'—'}</span> <span class="arrow">&rarr;</span> <span class="after">${d.new||'(removed)'}</span> <span class="muted">${d.fld}</span></div>`).join('');
+  return `<tr class="item ${openId===x.id?'sel':''}" onclick="openDrawer('${x.id}')">
+    <td onclick="event.stopPropagation()"><input type="checkbox" ${selected.has(x.id)?'checked':''} onchange="toggle('${x.id}',this)"></td>
+    <td><span class="badge ${sc}"><span class="dot"></span>${sl}</span></td>
+    <td><span class="op ${oc}">${ol}</span></td>
+    <td class="entity"><b>${x.entity}</b><span class="sub">${x.sub} · <span class="mono">${x.object}</span></span></td>
+    <td><div class="chg">${chg||'<span class="muted">—</span>'}</div></td>
+    <td>${ap}</td>
+    <td onclick="event.stopPropagation()"><button class="btn sm" onclick="openDrawer('${x.id}')">Review &rsaquo;</button></td>
+  </tr>`;
+}
+
+function toggleCollapse(g){ g=g.replace(/\\'/g,"'"); collapsed.has(g)?collapsed.delete(g):collapsed.add(g); render(); }
+function toggle(id,el){ el.checked?selected.add(id):selected.delete(id); document.getElementById('selcount').textContent=selected.size; }
+function selAllVisible(el){ visible().forEach(x=>{ el.checked?selected.add(x.id):selected.delete(x.id); }); render(); }
+function bulk(st){ if(!selected.size){alert('Select rows first.');return;} items().forEach(x=>{ if(selected.has(x.id)) x.status=st; }); selected.clear(); render(); }
+function verifyAuto(){ items().forEach(x=>{ if(x.auto&&x.auto.state==='ok'&&x.status==='pending') x.status='verified'; }); render(); }
+function verifyGroup(g){ g=g.replace(/\\'/g,"'"); items().forEach(x=>{ if(x.grp===g && x.status==='pending') x.status='verified'; }); render(); }
+function verifyGroupPrompt(){ if(!grouped){alert('Turn on "Group by practitioner" first.');return;} alert('Use the "Verify group" button on any practitioner header to verify that whole practitioner at once.'); }
+function approve(){ alert('Case closed. All change items verified/flagged. Flagged items routed to the submitting Provider Data Specialist.'); }
+
+/* ---------- detail drawer ---------- */
+function openDrawer(id){ openId=id; document.getElementById('qcwrap').classList.add('open'); renderDrawer(id); render(); }
+function closeDrawer(){ openId=null; document.getElementById('qcwrap').classList.remove('open'); render(); }
+function setStatus(id,st){ const x=items().find(v=>v.id===id); if(x){ x.status=st; render(); } }
+
+function renderDrawer(id){
+  const x=items().find(v=>v.id===id); if(!x){ document.getElementById('drawer').innerHTML=''; return; }
+  const [sc,sl]=ST_META[x.status]; const [oc,ol]=OP_META[x.op];
+  const diffRows=x.diffs.map(d=>{
+    const oldCls=d.type==='add'?'blank':(d.type==='same'?'same':'old');
+    const newCls=d.type==='remove'?'blank':(d.type==='same'?'same':'new');
+    return `<div class="diff-row"><span class="fld">${d.fld}</span><span class="cell ${oldCls}">${d.old||'(blank)'}</span><span class="cell ${newCls}">${d.new||'(removed)'}</span></div>`;
+  }).join('');
+  const checks=x.checks.map(ch=>{
+    const icon = ch.state==='ok'?'<svg viewBox="0 0 24 24"><path d="M9 16.17l-3.88-3.88L4 13.41 9 18.41l11-11L18.59 6z"/></svg>'
+      :'<svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>';
+    return `<div class="check ${ch.state}">${icon}<span>${ch.label}</span></div>`;
+  }).join('');
+  document.getElementById('drawer').innerHTML = `
+    <div class="drawer-head">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem;">
+        <div><b style="font-size:.95rem;">${x.entity}</b><div class="muted" style="font-size:.73rem;">${x.grp} · ${x.sub}</div></div>
+        <button class="btn sm" onclick="closeDrawer()">&times; Close</button>
+      </div>
+      <div style="margin-top:.4rem;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;">
+        <span class="op ${oc}">${ol}</span><span class="badge ${sc}"><span class="dot"></span>${sl}</span><span class="mono">${x.object}</span>
+      </div>
+    </div>
+    <div class="sec-title">Before &rarr; After <span class="muted" style="font-weight:400;">(field-level diff)</span></div>
+    <div class="diff"><div class="diff-head"><span>Field</span><span>Current (before)</span><span>Submitted (after)</span></div>${diffRows}</div>
+    <div class="sec-title">&#128269; Source of truth</div>
+    <div class="evidence"><span class="k">${x.evidence.source}</span><div style="margin-top:.2rem;">${x.evidence.detail}</div></div>
+    <div class="sec-title" style="margin-top:.8rem;">Automated checks</div>
+    <div class="checks">${checks}</div>
+    <div class="sec-title">QC note</div>
+    <textarea class="notebox" placeholder="Optional note (required when flagging)…"></textarea>
+    <div class="drawer-actions">
+      <button class="btn btn--green" onclick="setStatus('${x.id}','verified')">&#10003; Verify</button>
+      <button class="btn btn--danger" onclick="setStatus('${x.id}','flagged')">&#9873; Flag &amp; return to PDA</button>
+      <button class="btn" onclick="alert('Opens the underlying record (HealthcareFacilityNetwork / Address) in a console subtab for inline correction.')">Open record &rsaquo;</button>
+    </div>`;
+}
+
+/* boot */
+buildSwitcher();
+loadReq('terminate', document.querySelector('.rtab.active'));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,739 @@
+{
+  "runDir": "/Users/pkothapalli/Documents/IBXDEV/ibx-dev-project/",
+  "violationCounts": {
+    "total": 30,
+    "sev1": 0,
+    "sev2": 10,
+    "sev3": 4,
+    "sev4": 16,
+    "sev5": 0
+  },
+  "versions": {
+    "code-analyzer": "0.45.0",
+    "regex": "0.34.0",
+    "pmd": "0.39.0",
+    "cpd": "0.39.0"
+  },
+  "violations": [
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 454,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 454,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_PractitionerService' has a total cognitive complexity of 78 (highest 15), current threshold is 50",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "CyclomaticComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 454,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_PractitionerService' has a total cyclomatic complexity of 77 (highest 12).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cyclomaticcomplexity"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 112,
+          "startColumn": 13,
+          "endLine": 116,
+          "endColumn": 14
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 153,
+          "startColumn": 42,
+          "endLine": 157,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 295,
+          "startColumn": 9,
+          "endLine": 295,
+          "endColumn": 72
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 295,
+          "startColumn": 9,
+          "endLine": 295,
+          "endColumn": 72
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 298,
+          "startColumn": 13,
+          "endLine": 339,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'writeHealthcareProviderNpis(List<PractitionerUnitOfWork>)' has a cognitive complexity of 15, current threshold is 15",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "CyclomaticComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 298,
+          "startColumn": 13,
+          "endLine": 339,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'writeHealthcareProviderNpis(List<PractitionerUnitOfWork>)' has a cyclomatic complexity of 12.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cyclomaticcomplexity"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 311,
+          "startColumn": 47,
+          "endLine": 315,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 327,
+          "startColumn": 9,
+          "endLine": 327,
+          "endColumn": 29
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 356,
+          "startColumn": 36,
+          "endLine": 360,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 371,
+          "startColumn": 9,
+          "endLine": 371,
+          "endColumn": 36
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 382,
+          "startColumn": 9,
+          "endLine": 382,
+          "endColumn": 71
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 382,
+          "startColumn": 9,
+          "endLine": 382,
+          "endColumn": 71
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 10,
+          "startColumn": 1,
+          "endLine": 10,
+          "endColumn": 8
+        }
+      ],
+      "message": "The annotation @isTest should be in PascalCase: @IsTest",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 14,
+          "startColumn": 5,
+          "endLine": 14,
+          "endColumn": 15
+        }
+      ],
+      "message": "The annotation @testSetup should be in PascalCase: @TestSetup",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 85,
+          "startColumn": 5,
+          "endLine": 85,
+          "endColumn": 12
+        }
+      ],
+      "message": "The annotation @isTest should be in PascalCase: @IsTest",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexUnitTestClassShouldHaveRunAs",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 86,
+          "startColumn": 12,
+          "endLine": 140,
+          "endColumn": 6
+        }
+      ],
+      "message": "Apex unit test classes should have at least one System.runAs() call",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaverunas"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 142,
+          "startColumn": 5,
+          "endLine": 142,
+          "endColumn": 12
+        }
+      ],
+      "message": "The annotation @isTest should be in PascalCase: @IsTest",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexUnitTestClassShouldHaveRunAs",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 143,
+          "startColumn": 12,
+          "endLine": 159,
+          "endColumn": 6
+        }
+      ],
+      "message": "Apex unit test classes should have at least one System.runAs() call",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaverunas"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 161,
+          "startColumn": 5,
+          "endLine": 161,
+          "endColumn": 12
+        }
+      ],
+      "message": "The annotation @isTest should be in PascalCase: @IsTest",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexUnitTestClassShouldHaveRunAs",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 162,
+          "startColumn": 12,
+          "endLine": 184,
+          "endColumn": 6
+        }
+      ],
+      "message": "Apex unit test classes should have at least one System.runAs() call",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaverunas"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 186,
+          "startColumn": 5,
+          "endLine": 186,
+          "endColumn": 12
+        }
+      ],
+      "message": "The annotation @isTest should be in PascalCase: @IsTest",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexUnitTestClassShouldHaveRunAs",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 187,
+          "startColumn": 12,
+          "endLine": 209,
+          "endColumn": 6
+        }
+      ],
+      "message": "Apex unit test classes should have at least one System.runAs() call",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaverunas"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 211,
+          "startColumn": 5,
+          "endLine": 211,
+          "endColumn": 12
+        }
+      ],
+      "message": "The annotation @isTest should be in PascalCase: @IsTest",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexUnitTestClassShouldHaveRunAs",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 212,
+          "startColumn": 12,
+          "endLine": 225,
+          "endColumn": 6
+        }
+      ],
+      "message": "Apex unit test classes should have at least one System.runAs() call",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaverunas"
+      ]
+    },
+    {
+      "rule": "AnnotationsNamingConventions",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 227,
+          "startColumn": 5,
+          "endLine": 227,
+          "endColumn": 12
+        }
+      ],
+      "message": "The annotation @isTest should be in PascalCase: @IsTest",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#annotationsnamingconventions"
+      ]
+    },
+    {
+      "rule": "ApexUnitTestClassShouldHaveRunAs",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "BestPractices",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerServiceTest.cls",
+          "startLine": 228,
+          "startColumn": 12,
+          "endLine": 236,
+          "endColumn": 6
+        }
+      ],
+      "message": "Apex unit test classes should have at least one System.runAs() call",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_bestpractices.html#apexunittestclassshouldhaverunas"
+      ]
+    }
+  ]
+}

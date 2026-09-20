@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Developer Onboarding & Training Guide — PRM System</title>
+<style>
+  :root {
+    --blue-dark:   #003865;
+    --blue-mid:    #005EB8;
+    --blue-light:  #E8F1FB;
+    --accent:      #00A3E0;
+    --green:       #00875A;
+    --amber:       #FF8B00;
+    --red:         #DE350B;
+    --grey-bg:     #F4F5F7;
+    --grey-border: #DFE1E6;
+    --text:        #172B4D;
+    --text-light:  #6B778C;
+    --white:       #FFFFFF;
+    --shadow:      0 2px 8px rgba(0,0,0,.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--grey-bg);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── TOP BANNER ── */
+  .banner {
+    background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+    color: var(--white);
+    padding: 36px 48px 28px;
+  }
+  .banner-inner { max-width: 1200px; margin: 0 auto; }
+  .banner h1 { font-size: 28px; font-weight: 700; letter-spacing: -.3px; margin-bottom: 6px; }
+  .banner .sub { font-size: 15px; opacity: .85; margin-bottom: 18px; }
+  .banner-meta { display: flex; gap: 24px; flex-wrap: wrap; }
+  .badge {
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+
+  /* ── STAT CARDS ROW ── */
+  .stats-row {
+    background: var(--white);
+    border-bottom: 1px solid var(--grey-border);
+    padding: 20px 48px;
+  }
+  .stats-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
+  }
+  .stat-card {
+    text-align: center;
+    padding: 16px 8px;
+    border-radius: 8px;
+    background: var(--blue-light);
+    border: 1px solid #C5D9F1;
+  }
+  .stat-card .num { font-size: 28px; font-weight: 800; color: var(--blue-mid); line-height: 1; }
+  .stat-card .lbl { font-size: 11px; color: var(--text-light); text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; font-weight: 600; }
+
+  /* ── MAIN LAYOUT ── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 32px 48px 64px; }
+
+  /* ── NAV TABS ── */
+  .tab-nav {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--grey-border);
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 10px 18px;
+    border: none;
+    background: transparent;
+    color: var(--text-light);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    border-radius: 4px 4px 0 0;
+    transition: all .15s;
+  }
+  .tab-btn:hover { background: var(--blue-light); color: var(--blue-mid); }
+  .tab-btn.active { color: var(--blue-mid); border-bottom-color: var(--blue-mid); background: var(--blue-light); }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── SECTION HEADERS ── */
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 6px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--blue-light);
+  }
+  .section-desc { color: var(--text-light); margin-bottom: 24px; font-size: 13px; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--grey-border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--blue-dark);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .card-title .icon { font-size: 18px; }
+
+  /* ── TABLES ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--blue-dark); color: var(--white); }
+  thead th { padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; letter-spacing: .3px; }
+  tbody tr { border-bottom: 1px solid var(--grey-border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:nth-child(even) { background: var(--grey-bg); }
+  tbody td { padding: 9px 14px; vertical-align: top; }
+  .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--grey-border); margin-bottom: 20px; box-shadow: var(--shadow); }
+
+  /* ── PRIORITY PILLS ── */
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+    white-space: nowrap;
+  }
+  .pill-high   { background: #FFEBE6; color: #BF2600; }
+  .pill-medium { background: #FFF7D6; color: #974F0C; }
+  .pill-low    { background: #E3FCEF; color: #006644; }
+  .pill-blue   { background: var(--blue-light); color: var(--blue-mid); }
+  .pill-purple { background: #EAE6FF; color: #403294; }
+
+  /* ── TIMELINE / WEEK PLAN ── */
+  .timeline { position: relative; padding-left: 28px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--blue-light);
+  }
+  .tl-item { position: relative; margin-bottom: 20px; }
+  .tl-dot {
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--blue-mid);
+    border: 3px solid var(--white);
+    box-shadow: 0 0 0 2px var(--blue-mid);
+  }
+  .tl-week {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--blue-mid);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+    margin-bottom: 4px;
+  }
+  .tl-content {
+    background: var(--white);
+    border: 1px solid var(--grey-border);
+    border-left: 4px solid var(--blue-mid);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+  }
+  .tl-content h4 { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--blue-dark); }
+  .tl-content ul { padding-left: 16px; }
+  .tl-content li { margin-bottom: 3px; font-size: 13px; color: var(--text); }
+
+  /* ── EXERCISE CARDS ── */
+  .exercise-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .ex-card {
+    background: var(--white);
+    border: 1px solid var(--grey-border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .ex-card-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .ex-card-header .ex-num {
+    width: 32px; height: 32px;
+    background: var(--white);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .ex-card-header h4 { font-size: 14px; font-weight: 700; margin: 0; }
+  .ex-card-header .time-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(255,255,255,.25);
+    padding: 2px 8px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .ex-card-body { padding: 12px 16px; }
+  .ex-card-body .flow-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--grey-border);
+    font-size: 12px;
+  }
+  .ex-card-body .flow-row:last-child { border-bottom: none; }
+  .ex-card-body .flow-name { font-weight: 600; color: var(--blue-mid); min-width: 200px; word-break: break-word; }
+  .ex-card-body .flow-cases { color: var(--text-light); }
+  .ex-card-footer {
+    background: var(--grey-bg);
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text-light);
+  }
+  .ex-card-footer strong { color: var(--text); }
+
+  /* ── COLOR THEMES FOR EXERCISE CARDS ── */
+  .theme-blue   { background: linear-gradient(135deg, #005EB8, #003865); color: #fff; }
+  .theme-teal   { background: linear-gradient(135deg, #00875A, #005C40); color: #fff; }
+  .theme-purple { background: linear-gradient(135deg, #6554C0, #403294); color: #fff; }
+  .theme-amber  { background: linear-gradient(135deg, #FF8B00, #CC5F00); color: #fff; }
+  .theme-red    { background: linear-gradient(135deg, #DE350B, #A81600); color: #fff; }
+  .theme-cyan   { background: linear-gradient(135deg, #00A3E0, #006B94); color: #fff teal; }
+  .theme-green2 { background: linear-gradient(135deg, #36B37E, #00875A); color: #fff; }
+  .theme-indigo { background: linear teal(135deg, #2684FF, #0052CC); color: #fff; }
+  .theme-slate  { background: linear-gradient(135deg, #344563, #172B4D); color: #fff; }
+  .theme-rose   { background: linear-gradient(135deg, #FF5630, #BF2600); color: #fff; }
+  .theme-lime   { background: linear-gradient(135deg, #57D9A3, #00875A); color: #fff; }
+  .theme-navy   { background: linear-gradient(135deg, #0052CC, #003884); color: #fff; }
+
+  /* ── BUCKET GRID ── */
+  .bucket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .bucket-card {
+    background: var(--white);
+    border: 1px solid var(--grey-border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+  }
+  .bucket-card .bkt-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .bucket-card .bkt-icon { font-size: 20px; }
+  .bucket-card .bkt-title { font-size: 13px; font-weight: 700; color: var(--blue-dark); }
+  .bucket-card .bkt-count { margin-left: auto; font-size: 20px; font-weight: 800; color: var(--blue-mid); }
+  .bucket-card .bkt-time { font-size: 11px; color: var(--text-light); margin-bottom: 8px; }
+  .bucket-card .component-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .component-tags .tag {
+    background: var(--grey-bg);
+    border: 1px solid var(--grey-border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 10px;
+    color: var(--text-light);
+    font-family: monospace;
+  }
+
+  /* ── ACCORDION ── */
+  .accordion { margin-bottom: 12px; }
+  .acc-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--white);
+    border: 1px solid var(--grey-border);
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s;
+  }
+  .acc-header:hover { background: var(--blue-light); }
+  .acc-header.open { border-radius: 8px 8px 0 0; border-bottom: none; background: var(--blue-light); }
+  .acc-header .acc-arrow { margin-left: auto; transition: transform .2s; font-size: 12px; color: var(--text-light); }
+  .acc-header.open .acc-arrow { transform: rotate(180deg); }
+  .acc-header h4 { font-size: 14px; font-weight: 700; color: var(--blue-dark); margin: 0; }
+  .acc-header .acc-meta { font-size: 12px; color: var(--text-light); }
+  .acc-body {
+    display: none;
+    border: 1px solid var(--grey-border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+  }
+  .acc-body.open { display: block; }
+
+  /* ── GLOSSARY ── */
+  .glossary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+  .glossary-item {
+    background: var(--white);
+    border: 1px solid var(--grey-border);
+    border-left: 4px solid var(--blue-mid);
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+  }
+  .glossary-item .term { font-weight: 700; font-size: 13px; color: var(--blue-dark); }
+  .glossary-item .def { font-size: 12px; color: var(--text-light); margin-top: 2px; }
+
+  /* ── PROGRESS INDICATOR ── */
+  .progress-bar-wrap { background: #DFE1E6; border-radius: 4px; height: 6px; margin-top: 6px; }
+  .progress-bar { height: 6px; border-radius: 4px; background: var(--blue-mid); }
+
+  /* ── CALLOUT BOX ── */
+  .callout {
+    border-radius: 6px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 13px;
+  }
+  .callout-info  { background: #E8F1FB; border-left: 4px solid var(--blue-mid); }
+  .callout-warn  { background: #FFF7D6; border-left: 4px solid var(--amber); }
+  .callout-tip   { background: #E3FCEF; border-left: 4px solid var(--green); }
+  .callout .ico  { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout strong { display: block; margin-bottom: 2px; }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-light);
+    font-size: 12px;
+    border-top: 1px solid var(--grey-border);
+    margin-top: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .banner, .stats-row, .page { padding-left: 16px; padding-right: 16px; }
+    .exercise-grid { grid-template-columns: 1fr; }
+    .bucket-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ BANNER ═══════════════════ -->
+<div class="banner">
+  <div class="banner-inner">
+    <h1>🏥 Developer Onboarding &amp; Training Guide</h1>
+    <div class="sub">Salesforce Health Cloud — Provider Network Management (PRM) System</div>
+    <div class="banner-meta">
+      <span class="badge">Version 1.0</span>
+      <span class="badge">Audience: PM / PO</span>
+      <span class="badge">May 2026</span>
+      <span class="badge">12-Week Ramp-Up Plan</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ STAT CARDS ═══════════════════ -->
+<div class="stats-row">
+  <div class="stats-inner">
+    <div class="stat-card"><div class="num">100</div><div class="lbl">OmniScripts</div></div>
+    <div class="stat-card"><div class="num">10</div><div class="lbl">FlexCards</div></div>
+    <div class="stat-card"><div class="num">165</div><div class="lbl">LWC Components</div></div>
+    <div class="stat-card"><div class="num">533</div><div class="lbl">Apex Classes</div></div>
+    <div class="stat-card"><div class="num">46</div><div class="lbl">Batch Jobs</div></div>
+    <div class="stat-card"><div class="num">1,327</div><div class="lbl">DataRaptors</div></div>
+    <div class="stat-card"><div class="num">402</div><div class="lbl">Integration Procs</div></div>
+    <div class="stat-card"><div class="num">21</div><div class="lbl">SF Flows</div></div>
+    <div class="stat-card"><div class="num">2,588+</div><div class="lbl">Total Artifacts</div></div>
+    <div class="stat-card"><div class="num">12 wks</div><div class="lbl">Ramp-Up Time</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════ PAGE ═══════════════════ -->
+<div class="page">
+
+  <!-- TAB NAV -->
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="showTab('overview', this)">📋 Overview</button>
+    <button class="tab-btn" onclick="showTab('topics', this)">📚 Training Topics</button>
+    <button class="tab-btn" onclick="showTab('flows', this)">▶ Guided Flow Exercises</button>
+    <button class="tab-btn" onclick="showTab('components', this)">🧩 Component Buckets</button>
+    <button class="tab-btn" onclick="showTab('artifacts', this)">📦 Artifact Inventory</button>
+    <button class="tab-btn" onclick="showTab('roadmap', this)">🗓 12-Week Roadmap</button>
+    <button class="tab-btn" onclick="showTab('glossary', this)">📖 Glossary</button>
+  </div>
+
+  <!-- ═══ TAB 1: OVERVIEW ═══ -->
+  <div id="tab-overview" class="tab-panel active">
+    <div class="section-title">System Overview</div>
+    <div class="section-desc">What new developers are stepping into — scope, platform, and key domains.</div>
+
+    <div class="callout callout-info">
+      <span class="ico">ℹ️</span>
+      <div>
+        <strong>For PM / PO Use</strong>
+        This document gives you a full picture of the training investment required for new developers, the system complexity they will be navigating, and a week-by-week plan you can use for sprint planning and onboarding milestone tracking.
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:24px;">
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🏗️</span> Platform Stack</div>
+        <p style="color:var(--text-light);font-size:13px;margin:8px 0 12px;">The system is built on multiple Salesforce technology layers that developers must master:</p>
+        <table>
+          <thead><tr><th>Layer</th><th>Technology</th></tr></thead>
+          <tbody>
+            <tr><td>Guided Flows / UI</td><td>OmniStudio OmniScripts (100)</td></tr>
+            <tr><td>Data ETL</td><td>DataRaptors (1,327)</td></tr>
+            <tr><td>Business Orchestration</td><td>Integration Procedures (402)</td></tr>
+            <tr><td>Custom UI</td><td>Lightning Web Components (165)</td></tr>
+            <tr><td>Business Logic</td><td>Apex Classes + Triggers (533)</td></tr>
+            <tr><td>Automation</td><td>Salesforce Flows (21)</td></tr>
+            <tr><td>Dashboard Cards</td><td>FlexCards (10)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🌐</span> External Integrations</div>
+        <p style="color:var(--text-light);font-size:13px;margin:8px 0 12px;">Developers must understand four live external APIs:</p>
+        <table>
+          <thead><tr><th>System</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><strong>CAQH</strong></td><td>Credential data repository &amp; re-cred cycle</td></tr>
+            <tr><td><strong>NPDB</strong></td><td>National Practitioner Data Bank checks</td></tr>
+            <tr><td><strong>Precisely</strong></td><td>Address standardization / USPS validation</td></tr>
+            <tr><td><strong>BCBSA</strong></td><td>Blue Cross Blue Shield data sync</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">🔄</span> Key Business Domains</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;">
+          <span class="pill pill-blue">PAR Form</span>
+          <span class="pill pill-blue">Practitioner Creation</span>
+          <span class="pill pill-blue">Account Creation</span>
+          <span class="pill pill-blue">Non-PAR Flow</span>
+          <span class="pill pill-purple">Credentialing</span>
+          <span class="pill pill-purple">Re-Credentialing</span>
+          <span class="pill pill-purple">PSV</span>
+          <span class="pill pill-purple">Off-Cycle</span>
+          <span class="pill pill-high">Termination</span>
+          <span class="pill pill-high">Reinstatement</span>
+          <span class="pill pill-medium">PDM</span>
+          <span class="pill pill-medium">PNC</span>
+          <span class="pill pill-medium">Ancillary Provider</span>
+          <span class="pill pill-low">RCAT</span>
+          <span class="pill pill-low">Case Management</span>
+          <span class="pill pill-low">HACAC</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title"><span class="icon">⏱️</span> Onboarding Investment Summary</div>
+        <table style="margin-top:10px;">
+          <thead><tr><th>Phase</th><th>Weeks</th><th>Focus</th></tr></thead>
+          <tbody>
+            <tr><td>Foundation</td><td>1–2</td><td>Architecture, DevOps, FlexCards</td></tr>
+            <tr><td>Core Flows</td><td>3–4</td><td>PAR, Credentialing, Provider Change, Non-PAR</td></tr>
+            <tr><td>Lifecycle Flows</td><td>5–6</td><td>Off-Cycle, PDM, Termination, Reinstatement</td></tr>
+            <tr><td>Ancillary &amp; ReCred</td><td>7–8</td><td>ReCred, Ancillary, PSV, RCAT, PNC</td></tr>
+            <tr><td>Apex &amp; LWC</td><td>9–10</td><td>Triggers, Components, Utilities</td></tr>
+            <tr><td>Batch &amp; Advanced</td><td>11–12</td><td>Batch Jobs, DFX, Test Classes, Capstone</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="ico">⚠️</span>
+      <div>
+        <strong>PM / PO Planning Note</strong>
+        Budget 10–12 weeks of dedicated onboarding time per developer before they can be considered independently productive. Rushing this risks production defects in a highly regulated healthcare credentialing system. Pairing with a senior dev for Weeks 1–4 is strongly recommended.
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB 2: TRAINING TOPICS ═══ -->
+  <div id="tab-topics" class="tab-panel">
+    <div class="section-title">Training Topics &amp; Time Estimates</div>
+    <div class="section-desc">28 total topics — 14 requested by the business (marked ✅) plus 14 recommended additions (marked ➕).</div>
+
+    <div class="callout callout-tip">
+      <span class="ico">✅</span>
+      <div><strong>Total Estimated Training Time: 58–72 business days (~12 weeks)</strong> — working across topics in parallel with guided exercises, code reviews, and hands-on sandbox sessions.</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Topic</th>
+            <th>Time</th>
+            <th>Format</th>
+            <th>Source</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td><strong>PAR Form (Participation Application Review)</strong></td><td>3–4 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>2</td><td><strong>Provider Change Request</strong></td><td>2–3 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>3</td><td><strong>Account Creation</strong></td><td>2 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>4</td><td><strong>Non-PAR Flow</strong></td><td>2 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>5</td><td><strong>Practitioner Creation</strong></td><td>2–3 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>6</td><td><strong>Off-Cycle Credentialing</strong></td><td>2 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>7</td><td><strong>PDM Flow (Provider Data Management)</strong></td><td>3 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>8</td><td><strong>Termination (Account / Practitioner / Practice Location)</strong></td><td>3 days</td><td>Guided flows + batch review</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>9</td><td><strong>Reinstatement</strong></td><td>1–2 days</td><td>Guided flows + code walkthrough</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>10</td><td><strong>OmniScript Components</strong></td><td>3–4 days</td><td>Hands-on development</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>11</td><td><strong>LWC Components</strong></td><td>4–5 days</td><td>Hands-on development</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>12</td><td><strong>Apex Classes &amp; Triggers</strong></td><td>3–4 days</td><td>Code review + exercises</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>13</td><td><strong>Test Class Coverage</strong></td><td>2 days</td><td>Hands-on writing + review</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr><td>14</td><td><strong>Batch Processing</strong></td><td>2–3 days</td><td>Code review + execution</td><td>✅ Business</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr style="background:#F0F8F0"><td>15</td><td><strong>Re-Credentialing (ReCred) Flow</strong></td><td>2–3 days</td><td>Guided flows + batch review</td><td>➕ Recommended</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr style="background:#F0F8F0"><td>16</td><td><strong>Primary Source Verification (PSV)</strong></td><td>1–2 days</td><td>Guided flows walkthrough</td><td>➕ Recommended</td><td><span class="pill pill-medium">Medium</span></td></tr>
+          <tr style="background:#F0F8F0"><td>17</td><td><strong>Ancillary Provider Flow</strong></td><td>2 days</td><td>Guided flows + code walkthrough</td><td>➕ Recommended</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr style="background:#F0F8F0"><td>18</td><td><strong>DataRaptors (Extract / Transform / Load)</strong></td><td>3–4 days</td><td>Hands-on development</td><td>➕ Recommended</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr style="background:#F0F8F0"><td>19</td><td><strong>Integration Procedures (IP)</strong></td><td>3–4 days</td><td>Hands-on development</td><td>➕ Recommended</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr style="background:#F0F8F0"><td>20</td><td><strong>FlexCards</strong></td><td>1 day</td><td>Hands-on development</td><td>➕ Recommended</td><td><span class="pill pill-medium">Medium</span></td></tr>
+          <tr style="background:#F0F8F0"><td>21</td><td><strong>Salesforce Flows &amp; Process Automation</strong></td><td>1–2 days</td><td>Review + build exercise</td><td>➕ Recommended</td><td><span class="pill pill-medium">Medium</span></td></tr>
+          <tr style="background:#F0F8F0"><td>22</td><td><strong>Case Management &amp; Routing</strong></td><td>1–2 days</td><td>Walkthrough + Apex review</td><td>➕ Recommended</td><td><span class="pill pill-medium">Medium</span></td></tr>
+          <tr style="background:#F0F8F0"><td>23</td><td><strong>External Integrations (CAQH, BCBSA, Precisely, NPDB)</strong></td><td>2 days</td><td>Architecture + code walkthrough</td><td>➕ Recommended</td><td><span class="pill pill-high">High</span></td></tr>
+          <tr style="background:#F0F8F0"><td>24</td><td><strong>PNC (Provider Network Change) Flow</strong></td><td>1–2 days</td><td>Guided flows + code review</td><td>➕ Recommended</td><td><span class="pill pill-medium">Medium</span></td></tr>
+          <tr style="background:#F0F8F0"><td>25</td><td><strong>RCAT (Roster Compliance &amp; Attestation Tool)</strong></td><td>1–2 days</td><td>Walkthrough + batch review</td><td>➕ Recommended</td><td><span class="pill pill-medium">Medium</span></td></tr>
+          <tr style="background:#F0F8F0"><td>26</td><td><strong>Address Validation &amp; Management</strong></td><td>1 day</td><td>LWC + IP walkthrough</td><td>➕ Recommended</td><td><span class="pill pill-medium">Medium</span></td></tr>
+          <tr style="background:#F0F8F0"><td>27</td><td><strong>Data Fix Framework (DFX)</strong></td><td>1 day</td><td>Code walkthrough</td><td>➕ Recommended</td><td><span class="pill pill-low">Low</span></td></tr>
+          <tr style="background:#F0F8F0"><td>28</td><td><strong>Org Setup, Deployment &amp; DevOps Practices</strong></td><td>1 day</td><td>Hands-on</td><td>➕ Recommended</td><td><span class="pill pill-high">High</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--text-light);margin-top:-10px;">Rows in green = additions recommended by the development team not originally in the business list.</p>
+  </div>
+
+  <!-- ═══ TAB 3: GUIDED FLOW EXERCISES ═══ -->
+  <div id="tab-flows" class="tab-panel">
+    <div class="section-title">Guided Flow Hands-On Exercises</div>
+    <div class="section-desc">45 OmniScript flows grouped into 12 exercise sets. Each set includes 2–3 use-case scenarios per flow so developers learn edge cases, not just happy paths. All exercises must be completed in a sandbox environment.</div>
+
+    <div class="callout callout-tip">
+      <span class="ico">💡</span>
+      <div><strong>Exercise Rule:</strong> Every flow should be run a minimum of 2–3 times with different scenarios. This surfaces error handling, validation logic, and downstream record creation patterns that a single run will not expose.</div>
+    </div>
+
+    <div class="exercise-grid">
+
+      <!-- Set 1 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-blue">
+          <div class="ex-num">1</div>
+          <h4>Account &amp; Practitioner Creation</h4>
+          <span class="time-badge">3 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_AccountCreation_English</span><span class="flow-cases">a) New Group Account &nbsp;b) Individual Account &nbsp;c) Duplicate NPI test</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PractitionerCreation_English</span><span class="flow-cases">a) All required fields &nbsp;b) Missing mandatory (error test) &nbsp;c) Existing NPI</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_SupplierNetworkCreation_English</span><span class="flow-cases">a) New supplier network &nbsp;b) With ancillary type</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> DataRaptor pre-populate patterns, NPI validation via IP, duplicate checks</div>
+      </div>
+
+      <!-- Set 2 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-teal">
+          <div class="ex-num">2</div>
+          <h4>PAR Form (Provider Application Review)</h4>
+          <span class="time-badge">3 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_PractitionerParticipationForm_English</span><span class="flow-cases">a) Full submission &nbsp;b) Save &amp; resume &nbsp;c) Missing specialty</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PractitionerParticipationAddressForm_English</span><span class="flow-cases">a) New address &nbsp;b) Precisely API validation &nbsp;c) Invalid address</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_AttestationFlow_English</span><span class="flow-cases">a) Complete attestation &nbsp;b) Partial/incomplete</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Multi-step OmniScript pattern, address LWC ↔ IP interaction, save-for-later</div>
+      </div>
+
+      <!-- Set 3 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-purple">
+          <div class="ex-num">3</div>
+          <h4>Credentialing Review Flows</h4>
+          <span class="time-badge">3 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_InitialCredentialAppReview_English</span><span class="flow-cases">a) Approve &nbsp;b) Request more info &nbsp;c) Deny</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_InitialCredPDA_English</span><span class="flow-cases">a) All approvals &nbsp;b) Flag for QC</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_InitialCredPDAQC_English</span><span class="flow-cases">a) QC approve &nbsp;b) QC reject &amp; send back</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_CredentialAppReviewCompleteOS_English</span><span class="flow-cases">a) Mark complete</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Multi-stage review workflow (App → PDA → QC), role-based visibility</div>
+      </div>
+
+      <!-- Set 4 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-amber">
+          <div class="ex-num">4</div>
+          <h4>Provider Change Request</h4>
+          <span class="time-badge">2 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_ProviderChangeForm_English</span><span class="flow-cases">a) Specialty change &nbsp;b) Address change &nbsp;c) Panel status change</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_ProviderChangeFormCapitationSite_English</span><span class="flow-cases">a) Capitation site change</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_ProviderChangeQC_English</span><span class="flow-cases">a) QC approve &nbsp;b) QC reject with reason</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_ProviderChangePDAUpdate_English</span><span class="flow-cases">a) PDA update after approval</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Downstream record updates, PDA update pattern, QC validation</div>
+      </div>
+
+      <!-- Set 5 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-red">
+          <div class="ex-num">5</div>
+          <h4>Non-PAR Flow</h4>
+          <span class="time-badge">2 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_NonParProviderRegistration_English</span><span class="flow-cases">a) Register non-par provider &nbsp;b) With NPDB check &nbsp;c) Ancillary non-par</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_NonParQCReview_English</span><span class="flow-cases">a) QC approve &nbsp;b) QC reject</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_NonParReview_English</span><span class="flow-cases">a) Full review of non-par submission</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_CallNPDB_English</span><span class="flow-cases">a) Trigger NPDB check</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> PAR vs Non-PAR differences, NPDB integration, QC review patterns</div>
+      </div>
+
+      <!-- Set 6 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-cyan" style="background:linear-gradient(135deg,#00A3E0,#006B94);color:#fff;">
+          <div class="ex-num">6</div>
+          <h4>Off-Cycle Credentialing</h4>
+          <span class="time-badge">2 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_OffCycleCredentialing_English</span><span class="flow-cases">a) Standard off-cycle request &nbsp;b) Urgent flag</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_OffCycleVerification_English</span><span class="flow-cases">a) Verification complete &nbsp;b) Verification issues</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_OffCycleQCReview_English</span><span class="flow-cases">a) QC approve &nbsp;b) QC reject &amp; return</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_OffCyclePDAReview_English</span><span class="flow-cases">a) PDA review for off-cycle</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Off-cycle vs initial cred differences, abbreviated review process</div>
+      </div>
+
+      <!-- Set 7 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-green2">
+          <div class="ex-num">7</div>
+          <h4>PDM (Provider Data Management)</h4>
+          <span class="time-badge">3 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_PDMManualChanges_English</span><span class="flow-cases">a) Demographic change &nbsp;b) Network association change</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PDMManualUpdatePractitioner_English</span><span class="flow-cases">a) Update practitioner data &nbsp;b) Update taxonomy code</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PDMManualUpdateVendor_English</span><span class="flow-cases">a) Update vendor/ancillary data</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PDMManualUpdateHCFAssociations_English</span><span class="flow-cases">a) Update HCF associations</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> PDM vs standard updates, cross-ref validation, external system propagation</div>
+      </div>
+
+      <!-- Set 8 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-red">
+          <div class="ex-num">8</div>
+          <h4>Termination Flows</h4>
+          <span class="time-badge">3 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_PractitionerTerminationForm_English</span><span class="flow-cases">a) Future effective date &nbsp;b) Immediate &nbsp;c) Network notifications</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PracticeLocationTermination_English</span><span class="flow-cases">a) Standard termination &nbsp;b) Last location (warning test)</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_AccountTerminationForm_English</span><span class="flow-cases">a) Terminate group &nbsp;b) Active practitioners (block test)</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PractitionerTerminationRecredForm_English</span><span class="flow-cases">a) Terminate during re-cred cycle</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Cascading termination (Account → Location → Practitioner), effective date logic</div>
+      </div>
+
+      <!-- Set 9 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-lime">
+          <div class="ex-num">9</div>
+          <h4>Reinstatement Flows</h4>
+          <span class="time-badge">2 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_PractitionerReinstateForm_English</span><span class="flow-cases">a) Reinstate terminated practitioner &nbsp;b) With new location</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PracticeLocationReinstate_English</span><span class="flow-cases">a) Reinstate terminated location</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_ReinstateLinkExistingPractitioner_English</span><span class="flow-cases">a) Re-link practitioner on reinstate</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PractitionerReinstateVendorForm_English</span><span class="flow-cases">a) Reinstate vendor/ancillary</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Record restoration logic, validation preventing invalid reinstatements</div>
+      </div>
+
+      <!-- Set 10 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-navy">
+          <div class="ex-num">10</div>
+          <h4>Re-Credentialing (ReCred)</h4>
+          <span class="time-badge">2 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_ReCredUpdate_English</span><span class="flow-cases">a) Complete ReCred update &nbsp;b) Update CAQH data</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_ReCredQCUpdate_English</span><span class="flow-cases">a) QC approve &nbsp;b) QC flag for follow-up</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_RecredQC_English</span><span class="flow-cases">a) Full QC review for ReCred</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> ReCred cycle, CAQH integration, batch-driven notifications</div>
+      </div>
+
+      <!-- Set 11 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-purple">
+          <div class="ex-num">11</div>
+          <h4>Ancillary Provider Flow</h4>
+          <span class="time-badge">2 days</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_AncillaryProviderForm_English</span><span class="flow-cases">a) Submit application &nbsp;b) With subcontractor</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_AncillaryCredApplicationReview_English</span><span class="flow-cases">a) Approve &nbsp;b) Request additional docs</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_AncillaryPDA_English</span><span class="flow-cases">a) Complete PDA for ancillary</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_AncillaryQC_English</span><span class="flow-cases">a) QC approve &nbsp;b) QC reject</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_AncillaryPSVForm_English</span><span class="flow-cases">a) Complete PSV for ancillary</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Ancillary vs standard credentialing differences, PSV reassessment</div>
+      </div>
+
+      <!-- Set 12 -->
+      <div class="ex-card">
+        <div class="ex-card-header theme-slate">
+          <div class="ex-num">12</div>
+          <h4>PSV (Primary Source Verification)</h4>
+          <span class="time-badge">1 day</span>
+        </div>
+        <div class="ex-card-body">
+          <div class="flow-row"><span class="flow-name">PRM_PrimarySourceVerificationReview_English</span><span class="flow-cases">a) Full PSV review &nbsp;b) Unable to verify scenario</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PSVSubOsWSNPDB_English</span><span class="flow-cases">a) NPDB check within PSV</span></div>
+          <div class="flow-row"><span class="flow-name">PRM_PSVSubOsSummary_English</span><span class="flow-cases">a) Review PSV summary screen</span></div>
+        </div>
+        <div class="ex-card-footer"><strong>Learn:</strong> Sub-OmniScript chaining, NPDB integration within parent flows</div>
+      </div>
+
+    </div><!-- /exercise-grid -->
+  </div>
+
+  <!-- ═══ TAB 4: COMPONENT BUCKETS ═══ -->
+  <div id="tab-components" class="tab-panel">
+    <div class="section-title">LWC Component Buckets for Developer Familiarity</div>
+    <div class="section-desc">165 Lightning Web Components grouped into 16 functional buckets. Study bucket-by-bucket to build systematic understanding.</div>
+
+    <div class="callout callout-info">
+      <span class="ico">📌</span>
+      <div><strong>Study Approach:</strong> For each bucket, read the component source, identify which OmniScripts use it, and trace one full data-flow from LWC → IP → DataRaptor → Salesforce object.</div>
+    </div>
+
+    <div class="bucket-grid">
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">📍</span><span class="bkt-title">Address Management</span><span class="bkt-count">15</span></div>
+        <div class="bkt-time">⏱ 1.5 days</div>
+        <div class="component-tags">
+          <span class="tag">addressValidationModal</span><span class="tag">prmAddrBillMailAlt</span><span class="tag">prmAddrBillMailPrim</span><span class="tag">prmAdditionalAddressBlockForParForm</span><span class="tag">prmAddressComparison</span><span class="tag">prmAddressFilterGrid</span><span class="tag">prmAddressGroupManager</span><span class="tag">prmAddressSelectionModal</span><span class="tag">prmSmartAddressSearch</span><span class="tag">prmBillingMailingLocations</span><span class="tag">+5 more</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">📋</span><span class="bkt-title">Attestation / PAR Form</span><span class="bkt-count">7</span></div>
+        <div class="bkt-time">⏱ 1 day</div>
+        <div class="component-tags">
+          <span class="tag">pRMAttestationFlowEnglish</span><span class="tag">prmAttestationHelpNInstructions</span><span class="tag">prmAttestationOSForProviderSite</span><span class="tag">prmAttestationPrefill</span><span class="tag">prmReadOnlyTableForAttestation</span><span class="tag">prmToastElementForAttestation</span><span class="tag">prmAttestationOfficeHourReadOnly</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">☑️</span><span class="bkt-title">Multi-Select &amp; Selection Controls</span><span class="bkt-count">11</span></div>
+        <div class="bkt-time">⏱ 1 day</div>
+        <div class="component-tags">
+          <span class="tag">prmMultiSelect</span><span class="tag">prmMultiSelectEditBlock</span><span class="tag">prmMultiSelectPicklist</span><span class="tag">prmMultiselectForNetworkSelection</span><span class="tag">prmCheckboxList</span><span class="tag">prmEditBlockMultiSelect</span><span class="tag">prmHACACEditBlockMultiSelect</span><span class="tag">+4 more</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">📊</span><span class="bkt-title">Data Tables &amp; Grids</span><span class="bkt-count">10</span></div>
+        <div class="bkt-time">⏱ 1 day</div>
+        <div class="component-tags">
+          <span class="tag">prmEnhancedDatatable</span><span class="tag">prmSelectableDataTableForRepeatBlock</span><span class="tag">prmPatientAcceptStatusDatatable</span><span class="tag">pRMLinkViewTable</span><span class="tag">prmNPDBTable</span><span class="tag">prmNewRelatedList</span><span class="tag">prmCaseManagerRelatedList</span><span class="tag">+3 more</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🏥</span><span class="bkt-title">Network / Facility Management</span><span class="bkt-count">10</span></div>
+        <div class="bkt-time">⏱ 1 day</div>
+        <div class="component-tags">
+          <span class="tag">pRMFacNwModalPatientAccept</span><span class="tag">pRMFacNwProviderChangeModal</span><span class="tag">pRMPncAndDelegated</span><span class="tag">pRMPdmDatatableViewOnly</span><span class="tag">prmRefreshFacilitySelections</span><span class="tag">pRMNotLastAndPncDelegated</span><span class="tag">+4 more</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🗺️</span><span class="bkt-title">Practice Location Management</span><span class="bkt-count">4</span></div>
+        <div class="bkt-time">⏱ 0.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmActiveLocations</span><span class="tag">prmPendingLocations</span><span class="tag">prmPracticeLocationBundleAssociations</span><span class="tag">prmPracticeLocationForAccountTerm</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🔧</span><span class="bkt-title">Utility / Helper Components</span><span class="bkt-count">7</span></div>
+        <div class="bkt-time">⏱ 0.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmOmniUtils</span><span class="tag">prmUtilComponent</span><span class="tag">prmExceptionLoggerUtil</span><span class="tag">prmPubSubUtil</span><span class="tag">prmQueryDataDecipher</span><span class="tag">prmSetValueNext</span><span class="tag">prmSetValuePrevious</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🔍</span><span class="bkt-title">Search &amp; Lookup</span><span class="bkt-count">4</span></div>
+        <div class="bkt-time">⏱ 0.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmProviderLocationSearch</span><span class="tag">prmGenericSearchInput</span><span class="tag">prmGetInfoBasedOnNPI</span><span class="tag">prmGetAddressForPractitionerCreation</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🔤</span><span class="bkt-title">Text / Display Overrides</span><span class="bkt-count">13</span></div>
+        <div class="bkt-time">⏱ 0.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmTextElementOverrideForMultiSelect</span><span class="tag">prmTextElementOverrideForAncillary</span><span class="tag">prmTextElementOverrideForGroupSelection</span><span class="tag">prm_TextElementOverrideGeneric</span><span class="tag">prmTextElemOverideForSearchAndButtons</span><span class="tag">+8 more</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">📄</span><span class="bkt-title">Content / Document Management</span><span class="bkt-count">7</span></div>
+        <div class="bkt-time">⏱ 0.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmContentDocumentViewer</span><span class="tag">prmLetterDocuments</span><span class="tag">prmHtmlPreviewer</span><span class="tag">prmPreviewHtmlAsPdf</span><span class="tag">prmViewFileFromSDS</span><span class="tag">prmViewFileOnIdentifier</span><span class="tag">prm_HTMLFilePreview</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">⚙️</span><span class="bkt-title">Data Processing / Business Logic</span><span class="bkt-count">11</span></div>
+        <div class="bkt-time">⏱ 1.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmCapitationSiteLogic</span><span class="tag">prmInitialCredPDACaptiationLogic</span><span class="tag">prmInitialCredPDADataTableLogic</span><span class="tag">prmPrimaryPracticeLogic</span><span class="tag">prmReinstatePractitionerPracticeLocation</span><span class="tag">prmClearNestedNodes</span><span class="tag">+5 more</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">✅</span><span class="bkt-title">Compliance / QC / RCAT</span><span class="bkt-count">6</span></div>
+        <div class="bkt-time">⏱ 0.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmProcessingStatusBanner</span><span class="tag">prmBatchRecordException</span><span class="tag">prmHACACCommitteeReportFilterRecords</span><span class="tag">prmHACACCommitteeReviewExport</span><span class="tag">pRMRcatDataExport</span><span class="tag">pRMReveiwRcatLms</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🧑‍⚕️</span><span class="bkt-title">Practitioner &amp; Network Summary</span><span class="bkt-count">8</span></div>
+        <div class="bkt-time">⏱ 1 day</div>
+        <div class="component-tags">
+          <span class="tag">prmPractitionerSummary</span><span class="tag">prmNetworkSummaryForPracTermination</span><span class="tag">prmPracLocSummaryForPractitionerTerm</span><span class="tag">prmGroupSelectionAncillaryProvider</span><span class="tag">prmPrimaryTaxonomySelect</span><span class="tag">+3 more</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🧭</span><span class="bkt-title">Navigation &amp; Flow Launchers</span><span class="bkt-count">5</span></div>
+        <div class="bkt-time">⏱ 0.5 days</div>
+        <div class="component-tags">
+          <span class="tag">prmNavigateToRecord</span><span class="tag">prmOverrideNavigationActionForAncillary</span><span class="tag">prmLaunchAddressAction</span><span class="tag">prmSubmitGuardIPAction</span><span class="tag">prmOverrideDateFieldForSelectNetwork</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">💬</span><span class="bkt-title">Modal &amp; Dialog</span><span class="bkt-count">2</span></div>
+        <div class="bkt-time">⏱ 0.25 days</div>
+        <div class="component-tags">
+          <span class="tag">prmGenericConfirmModal</span><span class="tag">prmGenericButtonLauncher</span>
+        </div>
+      </div>
+
+      <div class="bucket-card">
+        <div class="bkt-header"><span class="bkt-icon">🔀</span><span class="bkt-title">Misc / Generic</span><span class="bkt-count">10</span></div>
+        <div class="bkt-time">⏱ 1 day</div>
+        <div class="component-tags">
+          <span class="tag">prmGenericPagination</span><span class="tag">prmGenericRelatedList</span><span class="tag">prmOmniSaveForLater</span><span class="tag">resumeOSSavedSession</span><span class="tag">prmShowBrandLogo</span><span class="tag">prmAddNetworks</span><span class="tag">+4 more</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ TAB 5: ARTIFACT INVENTORY ═══ -->
+  <div id="tab-artifacts" class="tab-panel">
+    <div class="section-title">Full Artifact Inventory by Category</div>
+    <div class="section-desc">Complete breakdown of all 2,588+ artifacts in the system, grouped by type and functional area.</div>
+
+    <!-- OmniScripts accordion -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <span style="font-size:20px;">🔄</span>
+        <h4>OmniScripts (Guided Flows) — 100 Total</h4>
+        <span class="acc-meta">14 functional groups</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="table-wrap" style="border-radius:0;border:none;box-shadow:none;">
+          <table>
+            <thead><tr><th>Group</th><th>Count</th><th>Key OmniScripts</th></tr></thead>
+            <tbody>
+              <tr><td><strong>A – Provider &amp; Account Enrollment</strong></td><td>7</td><td>PRM_AccountCreation, PRM_PractitionerCreation, PRM_PractitionerParticipationForm, PRM_NonParProviderRegistration, PRM_SupplierNetworkCreation</td></tr>
+              <tr><td><strong>B – Credentialing &amp; QC Review</strong></td><td>14</td><td>PRM_InitialCredentialAppReview, PRM_InitialCredPDA, PRM_InitialCredPDAQC, PRM_ProviderChangeForm, PRM_ProviderChangeQC, PRM_CredApplicationReviewCompleteOS</td></tr>
+              <tr><td><strong>C – Re-Credentialing</strong></td><td>3</td><td>PRM_ReCredUpdate, PRM_ReCredQCUpdate, PRM_RecredQC</td></tr>
+              <tr><td><strong>D – Primary Source Verification</strong></td><td>4</td><td>PRM_PrimarySourceVerificationReview, PRM_PSVSubOsWSNPDB, PRM_PSVSubOsSummary, PRM_PSVSubOsTxnyRole</td></tr>
+              <tr><td><strong>E – Off-Cycle Credentialing</strong></td><td>3</td><td>PRM_OffCycleCredentialing, PRM_OffCycleVerification, PRM_OffCycleQCReview</td></tr>
+              <tr><td><strong>F – PDM (Provider Data Management)</strong></td><td>5</td><td>PRM_PDMManualChanges, PRM_PDMManualUpdatePractitioner, PRM_PDMManualUpdateVendor, PRM_PDMManualUpdateHCFAssociations</td></tr>
+              <tr><td><strong>G – Practice Location Management</strong></td><td>7</td><td>PRM_PracticeLocationBundles, PRM_CreatePracticeLocationBundle, PRM_ManagePracticeLocationBundles, PRM_UpdatePrimaryPracticeLocation, PRM_PracticeLocationReinstate</td></tr>
+              <tr><td><strong>H – Non-PAR Flow</strong></td><td>4</td><td>PRM_NonParQCReview, PRM_NonParReview, PRM_CallNPDB, PRM_AttestationFlow</td></tr>
+              <tr><td><strong>I – Termination</strong></td><td>4</td><td>PRM_PractitionerTerminationForm, PRM_PracticeLocationTermination, PRM_AccountTerminationForm, PRM_PractitionerTerminationRecredForm</td></tr>
+              <tr><td><strong>J – Reinstatement</strong></td><td>3</td><td>PRM_PractitionerReinstateForm, PRM_PractitionerReinstateVendorForm, PRM_ReinstateLinkExistingPractitioner</td></tr>
+              <tr><td><strong>K – Ancillary Provider</strong></td><td>11</td><td>PRM_AncillaryProviderForm, PRM_AncillaryCredApplicationReview, PRM_AncillaryPDA, PRM_AncillaryQC, PRM_AncillaryPSVForm, PRM_AncillaryReassessmentPSV</td></tr>
+              <tr><td><strong>L – PNC &amp; Delegation</strong></td><td>3</td><td>PRM_PNCPDA, PRM_PNCQC, PRM_PNCReview</td></tr>
+              <tr><td><strong>M – QC Reviews (Multiple Types)</strong></td><td>10</td><td>PRM_ManualUpdatesQC, PRM_ManualUpdatesQCReview1–5, PRM_OffCyclePDAReview, PRM_NonRoutineCommitteeReview, PRM_ReviewHACAC</td></tr>
+              <tr><td><strong>N – Special Flows &amp; Utilities</strong></td><td>12</td><td>PRM_FileUploadOS, PRM_CloseCaseGuidedFlow, PRM_ContractHierarchy, PRM_ReviewRCAT, PRM_SanctionedPractitioner, PRM_UpdateBoardCertification</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Batch Apex accordion -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <span style="font-size:20px;">⚡</span>
+        <h4>Batch Apex Classes — 46 Total</h4>
+        <span class="acc-meta">Background processing jobs covering termination, activation, credentialing, integrations</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="table-wrap" style="border-radius:0;border:none;box-shadow:none;">
+          <table>
+            <thead><tr><th>#</th><th>Batch Class</th><th>Functional Area</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>PRM_AccountTerminationBatch</td><td>Account Termination</td></tr>
+              <tr><td>2</td><td>PRM_AccountTerminationInitialCredBatch</td><td>Account + Initial Cred Termination</td></tr>
+              <tr><td>3</td><td>PRM_AccountCreationCrossRefBatch</td><td>Account Cross-Reference</td></tr>
+              <tr><td>4</td><td>PRM_PractitionerActivationBatch</td><td>Practitioner Activation</td></tr>
+              <tr><td>5</td><td>PRM_PractitionerTerminationBatch</td><td>Practitioner Termination</td></tr>
+              <tr><td>6</td><td>PRM_PractitionerTermForFacilityBatch</td><td>Practitioner-Facility Termination</td></tr>
+              <tr><td>7</td><td>PRM_FullPractitionerTerminationBatch</td><td>Full Practitioner Termination</td></tr>
+              <tr><td>8</td><td>PRM_FullPracTermForFacilityBatch</td><td>Full Termination – Facility</td></tr>
+              <tr><td>9</td><td>PRM_FullPracTerminationRecredBatch</td><td>Full Termination – ReCred</td></tr>
+              <tr><td>10</td><td>PRM_PracticeLocationAutomationBatch</td><td>Practice Location Automation</td></tr>
+              <tr><td>11</td><td>PRM_PracticeLocationTerminationBatch</td><td>Practice Location Termination</td></tr>
+              <tr><td>12</td><td>PRM_ManualUpdatePracLocTerminationBatch</td><td>Manual Practice Location Termination</td></tr>
+              <tr><td>13</td><td>PRM_PNCPDABatch</td><td>PNC PDA Processing</td></tr>
+              <tr><td>14</td><td>PRM_PNCPracTxnyNetworkBatch</td><td>PNC Taxonomy Network</td></tr>
+              <tr><td>15</td><td>PRM_CrossRefBatch</td><td>Cross-Reference Processing</td></tr>
+              <tr><td>16</td><td>PRM_ManualUpdatesCrossRefBatch</td><td>Manual Updates Cross-Reference</td></tr>
+              <tr><td>17</td><td>PRM_RecredCAQHDueNotificationBatch</td><td>ReCred CAQH Due Notification</td></tr>
+              <tr><td>18</td><td>PRM_RecredDuePractitionersReportBatch</td><td>ReCred Due Report</td></tr>
+              <tr><td>19</td><td>PRM_RecredSendEmailOnDueAccountsBatch</td><td>ReCred Email Notification</td></tr>
+              <tr><td>20</td><td>PRM_CheckCAQHAccessOnDueAccountsBatch</td><td>CAQH Access Check</td></tr>
+              <tr><td>21</td><td>PRM_CheckDueOnAncillaryReAssessmentBatch</td><td>Ancillary Reassessment Due Check</td></tr>
+              <tr><td>22</td><td>PRM_ReCheckActiveCAQHValidationBatch</td><td>CAQH Re-Validation</td></tr>
+              <tr><td>23</td><td>PRM_LetterRecredBatch</td><td>Re-Credentialing Letters</td></tr>
+              <tr><td>24</td><td>PRM_RCATLocationTerminationBatch</td><td>RCAT Location Termination</td></tr>
+              <tr><td>25</td><td>PRM_RCATNetworkTerminationBatch</td><td>RCAT Network Termination</td></tr>
+              <tr><td>26</td><td>PRM_RCATLetterGeneration</td><td>RCAT Letter Generation</td></tr>
+              <tr><td>27</td><td>PRM_HCFBundleAssociationBatch</td><td>HCF Bundle Association</td></tr>
+              <tr><td>28</td><td>PRM_HcFacilityNetworkAutomationBatch</td><td>HCF Network Automation</td></tr>
+              <tr><td>29</td><td>PRM_CaseManagerAssociationBatch</td><td>Case Manager Association</td></tr>
+              <tr><td>30</td><td>PRM_UpdateCaseManagerBatch</td><td>Case Manager Update</td></tr>
+              <tr><td>31</td><td>PRM_FutureDatedProcessingBatch</td><td>Future Dated Processing</td></tr>
+              <tr><td>32</td><td>PRM_FutureAddressActivateBatch</td><td>Future Address Activation</td></tr>
+              <tr><td>33</td><td>PRM_FutureHCProviderNPIActivateBatch</td><td>Future NPI Activation</td></tr>
+              <tr><td>34</td><td>PRM_OrgNPDBProcessorBatch</td><td>NPDB Processing</td></tr>
+              <tr><td>35</td><td>PRM_NotifyReAssessmentDueDateBatch</td><td>Reassessment Due Date Notification</td></tr>
+              <tr><td>36</td><td>PRM_ReinstateVendorAccountBatch</td><td>Vendor Account Reinstatement</td></tr>
+              <tr><td>37</td><td>PRM_ProvChangeTerminationBatch</td><td>Provider Change Termination</td></tr>
+              <tr><td>38</td><td>PRM_UPHSRosterRecordsSyncBatch</td><td>UPHS Roster Sync</td></tr>
+              <tr><td>39</td><td>PRM_UPennRosterRecordsSyncBatch</td><td>UPenn Roster Sync</td></tr>
+              <tr><td>40</td><td>PRM_NCPDPBatch</td><td>NCPDP Processing</td></tr>
+              <tr><td>41</td><td>PRM_PractitionerTermInitialCredBatch</td><td>Practitioner Initial Cred Termination</td></tr>
+              <tr><td>42</td><td>PRM_PractitionerTermRelateToVendorBatch</td><td>Practitioner-Vendor Relation on Term</td></tr>
+              <tr><td>43</td><td>PRM_FullPracTermForFacilityRecredBatch</td><td>Full Termination – Facility ReCred</td></tr>
+              <tr><td>44</td><td>DFX_Level4PrimaryTaxonomyFlagUpdateBatch</td><td>Data Fix – Taxonomy Flag</td></tr>
+              <tr><td>45</td><td>PRM_TerminatePracticeLocationNRelations</td><td>Practice Location Relation Termination</td></tr>
+              <tr><td>46</td><td>PRM_CreateAdverseActionNpdbBatch</td><td>Adverse Action NPDB</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DataRaptors accordion -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <span style="font-size:20px;">🗃️</span>
+        <h4>DataRaptors — 1,327 Total</h4>
+        <span class="acc-meta">Largest artifact category — focus on 20–30 key ones during training</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="table-wrap" style="border-radius:0;border:none;box-shadow:none;">
+          <table>
+            <thead><tr><th>Type</th><th>Approx. Count</th><th>Purpose</th><th>Training Focus</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Extract</strong> (DRExtract*)</td><td>~400</td><td>Retrieve data from Salesforce objects into OmniScript</td><td>DRExtractAccount, DRExtractPractitioner, DRExtractCaseManager</td></tr>
+              <tr><td><strong>Transform</strong> (PRMDRTransform*)</td><td>~200</td><td>Transform data between systems / objects</td><td>PRMDRTransformAccountCreation, PRMDRTransformAncillaryDetails</td></tr>
+              <tr><td><strong>Create / Load</strong> (PRMDRCreate* / PRMDRLoad*)</td><td>~200</td><td>Create or load new Salesforce records</td><td>PRMDRCreateCaseCaseManagerAndAccount, PRMDRLoadAccountDetails</td></tr>
+              <tr><td><strong>Update</strong> (PRMDRUpdate*)</td><td>~100</td><td>Update existing Salesforce records</td><td>PRMDRUpdateHealthcarePractitionerFacility, PRMDRUpdateIdentifierRecords</td></tr>
+              <tr><td><strong>Get / Fetch</strong> (PRMDRGet* / PRMDRFetch*)</td><td>~200</td><td>Targeted data retrieval for specific screens</td><td>PRMDRGetAccount, PRMDRFetchPracticeLocationData</td></tr>
+              <tr><td><strong>Other</strong></td><td>~227</td><td>Miscellaneous — address APIs, CAQH, NCPDP</td><td>PRMCAQHValidationService, PRMDRPreciselyAPICall</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Salesforce Flows accordion -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <span style="font-size:20px;">⚡</span>
+        <h4>Salesforce Flows — 21 Total</h4>
+        <span class="acc-meta">Scheduled, record-triggered, and platform-event flows</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="table-wrap" style="border-radius:0;border:none;box-shadow:none;">
+          <table>
+            <thead><tr><th>Flow Name</th><th>Type / Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>PRM_CMSExclusionProcess</td><td>CMS exclusion automation</td></tr>
+              <tr><td>PRM_CaseManagerClosureFlow</td><td>Case manager close automation</td></tr>
+              <tr><td>PRM_CaseManagerFinalDecisionButton</td><td>Final decision button action</td></tr>
+              <tr><td>PRM_CaseOnHoldUpdatesAndSendingNotifications</td><td>Case hold notifications</td></tr>
+              <tr><td>PRM_CloseCaseManagerFlow</td><td>Close case manager subflow</td></tr>
+              <tr><td>PRM_CreateAdverseActionLogs</td><td>Adverse action log creation</td></tr>
+              <tr><td>PRM_DailyScheduledFlowToCheckIfCaseHasExpiredOrNot</td><td>Scheduled – case expiry check</td></tr>
+              <tr><td>PRM_ExceptionLogPlatformEventToObject</td><td>Platform event → object</td></tr>
+              <tr><td>PRM_ExceptionLogSubflow</td><td>Exception logging subflow</td></tr>
+              <tr><td>PRM_PractitionerNPIUpdate</td><td>NPI update automation</td></tr>
+              <tr><td>PRM_RestrictToCreateTwoActiveTaxonomy</td><td>Taxonomy restriction logic</td></tr>
+              <tr><td>PRM_SendAddressBellNotification</td><td>Address change bell notification</td></tr>
+              <tr><td>PRM_SendBellNotificationtoCaseManagerRequester</td><td>Case manager requester notification</td></tr>
+              <tr><td>PRM_SendNotificationtoCaseOwner</td><td>Case owner notification</td></tr>
+              <tr><td>PRM_TerminateHCFBundleAssociations</td><td>HCF bundle termination</td></tr>
+              <tr><td>PRM_UpdateNPIHistoryUponPLCreation</td><td>NPI history update on creation</td></tr>
+              <tr><td>PRM_UpdatePrimaryTaxonomy</td><td>Primary taxonomy update</td></tr>
+              <tr><td>PRM_Update_In_Progress_OS_Saved_Flows</td><td>Update saved OmniScript sessions</td></tr>
+              <tr><td>PRM_scheduledNotificationToCredSupervisors</td><td>Scheduled cred supervisor notification</td></tr>
+              <tr><td>PRM_SendBellNoticationtoAdverseActionLogRequestor</td><td>Adverse action notification</td></tr>
+              <tr><td>PRM_SendBellNotificationtoAdverseActionLogRequestor</td><td>Adverse action notification (v2)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Apex categories accordion -->
+    <div class="accordion">
+      <div class="acc-header" onclick="toggleAcc(this)">
+        <span style="font-size:20px;">☕</span>
+        <h4>Apex Classes — 533 Total (incl. 203 test classes)</h4>
+        <span class="acc-meta">20 functional categories</span>
+        <span class="acc-arrow">▼</span>
+      </div>
+      <div class="acc-body">
+        <div class="table-wrap" style="border-radius:0;border:none;box-shadow:none;">
+          <table>
+            <thead><tr><th>Category</th><th>~Count</th><th>Key Classes</th></tr></thead>
+            <tbody>
+              <tr><td>Account Management</td><td>22</td><td>PRM_AccountTriggerHandler, PRM_AccountTerminationBatch, PRM_ExistingAccountService</td></tr>
+              <tr><td>Practitioner Management</td><td>24</td><td>PRM_PractitionerCreationHelper, PRM_PractitionerActivationBatch, PRM_PractitionerTerminationBatch</td></tr>
+              <tr><td>Practice Location Management</td><td>16</td><td>PRM_PracticeLocationAutomationBatch, PRM_PracLocTermUtility</td></tr>
+              <tr><td>Address Management</td><td>17</td><td>PRM_AddressValidationService, PRM_PreciselyAddressService, PRM_AddressManagementService</td></tr>
+              <tr><td>PAR / Credentialing</td><td>6</td><td>PRM_PARProviderSearch, PRM_PARRequestDenialUtility</td></tr>
+              <tr><td>PDM</td><td>9</td><td>PRM_PDMManualUtility, PRM_ProcessDataForPDM, PRM_PDMCheckDuplicateEditBlock</td></tr>
+              <tr><td>PNC (Provider Network Change)</td><td>9</td><td>PRM_PNCPDABatch, PRM_PNCPDAService, PRM_PNCPracTxnyNetworkBatch</td></tr>
+              <tr><td>Re-Credentialing</td><td>25</td><td>PRM_RecredCAQHDueNotificationBatch, PRM_CAQHValidationService, PRM_LetterRecredBatch</td></tr>
+              <tr><td>Termination</td><td>15</td><td>PRM_FullPractitionerTerminationBatch, PRM_RCATTerminationBatchHelper</td></tr>
+              <tr><td>Case Management</td><td>15</td><td>PRM_CaseManagerAssociationBatch, PRM_CaseManagerDenialUtility</td></tr>
+              <tr><td>Healthcare Facility / Network</td><td>20</td><td>PRM_HCFacilityNetworkTriggerHandler, PRM_HCFBundleAssociationBatch</td></tr>
+              <tr><td>Ancillary Provider</td><td>15</td><td>PRM_AncillaryProviderUtilsService, PRM_AncillaryHACACService</td></tr>
+              <tr><td>Cross-Reference</td><td>10</td><td>PRM_CrossRefBatch, PRM_CrossReferencePracticeLocation</td></tr>
+              <tr><td>BCBSA Integration</td><td>18</td><td>PRM_BCBSAGeneratePractionerRole, PRM_BCBSARecordSyncSubscriberService</td></tr>
+              <tr><td>Future Dated Processing</td><td>12</td><td>PRM_FutureDatedProcessingBatch, PRM_FutureAddressActivateBatch</td></tr>
+              <tr><td>Data Fix Framework (DFX)</td><td>30</td><td>DFX_DataFixScheduler, DFX_ActivateNPILocationHistoryExecutor</td></tr>
+              <tr><td>OmniScript Utilities</td><td>10</td><td>PRM_OmniUtils, PRM_OmniProcessUtils, PRM_OmniSaveForLaterCtrl</td></tr>
+              <tr><td>Common Utilities</td><td>15</td><td>PRM_GlobalConstant, PRM_CommonUtils, PRM_TriggerHandler</td></tr>
+              <tr><td>External Integrations</td><td>8</td><td>PRM_IntegrationProcedureCalloutUtil, PRM_SendGridEmailProcessor</td></tr>
+              <tr><td>Content Documents</td><td>8</td><td>PRM_ContentDocumentService, PRM_ContentDocumentUtil</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══ TAB 6: 12-WEEK ROADMAP ═══ -->
+  <div id="tab-roadmap" class="tab-panel">
+    <div class="section-title">12-Week Developer Onboarding Roadmap</div>
+    <div class="section-desc">A structured day-by-day plan for PM/PO sprint planning and milestone tracking. Total: ~60 working days.</div>
+
+    <div class="callout callout-warn">
+      <span class="ico">🗓️</span>
+      <div><strong>PM Checkpoint Milestones:</strong> End of Week 2 (Architecture), End of Week 4 (Core Flows), End of Week 6 (Lifecycle Flows), End of Week 8 (Ancillary/ReCred), End of Week 10 (Apex/LWC), End of Week 12 (Capstone + Production Ready).</div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Weeks 1–2 — Foundation</div>
+        <div class="tl-content">
+          <h4>🏗️ Architecture, DevOps &amp; First Exercises</h4>
+          <ul>
+            <li>Day 1–2: Org overview, Health Cloud data model, system architecture</li>
+            <li>Day 3–4: OmniStudio architecture — OmniScript, DataRaptor, IP, FlexCard</li>
+            <li>Day 5–6: Salesforce org setup, DevOps, deployment &amp; retrieval scripts</li>
+            <li>Day 7–8: FlexCards (all 10) — view, understand launcher patterns</li>
+            <li>Day 9–10: Exercise Set 1 — Account &amp; Practitioner Creation</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Weeks 3–4 — Core Flows</div>
+        <div class="tl-content">
+          <h4>📋 PAR, Credentialing, Provider Change, Non-PAR</h4>
+          <ul>
+            <li>Day 11–13: Exercise Set 2 — PAR Form (with save/resume &amp; Precisely API)</li>
+            <li>Day 14–15: Exercise Set 3 — Credentialing Review (App → PDA → QC)</li>
+            <li>Day 16–17: Exercise Set 4 — Provider Change Request</li>
+            <li>Day 18–19: Exercise Set 5 — Non-PAR Flow &amp; NPDB integration</li>
+            <li>Day 20: Review 10–15 key DataRaptors for above flows</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Weeks 5–6 — Lifecycle Flows</div>
+        <div class="tl-content">
+          <h4>🔄 Off-Cycle, PDM, Termination, Reinstatement</h4>
+          <ul>
+            <li>Day 21–22: Exercise Set 6 — Off-Cycle Credentialing</li>
+            <li>Day 23–25: Exercise Set 7 — PDM (Provider Data Management)</li>
+            <li>Day 26–28: Exercise Set 8 — Termination (cascading logic, future dates)</li>
+            <li>Day 29–30: Exercise Set 9 — Reinstatement</li>
+            <li>+ Review key Integration Procedures for all above flows</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Weeks 7–8 — Ancillary &amp; ReCred</div>
+        <div class="tl-content">
+          <h4>🏥 Re-Credentialing, Ancillary, PSV, RCAT, PNC</h4>
+          <ul>
+            <li>Day 31–32: Exercise Set 10 — Re-Credentialing (ReCred) + CAQH deep dive</li>
+            <li>Day 33–34: Exercise Set 11 — Ancillary Provider Flow</li>
+            <li>Day 35: Exercise Set 12 — PSV (Primary Source Verification)</li>
+            <li>Day 36–37: CAQH &amp; BCBSA external integration architecture</li>
+            <li>Day 38–40: RCAT (Roster Compliance) &amp; PNC flows</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Weeks 9–10 — Apex &amp; LWC Deep Dive</div>
+        <div class="tl-content">
+          <h4>☕ Trigger Framework, LWC Buckets 1–16, Utilities</h4>
+          <ul>
+            <li>Day 41–42: Trigger Handler framework + key trigger/handler classes</li>
+            <li>Day 43–44: LWC Buckets 1–5 (Address, Location, Network, PAR, Multi-Select)</li>
+            <li>Day 45–46: LWC Buckets 6–10 (Data Tables, Utilities, Search, Modal, Navigation)</li>
+            <li>Day 47–48: LWC Buckets 11–16 (Text Overrides, Content, Business Logic, etc.)</li>
+            <li>Day 49–50: Common utilities, PRM_GlobalConstant, helper class patterns</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Weeks 11–12 — Batch, Advanced &amp; Capstone</div>
+        <div class="tl-content">
+          <h4>⚡ Batch Processing, Test Classes, DFX, Capstone</h4>
+          <ul>
+            <li>Day 51–52: Batch Processing — review all 46 batch classes, understand scheduling</li>
+            <li>Day 53–54: Test Class patterns — write 3 test classes from scratch</li>
+            <li>Day 55–56: Data Fix Framework (DFX) — when and how to write data fixes</li>
+            <li>Day 57–58: Future Dated Processing + Scheduler classes</li>
+            <li>Day 59: Exception Logging &amp; Monitoring patterns</li>
+            <li>Day 60: <strong>Capstone</strong> — trace full PAR form end-to-end through all system layers</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="card" style="margin-top:24px;border-left:4px solid var(--green);">
+      <div class="card-title"><span class="icon">🎯</span> Capstone Exercise (Day 60) — End-to-End Provider Lifecycle Trace</div>
+      <p style="font-size:13px;color:var(--text-light);margin:10px 0;">Developers must be able to answer all five questions below without assistance to be considered onboarding-complete:</p>
+      <ol style="padding-left:20px;font-size:13px;line-height:1.8;">
+        <li>A new practitioner submits a PAR form — which OmniScript launches? Which IPs are called? Which DataRaptors create records? Which Apex classes fire?</li>
+        <li>The application goes through credentialing review — which flows are used? How are case records updated at each stage?</li>
+        <li>After approval, the provider is activated — which batch jobs fire? What records are created/updated?</li>
+        <li>Five years later, the provider is due for re-credentialing — which batch triggers the notification? How does CAQH integrate?</li>
+        <li>The provider terminates — what cascade happens? Which batch jobs run? What is the effective date logic?</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ═══ TAB 7: GLOSSARY ═══ -->
+  <div id="tab-glossary" class="tab-panel">
+    <div class="section-title">Glossary of Key Terms</div>
+    <div class="section-desc">Essential terminology for the PRM system. Developers should know all of these before beginning Week 3.</div>
+    <div class="glossary-grid">
+      <div class="glossary-item"><div class="term">PAR</div><div class="def">Participating provider — full network member with an active credentialing application</div></div>
+      <div class="glossary-item"><div class="term">Non-PAR</div><div class="def">Non-participating provider — out-of-network provider going through a lighter registration process</div></div>
+      <div class="glossary-item"><div class="term">PDM</div><div class="def">Provider Data Management — the manual data update process for provider records</div></div>
+      <div class="glossary-item"><div class="term">PNC</div><div class="def">Provider Network Change — changes to a provider's network associations</div></div>
+      <div class="glossary-item"><div class="term">PSV</div><div class="def">Primary Source Verification — independent verification of credentials from original sources</div></div>
+      <div class="glossary-item"><div class="term">ReCred</div><div class="def">Re-Credentialing — periodic credential review cycle (typically every 2–3 years)</div></div>
+      <div class="glossary-item"><div class="term">PDA</div><div class="def">Professional Development Activities — a review step in the credentialing workflow</div></div>
+      <div class="glossary-item"><div class="term">QC</div><div class="def">Quality Control — secondary review checkpoint in credentialing and change workflows</div></div>
+      <div class="glossary-item"><div class="term">CAQH</div><div class="def">Council for Affordable Quality Healthcare — external credential data repository integrated via API</div></div>
+      <div class="glossary-item"><div class="term">NPDB</div><div class="def">National Practitioner Data Bank — federal database for adverse action reporting checks</div></div>
+      <div class="glossary-item"><div class="term">BCBSA</div><div class="def">Blue Cross Blue Shield Association — data sync partner receiving provider updates</div></div>
+      <div class="glossary-item"><div class="term">RCAT</div><div class="def">Roster Compliance and Attestation Tool — network compliance tracking tool</div></div>
+      <div class="glossary-item"><div class="term">HACAC</div><div class="def">Healthcare Accreditation Compliance Assessment Committee — committee for non-routine reviews</div></div>
+      <div class="glossary-item"><div class="term">HCF</div><div class="def">Healthcare Facility — facility-level entity in the provider data model</div></div>
+      <div class="glossary-item"><div class="term">PL</div><div class="def">Practice Location — physical address where a provider practices</div></div>
+      <div class="glossary-item"><div class="term">PLB</div><div class="def">Practice Location Bundle — a grouping of practice locations for management purposes</div></div>
+      <div class="glossary-item"><div class="term">IP</div><div class="def">Integration Procedure — OmniStudio orchestration component chaining DataRaptors and callouts</div></div>
+      <div class="glossary-item"><div class="term">DR</div><div class="def">DataRaptor — OmniStudio ETL component for Extract, Transform, Load operations</div></div>
+      <div class="glossary-item"><div class="term">OS</div><div class="def">OmniScript — OmniStudio guided flow component used for multi-step user interactions</div></div>
+      <div class="glossary-item"><div class="term">DFX</div><div class="def">Data Fix Framework — internal framework for safe, audited one-time data corrections</div></div>
+      <div class="glossary-item"><div class="term">NPI</div><div class="def">National Provider Identifier — unique 10-digit ID assigned to US healthcare providers</div></div>
+      <div class="glossary-item"><div class="term">LWC</div><div class="def">Lightning Web Component — custom Salesforce UI component built with modern web standards</div></div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<footer>
+  IBX Provider Network Management — Developer Onboarding Guide &nbsp;|&nbsp; Version 1.0 &nbsp;|&nbsp; May 2026
+  <br>Generated by Claude Code &nbsp;·&nbsp; For PM / PO distribution
+</footer>
+
+<script>
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function toggleAcc(header) {
+    const body = header.nextElementSibling;
+    header.classList.toggle('open');
+    body.classList.toggle('open');
+  }
+</script>
+</body>
+</html>

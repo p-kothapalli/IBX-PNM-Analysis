@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rate Schedule Picklist — Business Confirmation Sheet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Calibri, Arial, sans-serif; font-size: 13px; background: #f5f6fa; color: #222; }
+  .page { max-width: 1200px; margin: 30px auto; background: white; padding: 36px 44px; border: 1px solid #dde; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+
+  h1 { font-size: 20px; color: #1a3a6b; border-bottom: 3px solid #1a3a6b; padding-bottom: 10px; margin-bottom: 8px; }
+  .meta { font-size: 12px; color: #666; margin-bottom: 16px; }
+  .meta span { margin-right: 28px; }
+
+  .response-banner { background: #1a7a4a; color: white; padding: 10px 16px; border-radius: 4px; margin-bottom: 24px; font-size: 12.5px; line-height: 1.7; }
+  .response-banner strong { font-size: 13px; }
+  .response-banner ul { margin: 6px 0 0 18px; }
+  .response-banner li { margin-bottom: 2px; }
+
+  .section { margin-bottom: 32px; }
+  .section-title { font-size: 14px; font-weight: bold; padding: 8px 12px; border-radius: 4px 4px 0 0; letter-spacing: 0.3px; display: flex; align-items: center; gap: 8px; }
+  .section-title .badge { font-size: 11px; font-weight: normal; padding: 2px 8px; border-radius: 10px; }
+
+  /* NEW — green */
+  .section-new .section-title  { background: #1a7a4a; color: white; }
+  .section-new .badge          { background: rgba(255,255,255,0.25); }
+  .section-new tr.data-row     { background: #edfaf3; }
+  .section-new tr.data-row:hover { background: #d4f5e3; }
+
+  /* LABEL UPDATE — blue */
+  .section-update .section-title { background: #1a5a9e; color: white; }
+  .section-update .badge         { background: rgba(255,255,255,0.25); }
+  .section-update tr.data-row    { background: #eef4ff; }
+  .section-update tr.data-row:hover { background: #ddeaff; }
+
+  /* NO CHANGE — grey */
+  .section-nochange .section-title { background: #5a6472; color: white; }
+  .section-nochange .badge         { background: rgba(255,255,255,0.2); }
+  .section-nochange tr.data-row    { background: #f8f9fa; }
+  .section-nochange tr.data-row:hover { background: #eef0f2; }
+
+  /* CONFIRMED REMOVAL — dark red */
+  .section-remove .section-title { background: #7a1010; color: white; }
+  .section-remove .badge         { background: rgba(255,255,255,0.25); }
+  .section-remove tr.data-row    { background: #fff0ef; }
+
+  /* DEFERRED — amber */
+  .section-question .section-title { background: #b07a00; color: white; }
+  .section-question .badge         { background: rgba(255,255,255,0.25); }
+  .section-question tr.data-row    { background: #fffbea; }
+
+  /* COMPLETE FINAL LIST — dark */
+  .section-final .section-title  { background: #2c2c3e; color: white; }
+  .section-final tr.data-row     { background: #f9f9fc; }
+  .section-final tr.data-row:hover { background: #ededf5; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: rgba(0,0,0,0.06); }
+  th { padding: 8px 10px; text-align: left; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 2px solid rgba(0,0,0,0.08); }
+  td { padding: 7px 10px; border-bottom: 1px solid rgba(0,0,0,0.06); vertical-align: top; }
+
+  .api { font-family: 'Courier New', monospace; font-weight: bold; font-size: 12px; color: #1a3a6b; }
+  .label-old { color: #888; text-decoration: line-through; }
+  .label-new { color: #1a5a1a; font-weight: 600; }
+  .label-same { color: #444; }
+  .label-remove { color: #7a1010; text-decoration: line-through; font-style: italic; }
+  .final-display { font-family: 'Courier New', monospace; font-size: 11.5px; color: #2c2c6b; background: #f0f2ff; padding: 2px 6px; border-radius: 3px; }
+  .final-remove { font-family: 'Courier New', monospace; font-size: 11.5px; color: #999; background: #f8eded; padding: 2px 6px; border-radius: 3px; text-decoration: line-through; }
+  .subtype { font-size: 11px; padding: 2px 7px; border-radius: 10px; font-weight: 600; display: inline-block; }
+  .st-pc  { background: #d4eaff; color: #0a3a7a; }
+  .st-pt  { background: #d4f5e3; color: #0a5a2a; }
+  .st-lb  { background: #fff3cc; color: #7a5a00; }
+  .st-rd  { background: #ffe4f0; color: #7a0040; }
+  .st-de  { background: #ece4ff; color: #3a006a; }
+  .st-tg  { background: #ffe8d4; color: #7a3000; }
+  .st-vi  { background: #d4f0ff; color: #003a7a; }
+  .st-um  { background: #e4e4e4; color: #333; }
+  .st-ba  { background: #ffd4e8; color: #7a003a; }
+  .st-none { background: #f0f0f0; color: #888; font-style: italic; }
+
+  .note-cell { font-size: 11.5px; color: #8b0000; font-style: italic; }
+  .note-answer { font-size: 11.5px; color: #1a5a00; font-style: italic; }
+  .note-deferred { font-size: 11.5px; color: #7a5000; }
+  .subtype-group { background: rgba(0,0,0,0.03); font-size: 11px; font-weight: bold; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+  .subtype-group td { padding: 5px 10px; }
+  .business-note { font-size: 11px; background: #fffbe6; border-left: 3px solid #e0a800; padding: 3px 8px; border-radius: 0 3px 3px 0; margin-top: 3px; color: #5a4000; }
+
+  .footer { margin-top: 32px; padding-top: 14px; border-top: 2px solid #eee; font-size: 11px; color: #888; display: flex; justify-content: space-between; }
+
+  @media print {
+    body { background: white; }
+    .page { box-shadow: none; border: none; padding: 16px; }
+    tr.data-row { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .section-title { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <h1>Rate Schedule Picklist — Business Confirmation Sheet <span style="font-size:13px;color:#1a7a4a;font-weight:normal">✓ Business Response Received 2026-04-30</span></h1>
+  <div class="meta">
+    <span><strong>Prepared:</strong> 2026-04-29</span>
+    <span><strong>Updated:</strong> 2026-04-30</span>
+    <span><strong>Objects:</strong> PRM_Program__c &amp; PRM_ProgramParticipation__c</span>
+    <span><strong>QA:</strong> Loop in Capitation team for testing</span>
+  </div>
+
+  <div class="response-banner">
+    <strong>Business Responses Applied — 8 items resolved:</strong>
+    <ul>
+      <li><strong>PTH722</strong> — Remove "PCP" from label → <em>PRIME HLTH - ROXBOROUGH/SOLIS SUBURBAN/LOWER BUCKS</em></li>
+      <li><strong>NRAD02</strong> — Confirmed REMOVE (termed 11/1/2014). <strong>RAD005</strong> — Confirmed KEEP, rename to <em>Tower Brandywine/Jennersville</em></li>
+      <li><strong>RAD105</strong> — Update to <em>Temple-Northeast TUHS Radiology</em></li>
+      <li><strong>RAD700</strong> — Update to <em>Community Radiology of HUP</em> (HUP itself is FFS; this is capitated to Community)</li>
+      <li><strong>RAD909</strong> — Update to <em>Trinity Mercy Health System-Mercy Fitzgerald Radiology</em></li>
+      <li><strong>UAMA01</strong> — Update to <em>Carelon UM Admin Fee</em></li>
+      <li><strong>UAMV01</strong> — Update to <em>Carelon UM Vendor Payment</em></li>
+      <li><strong>DMD001 / Dental</strong> — Deferred. Not currently in use. Planned start: August 2026, first payment September 2026. Contact: Suja Rajalekshmy (Pricing Support &amp; GL teams working through downstream mapping).</li>
+    </ul>
+  </div>
+
+  <!-- ===== SECTION 1: NEW ADDITIONS ===== -->
+  <div class="section section-new">
+    <div class="section-title">
+      ✦ NEW ADDITIONS
+      <span class="badge">2 values — new API names, not currently in org</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">API Name</th>
+          <th style="width:200px">New Label</th>
+          <th style="width:200px">SubType</th>
+          <th>Final Display Format</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="data-row">
+          <td><span class="api">100105</span></td>
+          <td><span class="label-new">PA PCP 5% above Standard</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">100105 - PA PCP 5% above Standard</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">LAB905</span></td>
+          <td><span class="label-new">Parkesburg</span></td>
+          <td><span class="subtype st-lb">Lab Fund (LB)</span></td>
+          <td><span class="final-display">LAB905 - Parkesburg</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 2: LABEL UPDATES ===== -->
+  <div class="section section-update">
+    <div class="section-title">
+      ✎ LABEL UPDATES
+      <span class="badge">43 values — API name unchanged, label text updated (incl. 4 added from business responses)</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">API Name</th>
+          <th>Current Label (Org)</th>
+          <th>New Label</th>
+          <th style="width:190px">SubType</th>
+          <th>Final Display Format</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Primary Care Physician -->
+        <tr class="subtype-group"><td colspan="5">— Primary Care Physician (PC) — 16 values</td></tr>
+        <tr class="data-row">
+          <td><span class="api">100000</span></td>
+          <td><span class="label-old">PA PCP</span></td>
+          <td><span class="label-new">PA STANDARD - PCP</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">100000 - PA STANDARD - PCP</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">100004</span></td>
+          <td><span class="label-old">PCP-CHOP 25 CAPITATION</span></td>
+          <td><span class="label-new">CHOP PA PCP</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">100004 - CHOP PA PCP</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">CHA200</span></td>
+          <td><span class="label-old">CHILDRENS MEDICAL ASSOCIATES</span></td>
+          <td><span class="label-new">ADVOCARE OF PA</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">CHA200 - ADVOCARE OF PA</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">DPCP01</span></td>
+          <td><span class="label-old">DELAWARE 1997 PCP</span></td>
+          <td><span class="label-new">DE STANDARD</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">DPCP01 - DE STANDARD</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">DPCP02</span></td>
+          <td><span class="label-old">DE CHRISTIANA PCP NETWORK</span></td>
+          <td><span class="label-new">CCHS – CHRISTIANA CARE HEALTH SERVICES</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">DPCP02 - CCHS – CHRISTIANA CARE HEALTH SERVICES</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">J10000</span></td>
+          <td><span class="label-old">JEFFERSON HEALTH SYS PCP</span></td>
+          <td><span class="label-new">JEFFERSON HEALTH SYSTEM</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">J10000 - JEFFERSON HEALTH SYSTEM</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">JUP100</span></td>
+          <td><span class="label-old">Jefferson Standard Premium</span></td>
+          <td><span class="label-new">JEFFERSON UNIV PHYSICIANS PCP</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">JUP100 - JEFFERSON UNIV PHYSICIANS PCP</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">JUP115</span></td>
+          <td><span class="label-old">Jefferson Univ Physicians Enhanced CAP</span></td>
+          <td><span class="label-new">JEFFERSON UNIV PHYSICIANS PCP ENHANCED CAP</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">JUP115 - JEFFERSON UNIV PHYSICIANS PCP ENHANCED CAP</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">MER100</span></td>
+          <td><span class="label-old">MERCY PCP CAP</span></td>
+          <td><span class="label-new">TRINITY HLTH - MERCY</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">MER100 - TRINITY HLTH - MERCY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">MER300</span></td>
+          <td><span class="label-old">MERCY FITZGERALD PCP CAP</span></td>
+          <td><span class="label-new">TRINITY HLTH - MERCY FITZGERALD PCP CAP</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">MER300 - TRINITY HLTH - MERCY FITZGERALD PCP CAP</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">MLH100</span></td>
+          <td><span class="label-old">Main Line Health</span></td>
+          <td><span class="label-new">Main Line Healthcare</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">MLH100 - Main Line Healthcare</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">N10000</span></td>
+          <td><span class="label-old">NJ PCP</span></td>
+          <td><span class="label-new">AMERIHEALTH NJ</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">N10000 - AMERIHEALTH NJ</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">N10004</span></td>
+          <td><span class="label-old">NJ PCP-CHOP 25 CAPITATION</span></td>
+          <td><span class="label-new">CHOP NJ</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">N10004 - CHOP NJ</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">N10005</span></td>
+          <td><span class="label-old">VIRTUA PCP NETWORK</span></td>
+          <td><span class="label-new">VIRTUA NJ</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">N10005 - VIRTUA NJ</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">S20000</span></td>
+          <td><span class="label-old">ST CHRISTOPHER HOSPITAL FOR CHILDREN</span></td>
+          <td><span class="label-new">St Christopher Hospital for Children</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">S20000 - St Christopher Hospital for Children</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">U10000</span></td>
+          <td><span class="label-old">UNIV PENN HOSPITAL SYSTEMS</span></td>
+          <td><span class="label-new">UNIV PENN HOSPITAL SYSTEMS UPHS</span></td>
+          <td><span class="subtype st-pc">Primary Care Physician (PC)</span></td>
+          <td><span class="final-display">U10000 - UNIV PENN HOSPITAL SYSTEMS UPHS</span></td>
+        </tr>
+
+        <!-- Physical Therapy -->
+        <tr class="subtype-group"><td colspan="5">— Physical Therapy (PT) — 9 values</td></tr>
+        <tr class="data-row">
+          <td><span class="api">DPTH01</span></td>
+          <td><span class="label-old">DE PRO PHYSICIAN THERAPY</span></td>
+          <td><span class="label-new">ATI/PRO PT</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">DPTH01 - ATI/PRO PT</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">NPTH00</span></td>
+          <td><span class="label-old">NJ CAP PT</span></td>
+          <td><span class="label-new">AmeriHealth PT</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">NPTH00 - AmeriHealth PT</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">PTH700</span></td>
+          <td><span class="label-old">PA PHYSICAL THERAPY</span></td>
+          <td><span class="label-new">PA STANDARD PHYSICAL THERAPY</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">PTH700 - PA STANDARD PHYSICAL THERAPY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">PTH705</span></td>
+          <td><span class="label-old">POTTSTOWN MEMORIAL PHYSICAL THERAPY</span></td>
+          <td><span class="label-new">TOWER HLTH - POTTSTOWN MEMORIAL PHYSICAL THERAPY</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">PTH705 - TOWER HLTH - POTTSTOWN MEMORIAL PHYSICAL THERAPY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">PTH710</span></td>
+          <td><span class="label-old">TEMPLE PHYSICAL THERAPY</span></td>
+          <td><span class="label-new">TUHS – Temple</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">PTH710 - TUHS – Temple</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">PTH719</span></td>
+          <td><span class="label-old">PHOENIXVILLE HOSP PT TABLE</span></td>
+          <td><span class="label-new">TOWER HLTH - PHOENIXVILLE HOSP PT TABLE</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">PTH719 - TOWER HLTH - PHOENIXVILLE HOSP PT TABLE</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">PTH721</span></td>
+          <td><span class="label-old">PT NAZARETH HOSPITAL</span></td>
+          <td><span class="label-new">TRINITY HLTH - PT NAZARETH HOSPITAL PT</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">PTH721 - TRINITY HLTH - PT NAZARETH HOSPITAL PT</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">PTH722</span></td>
+          <td><span class="label-old">ROXBOROUGH/SOLIS PCP</span></td>
+          <td>
+            <span class="label-new">PRIME HLTH - ROXBOROUGH/SOLIS SUBURBAN/LOWER BUCKS</span>
+            <div class="business-note">✎ Business: "Remove PCP from description"</div>
+          </td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">PTH722 - PRIME HLTH - ROXBOROUGH/SOLIS SUBURBAN/LOWER BUCKS</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">PTH724</span></td>
+          <td><span class="label-old">PT CHESTNUT HILL HOSPITAL</span></td>
+          <td><span class="label-new">PT CHESTNUT HILL - TEMPLE</span></td>
+          <td><span class="subtype st-pt">Physical Therapy (PT)</span></td>
+          <td><span class="final-display">PTH724 - PT CHESTNUT HILL - TEMPLE</span></td>
+        </tr>
+
+        <!-- Lab Fund -->
+        <tr class="subtype-group"><td colspan="5">— Lab Fund (LB) — 3 values</td></tr>
+        <tr class="data-row">
+          <td><span class="api">LAB600</span></td>
+          <td><span class="label-old">QUEST LAB</span></td>
+          <td><span class="label-new">QUEST LAB NON-PAR NOT CAP</span></td>
+          <td><span class="subtype st-lb">Lab Fund (LB)</span></td>
+          <td><span class="final-display">LAB600 - QUEST LAB NON-PAR NOT CAP</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">LAB800</span></td>
+          <td><span class="label-old">KEYSTONE SMA MEDICAL LAB</span></td>
+          <td><span class="label-new">KEYSTONE SMA MEDICAL LAB NOT NEEDED</span></td>
+          <td><span class="subtype st-lb">Lab Fund (LB)</span></td>
+          <td><span class="final-display">LAB800 - KEYSTONE SMA MEDICAL LAB NOT NEEDED</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">LAB903</span></td>
+          <td><span class="label-old">POTTSTOWN HOSP LAB</span></td>
+          <td><span class="label-new">TOWER HLTH - POTTSTOWN HOSP LAB</span></td>
+          <td><span class="subtype st-lb">Lab Fund (LB)</span></td>
+          <td><span class="final-display">LAB903 - TOWER HLTH - POTTSTOWN HOSP LAB</span></td>
+        </tr>
+
+        <!-- Radiology -->
+        <tr class="subtype-group"><td colspan="5">— Radiology (RD) — 13 values (incl. RAD005 confirmed keep + RAD700 update)</td></tr>
+        <tr class="data-row">
+          <td><span class="api">RAD001</span></td>
+          <td><span class="label-old">RADIOLOGY - DOYLESTOWN</span></td>
+          <td><span class="label-new">RADIOLOGY – DOYLESTOWN RADIOLOGY</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD001 - RADIOLOGY – DOYLESTOWN RADIOLOGY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD004</span></td>
+          <td><span class="label-old">QUAKERTOWN RADIOLOGY</span></td>
+          <td><span class="label-new">ST LUKE'S QUAKERTOWN RADIOLOGY</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD004 - ST LUKE'S QUAKERTOWN RADIOLOGY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD005</span></td>
+          <td><span class="label-old">BRANDYWINE/JENNERSVILLE RADIOLOGY</span></td>
+          <td>
+            <span class="label-new">Tower Brandywine/Jennersville</span>
+            <div class="business-note">✎ Business: "We do need RAD005 — Tower Brandywine/Jennersville"</div>
+          </td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD005 - Tower Brandywine/Jennersville</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD100</span></td>
+          <td><span class="label-old">RADIOLOGY - STANDARD</span></td>
+          <td><span class="label-new">PA STANDARD - RADIOLOGY</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD100 - PA STANDARD - RADIOLOGY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD103</span></td>
+          <td><span class="label-old">POTTSTOWN MEMORIAL RADIOLOGY</span></td>
+          <td><span class="label-new">TOWER HLTH - POTTSTOWN MEMORIAL RADIOLOGY</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD103 - TOWER HLTH - POTTSTOWN MEMORIAL RADIOLOGY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD105</span></td>
+          <td><span class="label-old">RADIOLOGY- TEMPLE</span></td>
+          <td>
+            <span class="label-new">Temple-Northeast TUHS Radiology</span>
+            <div class="business-note">✎ Business: "Update to Temple-Northeast TUHS Radiology"</div>
+          </td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD105 - Temple-Northeast TUHS Radiology</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD150</span></td>
+          <td><span class="label-old">CHESTNUT HILL HOSPITAL RADIOLOGY</span></td>
+          <td><span class="label-new">CHESTNUT HILL - TEMPLE HOSPITAL RADIOLOGY</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD150 - CHESTNUT HILL - TEMPLE HOSPITAL RADIOLOGY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD700</span></td>
+          <td><span class="label-old">HUP CAPITATED RADIOLOGY</span></td>
+          <td>
+            <span class="label-new">Community Radiology of HUP</span>
+            <div class="business-note">✎ Business: "HUP itself is FFS, not Cap for Radiology. RAD700 is cap but to Community → Community Radiology of HUP"</div>
+          </td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD700 - Community Radiology of HUP</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD908</span></td>
+          <td><span class="label-old">ST MARY MEDICAL CTR RADIOLOGY</span></td>
+          <td><span class="label-new">TRINITY HLTH - ST MARY MEDICAL CTR RADIOLOGY</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD908 - TRINITY HLTH - ST MARY MEDICAL CTR RADIOLOGY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD909</span></td>
+          <td><span class="label-old">MERCY HEALTH SYSTEM RADIOLOGY</span></td>
+          <td>
+            <span class="label-new">Trinity Mercy Health System-Mercy Fitzgerald Radiology</span>
+            <div class="business-note">✎ Business: "Update to Trinity Mercy Health System-Mercy Fitzgerald Radiology"</div>
+          </td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD909 - Trinity Mercy Health System-Mercy Fitzgerald Radiology</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD910</span></td>
+          <td><span class="label-old">NAZARETH HOSPITAL RADIOLOGY</span></td>
+          <td><span class="label-new">TRINITY HLTH - NAZARETH HOSPITAL RADIOLOGY</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD910 - TRINITY HLTH - NAZARETH HOSPITAL RADIOLOGY</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD911</span></td>
+          <td><span class="label-old">ROXBOROUGH/SOLIS RAD</span></td>
+          <td><span class="label-new">PRIME HLTH - ROXBOROUGH/SOLIS RAD MERCY SUBURBAN</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD911 - PRIME HLTH - ROXBOROUGH/SOLIS RAD MERCY SUBURBAN</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">RAD915</span></td>
+          <td><span class="label-old">LOWER BUCKS HOSPITAL</span></td>
+          <td><span class="label-new">PRIME HLTH - LOWER BUCKS HOSPITAL</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td><span class="final-display">RAD915 - PRIME HLTH - LOWER BUCKS HOSPITAL</span></td>
+        </tr>
+
+        <!-- UM Admin Fee -->
+        <tr class="subtype-group"><td colspan="5">— UM Admin Fee / Vendor Payment — 2 values (moved from No Change per business response)</td></tr>
+        <tr class="data-row">
+          <td><span class="api">UAMA01</span></td>
+          <td><span class="label-old">AIM - UM Admin Fee</span></td>
+          <td>
+            <span class="label-new">Carelon UM Admin Fee</span>
+            <div class="business-note">✎ Business: "Update to Carelon UM Admin Fee"</div>
+          </td>
+          <td><span class="subtype st-um">UM Admin Fee</span></td>
+          <td><span class="final-display">UAMA01 - Carelon UM Admin Fee</span></td>
+        </tr>
+        <tr class="data-row">
+          <td><span class="api">UAMV01</span></td>
+          <td><span class="label-old">AIM UM Vendor Payment</span></td>
+          <td>
+            <span class="label-new">Carelon UM Vendor Payment</span>
+            <div class="business-note">✎ Business: "Update to Carelon UM Vendor Payment"</div>
+          </td>
+          <td><span class="subtype st-um">UM Vendor Payment</span></td>
+          <td><span class="final-display">UAMV01 - Carelon UM Vendor Payment</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 3: NO CHANGE ===== -->
+  <div class="section section-nochange">
+    <div class="section-title">
+      ✓ NO CHANGE
+      <span class="badge">24 values — label confirmed unchanged (RAD700, UAMA01, UAMV01 moved to Label Updates)</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">API Name</th>
+          <th>Current Label (Confirmed)</th>
+          <th style="width:210px">SubType</th>
+          <th>Final Display Format</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="data-row"><td><span class="api">C10000</span></td><td>CROZER PCP</td><td><span class="subtype st-pc">Primary Care Physician (PC)</span></td><td><span class="final-display">C10000 - CROZER PCP</span></td></tr>
+        <tr class="data-row"><td><span class="api">CRNP00</span></td><td>CRNP PROV NETWORK- 85 OF STANDARD</td><td><span class="subtype st-pc">Primary Care Physician (PC)</span></td><td><span class="final-display">CRNP00 - CRNP PROV NETWORK- 85 OF STANDARD</span></td></tr>
+        <tr class="data-row"><td><span class="api">DED100</span></td><td>Dedicated Physicians Group of Pennsylvania LLC</td><td><span class="subtype st-pc">PC / Dental (DE)</span></td><td><span class="final-display">DED100 - Dedicated Physicians Group of Pennsylvania LLC</span></td></tr>
+        <tr class="data-row"><td><span class="api">DEN001</span></td><td>Dental Vendor Schedule</td><td><span class="subtype st-de">Dental (DE)</span></td><td><span class="final-display">DEN001 - Dental Vendor Schedule</span></td></tr>
+        <tr class="data-row"><td><span class="api">FCP001</span></td><td>Fox Chase Pediatrics</td><td><span class="subtype st-pc">Primary Care Physician (PC)</span></td><td><span class="final-display">FCP001 - Fox Chase Pediatrics</span></td></tr>
+        <tr class="data-row"><td><span class="api">LAB200</span></td><td>HEALTH NETWORK LABORATORIES</td><td><span class="subtype st-lb">Lab Fund (LB)</span></td><td><span class="final-display">LAB200 - HEALTH NETWORK LABORATORIES</span></td></tr>
+        <tr class="data-row"><td><span class="api">LAB300</span></td><td>MERCY HEALTH LAB</td><td><span class="subtype st-lb">Lab Fund (LB)</span></td><td><span class="final-display">LAB300 - MERCY HEALTH LAB</span></td></tr>
+        <tr class="data-row"><td><span class="api">LAB500</span></td><td>LABCORP OF AMERICA</td><td><span class="subtype st-lb">Lab Fund (LB)</span></td><td><span class="final-display">LAB500 - LABCORP OF AMERICA</span></td></tr>
+        <tr class="data-row"><td><span class="api">LAB902</span></td><td>ATLANTIC DIAGNOSTICS LAB LLC PA/DE</td><td><span class="subtype st-lb">Lab Fund (LB)</span></td><td><span class="final-display">LAB902 - ATLANTIC DIAGNOSTICS LAB LLC PA/DE</span></td></tr>
+        <tr class="data-row"><td><span class="api">PTH702</span></td><td>PHYSICAL THERAPY MERCY HEALTH SYSTEM</td><td><span class="subtype st-pt">Physical Therapy (PT)</span></td><td><span class="final-display">PTH702 - PHYSICAL THERAPY MERCY HEALTH SYSTEM</span></td></tr>
+        <tr class="data-row"><td><span class="api">PTH703</span></td><td>UNIV OF PENNSYLVANIA PT TABLE</td><td><span class="subtype st-pt">Physical Therapy (PT)</span></td><td><span class="final-display">PTH703 - UNIV OF PENNSYLVANIA PT TABLE</span></td></tr>
+        <tr class="data-row"><td><span class="api">PTH706</span></td><td>BRANDYWINE/JENNERSVILLE PT</td><td><span class="subtype st-pt">Physical Therapy (PT)</span></td><td><span class="final-display">PTH706 - BRANDYWINE/JENNERSVILLE PT</span></td></tr>
+        <tr class="data-row"><td><span class="api">PTH714</span></td><td>CROZER/DE CNTY PT</td><td><span class="subtype st-pt">Physical Therapy (PT)</span></td><td><span class="final-display">PTH714 - CROZER/DE CNTY PT</span></td></tr>
+        <tr class="data-row"><td><span class="api">PTH716</span></td><td>DOYLESTOWN HOSP PT</td><td><span class="subtype st-pt">Physical Therapy (PT)</span></td><td><span class="final-display">PTH716 - DOYLESTOWN HOSP PT</span></td></tr>
+        <tr class="data-row"><td><span class="api">RAD200</span></td><td>CROZER CHESTER MED-RAD</td><td><span class="subtype st-rd">Radiology (RD)</span></td><td><span class="final-display">RAD200 - CROZER CHESTER MED-RAD</span></td></tr>
+        <tr class="data-row"><td><span class="api">RAD500</span></td><td>RADIOLOGY - INTEGRATED HEALTH NETWORK, INC</td><td><span class="subtype st-rd">Radiology (RD)</span></td><td><span class="final-display">RAD500 - RADIOLOGY - INTEGRATED HEALTH NETWORK, INC</span></td></tr>
+        <tr class="data-row"><td><span class="api">RAD907</span></td><td>RADIOLOGY-GRANDVIEW HOSPITAL</td><td><span class="subtype st-rd">Radiology (RD)</span></td><td><span class="final-display">RAD907 - RADIOLOGY-GRANDVIEW HOSPITAL</span></td></tr>
+        <tr class="data-row"><td><span class="api">RAD914</span></td><td>SOUTHEAST MEDICAL IMAGING</td><td><span class="subtype st-rd">Radiology (RD)</span></td><td><span class="final-display">RAD914 - SOUTHEAST MEDICAL IMAGING</span></td></tr>
+        <tr class="data-row"><td><span class="api">TDM001</span></td><td>Tandigm Enhanced</td><td><span class="subtype st-tg">Tandigm (TG)</span></td><td><span class="final-display">TDM001 - Tandigm Enhanced</span></td></tr>
+        <tr class="data-row"><td><span class="api">UBHA01</span></td><td>Behavioral Health UM Admin Fee</td><td><span class="subtype st-ba">Behavioral Health (BA)</span></td><td><span class="final-display">UBHA01 - Behavioral Health UM Admin Fee</span></td></tr>
+        <tr class="data-row"><td><span class="api">UECA01</span></td><td>EviCore UM Admin Fee</td><td><span class="subtype st-um">UM Admin Fee</span></td><td><span class="final-display">UECA01 - EviCore UM Admin Fee</span></td></tr>
+        <tr class="data-row"><td><span class="api">UECV01</span></td><td>EviCore Vendor Payment</td><td><span class="subtype st-um">UM Vendor Payment</span></td><td><span class="final-display">UECV01 - EviCore Vendor Payment</span></td></tr>
+        <tr class="data-row"><td><span class="api">VIS001</span></td><td>Vision Vendor Schedule</td><td><span class="subtype st-vi">Vision (VI)</span></td><td><span class="final-display">VIS001 - Vision Vendor Schedule</span></td></tr>
+        <tr class="data-row"><td><span class="api">DMD001</span></td><td>Dominion Vendor Payment <span style="font-size:11px;color:#b07a00">(see Deferred note below)</span></td><td><span class="subtype st-de">Dental (DE)</span></td><td><span class="final-display">DMD001 - Dominion Vendor Payment</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 4: CONFIRMED REMOVAL ===== -->
+  <div class="section section-remove">
+    <div class="section-title">
+      ✕ CONFIRMED REMOVAL
+      <span class="badge">1 value — business confirmed no longer needed, to be inactivated</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">API Name</th>
+          <th>Current Label (Org)</th>
+          <th style="width:160px">SubType</th>
+          <th>Business Decision</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="data-row">
+          <td><span class="api">NRAD02</span></td>
+          <td><span class="label-remove">NJ KENNEDY RADIOLOGY COMMERCIAL TABLE</span></td>
+          <td><span class="subtype st-rd">Radiology (RD)</span></td>
+          <td class="note-cell">✕ REMOVE — Business confirmed: "We don't need NRAD02, this termed 11/1/2014." Inactivate picklist value on both PRM_Program__c and PRM_ProgramParticipation__c.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 5: DEFERRED ===== -->
+  <div class="section section-question">
+    <div class="section-title">
+      ⏳ DEFERRED — DENTAL RATE SCHEDULE
+      <span class="badge">Business confirmed not active yet — planned August 2026</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">API Name</th>
+          <th>Label</th>
+          <th style="width:160px">SubType</th>
+          <th>Business Response &amp; Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="data-row">
+          <td><span class="api">DMD001</span></td>
+          <td>Dominion Vendor Payment</td>
+          <td><span class="subtype st-de">Dental (DE)</span></td>
+          <td class="note-deferred">
+            <strong>Business Response:</strong> "We're not currently using the Dental rate schedule, but we plan to start in August 2026, with the first payment being issued in September 2026."<br>
+            <strong>Contact:</strong> Suja Rajalekshmy — Pricing Support &amp; GL teams are still working through the downstream mapping.<br>
+            <strong>Action for this sprint:</strong> <em>No change to DMD001 at this time.</em> The controlling field mapping question (should DMD001 map to SubType DE on PRM_Program__c?) is deferred until the downstream mapping is confirmed. Schedule follow-up in July 2026 before August go-live.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== SECTION 6: COMPLETE FINAL LIST ===== -->
+  <div class="section section-final">
+    <div class="section-title">
+      ≡ COMPLETE FINAL PICKLIST — 65 values in <code style="font-size:12px;background:rgba(255,255,255,0.15);padding:1px 6px;border-radius:3px">{API Name} - {Label}</code> format
+      <span class="badge" style="background:rgba(255,255,255,0.15)">NRAD02 shown struck through (confirmed removal). DMD001 no change this sprint.</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:110px">API Name</th>
+          <th>Final Display Format in Guided Flows</th>
+          <th style="width:210px">SubType</th>
+          <th style="width:110px">Change Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- PC -->
+        <tr class="subtype-group"><td colspan="4">— Primary Care Physician (PC)</td></tr>
+        <tr class="data-row"><td><span class="api">100000</span></td><td><span class="final-display">100000 - PA STANDARD - PCP</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">100004</span></td><td><span class="final-display">100004 - CHOP PA PCP</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">100105</span></td><td><span class="final-display">100105 - PA PCP 5% above Standard</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a7a4a;font-weight:600">NEW</td></tr>
+        <tr class="data-row"><td><span class="api">C10000</span></td><td><span class="final-display">C10000 - CROZER PCP</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">CHA200</span></td><td><span class="final-display">CHA200 - ADVOCARE OF PA</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">CRNP00</span></td><td><span class="final-display">CRNP00 - CRNP PROV NETWORK- 85 OF STANDARD</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">DED100</span></td><td><span class="final-display">DED100 - Dedicated Physicians Group of Pennsylvania LLC</span></td><td><span class="subtype st-pc">PC / DE</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">DPCP01</span></td><td><span class="final-display">DPCP01 - DE STANDARD</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">DPCP02</span></td><td><span class="final-display">DPCP02 - CCHS – CHRISTIANA CARE HEALTH SERVICES</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">FCP001</span></td><td><span class="final-display">FCP001 - Fox Chase Pediatrics</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">J10000</span></td><td><span class="final-display">J10000 - JEFFERSON HEALTH SYSTEM</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">JUP100</span></td><td><span class="final-display">JUP100 - JEFFERSON UNIV PHYSICIANS PCP</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">JUP115</span></td><td><span class="final-display">JUP115 - JEFFERSON UNIV PHYSICIANS PCP ENHANCED CAP</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">MER100</span></td><td><span class="final-display">MER100 - TRINITY HLTH - MERCY</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">MER300</span></td><td><span class="final-display">MER300 - TRINITY HLTH - MERCY FITZGERALD PCP CAP</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">MLH100</span></td><td><span class="final-display">MLH100 - Main Line Healthcare</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">N10000</span></td><td><span class="final-display">N10000 - AMERIHEALTH NJ</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">N10004</span></td><td><span class="final-display">N10004 - CHOP NJ</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">N10005</span></td><td><span class="final-display">N10005 - VIRTUA NJ</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">S20000</span></td><td><span class="final-display">S20000 - St Christopher Hospital for Children</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">U10000</span></td><td><span class="final-display">U10000 - UNIV PENN HOSPITAL SYSTEMS UPHS</span></td><td><span class="subtype st-pc">PC</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+
+        <!-- PT -->
+        <tr class="subtype-group"><td colspan="4">— Physical Therapy (PT)</td></tr>
+        <tr class="data-row"><td><span class="api">DPTH01</span></td><td><span class="final-display">DPTH01 - ATI/PRO PT</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">NPTH00</span></td><td><span class="final-display">NPTH00 - AmeriHealth PT</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">PTH700</span></td><td><span class="final-display">PTH700 - PA STANDARD PHYSICAL THERAPY</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">PTH702</span></td><td><span class="final-display">PTH702 - PHYSICAL THERAPY MERCY HEALTH SYSTEM</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">PTH703</span></td><td><span class="final-display">PTH703 - UNIV OF PENNSYLVANIA PT TABLE</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">PTH705</span></td><td><span class="final-display">PTH705 - TOWER HLTH - POTTSTOWN MEMORIAL PHYSICAL THERAPY</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">PTH706</span></td><td><span class="final-display">PTH706 - BRANDYWINE/JENNERSVILLE PT</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">PTH710</span></td><td><span class="final-display">PTH710 - TUHS – Temple</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">PTH714</span></td><td><span class="final-display">PTH714 - CROZER/DE CNTY PT</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">PTH716</span></td><td><span class="final-display">PTH716 - DOYLESTOWN HOSP PT</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">PTH719</span></td><td><span class="final-display">PTH719 - TOWER HLTH - PHOENIXVILLE HOSP PT TABLE</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">PTH721</span></td><td><span class="final-display">PTH721 - TRINITY HLTH - PT NAZARETH HOSPITAL PT</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">PTH722</span></td><td><span class="final-display">PTH722 - PRIME HLTH - ROXBOROUGH/SOLIS SUBURBAN/LOWER BUCKS</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update ✎</td></tr>
+        <tr class="data-row"><td><span class="api">PTH724</span></td><td><span class="final-display">PTH724 - PT CHESTNUT HILL - TEMPLE</span></td><td><span class="subtype st-pt">PT</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+
+        <!-- LB -->
+        <tr class="subtype-group"><td colspan="4">— Lab Fund (LB)</td></tr>
+        <tr class="data-row"><td><span class="api">LAB200</span></td><td><span class="final-display">LAB200 - HEALTH NETWORK LABORATORIES</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">LAB300</span></td><td><span class="final-display">LAB300 - MERCY HEALTH LAB</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">LAB500</span></td><td><span class="final-display">LAB500 - LABCORP OF AMERICA</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">LAB600</span></td><td><span class="final-display">LAB600 - QUEST LAB NON-PAR NOT CAP</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">LAB800</span></td><td><span class="final-display">LAB800 - KEYSTONE SMA MEDICAL LAB NOT NEEDED</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">LAB902</span></td><td><span class="final-display">LAB902 - ATLANTIC DIAGNOSTICS LAB LLC PA/DE</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">LAB903</span></td><td><span class="final-display">LAB903 - TOWER HLTH - POTTSTOWN HOSP LAB</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">LAB905</span></td><td><span class="final-display">LAB905 - Parkesburg</span></td><td><span class="subtype st-lb">LB</span></td><td style="color:#1a7a4a;font-weight:600">NEW</td></tr>
+
+        <!-- RD -->
+        <tr class="subtype-group"><td colspan="4">— Radiology (RD)</td></tr>
+        <tr class="data-row"><td><span class="api" style="color:#999;text-decoration:line-through">NRAD02</span></td><td><span class="final-remove">NRAD02 - NJ KENNEDY RADIOLOGY COMMERCIAL TABLE</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#7a1010;font-weight:600">✕ REMOVE</td></tr>
+        <tr class="data-row"><td><span class="api">RAD001</span></td><td><span class="final-display">RAD001 - RADIOLOGY – DOYLESTOWN RADIOLOGY</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD004</span></td><td><span class="final-display">RAD004 - ST LUKE'S QUAKERTOWN RADIOLOGY</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD005</span></td><td><span class="final-display">RAD005 - Tower Brandywine/Jennersville</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update ✎</td></tr>
+        <tr class="data-row"><td><span class="api">RAD100</span></td><td><span class="final-display">RAD100 - PA STANDARD - RADIOLOGY</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD103</span></td><td><span class="final-display">RAD103 - TOWER HLTH - POTTSTOWN MEMORIAL RADIOLOGY</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD105</span></td><td><span class="final-display">RAD105 - Temple-Northeast TUHS Radiology</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update ✎</td></tr>
+        <tr class="data-row"><td><span class="api">RAD150</span></td><td><span class="final-display">RAD150 - CHESTNUT HILL - TEMPLE HOSPITAL RADIOLOGY</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD200</span></td><td><span class="final-display">RAD200 - CROZER CHESTER MED-RAD</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">RAD500</span></td><td><span class="final-display">RAD500 - RADIOLOGY - INTEGRATED HEALTH NETWORK, INC</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">RAD700</span></td><td><span class="final-display">RAD700 - Community Radiology of HUP</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update ✎</td></tr>
+        <tr class="data-row"><td><span class="api">RAD907</span></td><td><span class="final-display">RAD907 - RADIOLOGY-GRANDVIEW HOSPITAL</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">RAD908</span></td><td><span class="final-display">RAD908 - TRINITY HLTH - ST MARY MEDICAL CTR RADIOLOGY</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD909</span></td><td><span class="final-display">RAD909 - Trinity Mercy Health System-Mercy Fitzgerald Radiology</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update ✎</td></tr>
+        <tr class="data-row"><td><span class="api">RAD910</span></td><td><span class="final-display">RAD910 - TRINITY HLTH - NAZARETH HOSPITAL RADIOLOGY</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD911</span></td><td><span class="final-display">RAD911 - PRIME HLTH - ROXBOROUGH/SOLIS RAD MERCY SUBURBAN</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+        <tr class="data-row"><td><span class="api">RAD914</span></td><td><span class="final-display">RAD914 - SOUTHEAST MEDICAL IMAGING</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">RAD915</span></td><td><span class="final-display">RAD915 - PRIME HLTH - LOWER BUCKS HOSPITAL</span></td><td><span class="subtype st-rd">RD</span></td><td style="color:#1a5a9e;font-weight:600">Label Update</td></tr>
+
+        <!-- Dental -->
+        <tr class="subtype-group"><td colspan="4">— Dental (DE)</td></tr>
+        <tr class="data-row"><td><span class="api">DEN001</span></td><td><span class="final-display">DEN001 - Dental Vendor Schedule</span></td><td><span class="subtype st-de">DE</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">DMD001</span></td><td><span class="final-display">DMD001 - Dominion Vendor Payment</span></td><td><span class="subtype st-none">⏳ Deferred (Aug 2026)</span></td><td style="color:#b07a00;font-weight:600">Deferred</td></tr>
+
+        <!-- Tandigm -->
+        <tr class="subtype-group"><td colspan="4">— Tandigm (TG)</td></tr>
+        <tr class="data-row"><td><span class="api">TDM001</span></td><td><span class="final-display">TDM001 - Tandigm Enhanced</span></td><td><span class="subtype st-tg">TG</span></td><td style="color:#555">No Change</td></tr>
+
+        <!-- Vision -->
+        <tr class="subtype-group"><td colspan="4">— Vision (VI)</td></tr>
+        <tr class="data-row"><td><span class="api">VIS001</span></td><td><span class="final-display">VIS001 - Vision Vendor Schedule</span></td><td><span class="subtype st-vi">VI</span></td><td style="color:#555">No Change</td></tr>
+
+        <!-- UM -->
+        <tr class="subtype-group"><td colspan="4">— UM Admin Fee / UM Vendor Payment / Behavioral Health</td></tr>
+        <tr class="data-row"><td><span class="api">UAMA01</span></td><td><span class="final-display">UAMA01 - Carelon UM Admin Fee</span></td><td><span class="subtype st-um">UM</span></td><td style="color:#1a5a9e;font-weight:600">Label Update ✎</td></tr>
+        <tr class="data-row"><td><span class="api">UAMV01</span></td><td><span class="final-display">UAMV01 - Carelon UM Vendor Payment</span></td><td><span class="subtype st-um">UV</span></td><td style="color:#1a5a9e;font-weight:600">Label Update ✎</td></tr>
+        <tr class="data-row"><td><span class="api">UBHA01</span></td><td><span class="final-display">UBHA01 - Behavioral Health UM Admin Fee</span></td><td><span class="subtype st-ba">BA</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">UECA01</span></td><td><span class="final-display">UECA01 - EviCore UM Admin Fee</span></td><td><span class="subtype st-um">UM</span></td><td style="color:#555">No Change</td></tr>
+        <tr class="data-row"><td><span class="api">UECV01</span></td><td><span class="final-display">UECV01 - EviCore Vendor Payment</span></td><td><span class="subtype st-um">UV</span></td><td style="color:#555">No Change</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:10px;font-size:11px;color:#666;padding:6px 10px;background:#f5f5f5;border-radius:3px;">
+      ✎ = Additional change from business response 2026-04-30 &nbsp;|&nbsp;
+      Total active values after changes: <strong>64</strong> (65 − 1 removal of NRAD02) &nbsp;|&nbsp;
+      NEW: 2 &nbsp;|&nbsp; Label Updates: 43 &nbsp;|&nbsp; No Change: 24 &nbsp;|&nbsp; Remove: 1 &nbsp;|&nbsp; Deferred: 1 (DMD001 mapping)
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Rate Schedule Picklist Confirmation — IBXQA / PRM &nbsp;|&nbsp; v2 updated 2026-04-30</span>
+    <span>QA: Loop in Capitation team for testing &nbsp;|&nbsp; Dental follow-up: contact Suja Rajalekshmy (July 2026)</span>
+  </div>
+
+</div>
+</body>
+</html>

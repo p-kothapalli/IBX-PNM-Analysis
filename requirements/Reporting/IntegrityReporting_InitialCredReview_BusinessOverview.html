@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>Integrity Reporting Practitioner — Initial Cred Review — Field Mapping Overview</title>
+<style>
+:root {
+  --primary: #003a70;       /* IBX-style deep blue */
+  --primary-light: #0a5ca8;
+  --accent: #0066b3;
+  --bg-soft: #f3f6fb;
+  --rule: #d8dee8;
+  --text: #1f2937;
+  --muted: #4b5563;
+  --code-bg: #eef2f7;
+}
+@page {
+  size: Letter;
+  margin: 0.75in 0.75in 0.85in 0.75in;
+  @bottom-center {
+    content: counter(page) " / " counter(pages);
+    font-size: 9pt;
+    color: #6b7280;
+  }
+}
+* { box-sizing: border-box; }
+html, body {
+  font-family: -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10.5pt;
+  color: var(--text);
+  line-height: 1.45;
+  margin: 0;
+  padding: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.cover {
+  border-left: 6px solid var(--primary);
+  padding: 18px 22px 22px 22px;
+  margin-bottom: 24px;
+  background: linear-gradient(90deg, var(--bg-soft) 0%, #ffffff 80%);
+}
+.cover .eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 9pt;
+  color: var(--primary-light);
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+.cover h1 {
+  font-size: 22pt;
+  margin: 0 0 4px 0;
+  color: var(--primary);
+  border: none;
+  padding: 0;
+}
+.cover h2 {
+  font-size: 14pt;
+  margin: 0 0 14px 0;
+  color: var(--muted);
+  font-weight: 500;
+  font-style: italic;
+  border: none;
+  padding: 0;
+}
+.cover .meta {
+  display: flex;
+  gap: 26px;
+  font-size: 9.5pt;
+  color: var(--muted);
+  margin-top: 8px;
+}
+.cover .meta strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+h1, h2, h3, h4 {
+  color: var(--primary);
+  page-break-after: avoid;
+}
+h2 {
+  font-size: 14pt;
+  margin: 22px 0 10px 0;
+  padding-bottom: 4px;
+  border-bottom: 2px solid var(--primary);
+}
+h3 {
+  font-size: 11.5pt;
+  margin: 18px 0 6px 0;
+  color: var(--primary-light);
+}
+h4 {
+  font-size: 10.5pt;
+  margin: 14px 0 4px 0;
+  color: var(--accent);
+}
+
+p { margin: 6px 0 8px 0; }
+
+code {
+  font-family: "SFMono-Regular", "Menlo", monospace;
+  font-size: 9pt;
+  background: var(--code-bg);
+  color: #0b3a8a;
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: 1px solid #d8e0ed;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+ul, ol { margin: 6px 0 10px 22px; padding: 0; }
+li { margin: 2px 0; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 14px 0;
+  font-size: 9.5pt;
+  page-break-inside: auto;
+}
+thead th {
+  background: var(--primary);
+  color: #ffffff;
+  text-align: left;
+  padding: 6px 9px;
+  font-weight: 600;
+  border: 1px solid var(--primary);
+}
+tbody td {
+  padding: 5px 9px;
+  border: 1px solid var(--rule);
+  vertical-align: top;
+}
+tbody tr:nth-child(even) td {
+  background: var(--bg-soft);
+}
+tr { page-break-inside: avoid; }
+
+blockquote {
+  border-left: 4px solid var(--accent);
+  background: #f7fbff;
+  margin: 10px 0;
+  padding: 8px 14px;
+  border-radius: 4px;
+}
+blockquote table { font-size: 9.5pt; margin: 0; }
+blockquote thead th { background: var(--primary-light); }
+
+hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 18px 0;
+}
+
+/* page-break helpers */
+.page-break { page-break-after: always; }
+</style>
+</head>
+<body>
+<div class="cover">
+  <div class="eyebrow">Independence Blue Cross &middot; Provider Credentialing</div>
+  <h1>Integrity Reporting Practitioner — Closed Cases</h1>
+  <h2>Initial Cred Review — Field Mapping Overview</h2>
+  <div class="meta">
+    <span><strong>Audience:</strong> Business stakeholders, Integrity Reporting team, Credentialing Operations</span>
+    <span><strong>Prepared:</strong> June&nbsp;2026</span>
+  </div>
+</div>
+<h2>1. What this report shows</h2>
+<p>Every Approved <strong>Initial Credentialing</strong> case for an individual physician, with one row per <em>tracked field change</em> (App Review, PSV, and key administrative events). The same header information about the case and practitioner is repeated on every row of that case so the data can be filtered, pivoted, or audited any way the business needs.</p>
+<h3>Cohort included</h3>
+<p>A case appears in this export only when <strong>all</strong> of the following are true:</p>
+<table><thead><tr><th>Filter</th><th>Plain-language meaning</th></tr></thead><tbody><tr><td>Case is <strong>Approved</strong></td><td>The credentialing decision has been made and closed</td></tr><tr><td>Record Type = <strong>Practitioner Participation Request</strong></td><td>This is an <em>initial</em> credentialing case (not Re-Cred, Ancillary, etc.)</td></tr><tr><td>Practitioner is a <strong>Person Account</strong></td><td>The case is about an individual physician, not a facility or group</td></tr><tr><td>Decision Date falls in the requested window</td><td>The reporting window — typically a calendar quarter or year-to-date</td></tr></tbody></table>
+<h3>Why this cohort</h3>
+<p>These four filters together produce the &quot;Individual Physician — Full/Initial — Approved&quot; group that the legacy Excel feed already shows in columns 2, 3, and 4. The new report keeps the same scope so existing dashboards and historical comparisons remain valid.</p>
+<hr/>
+<h2>2. Column-by-column source mapping</h2>
+<p>The table below shows where each of the 18 columns comes from. <strong>&quot;Source&quot;</strong> is the Salesforce object and field that holds the value. <strong>&quot;Notes&quot;</strong> explains anything non-obvious.</p>
+<table><thead><tr><th>#</th><th>Column</th><th>Source</th><th>Notes</th></tr></thead><tbody><tr><td>1</td><td><strong>Case ID</strong></td><td>Individual Application — Name</td><td>The IA-NNNNNNN case number.</td></tr><tr><td>2</td><td><strong>Cred Body</strong></td><td><em>Constant:</em> <code>Individual Physician</code></td><td>Derived from the cohort filter (Person Account + Practitioner Participation record type).</td></tr><tr><td>3</td><td><strong>Status</strong></td><td>Individual Application — Status</td><td>Always <code>Approved</code> for this tab — the closed-case filter.</td></tr><tr><td>4</td><td><strong>Credentialing Type</strong></td><td><em>Constant:</em> <code>Full/Initial</code></td><td>Derived from the record type (<code>Practitioner Participation Request</code> ⇒ Full/Initial; <code>Re-Credentialing</code> ⇒ Re-Cred).</td></tr><tr><td>5</td><td><strong>Practitioner ID</strong></td><td>Account → Practitioner Number → Name</td><td>The 11-digit IBX practitioner identifier.</td></tr><tr><td>6</td><td><strong>Practitioner NPI</strong></td><td>Healthcare Provider NPI — NPI<br/><em>(Individual NPI tagged to the practitioner&#x27;s Account; active row preferred when more than one exists)</em></td><td>Standard Health Cloud NPI record on the Account. We deliberately do not filter on the <em>Active</em> flag — a small share of practitioners have only an inactive Individual NPI row tagged to their Account, and the legacy Excel feed never filtered on Active either.</td></tr><tr><td>7</td><td><strong>First Name</strong></td><td>Account — First Name</td><td>Person Account demographics.</td></tr><tr><td>8</td><td><strong>Middle Name</strong></td><td>Account — Middle Name</td><td>May be blank if not on file.</td></tr><tr><td>9</td><td><strong>Last Name</strong></td><td>Account — Last Name</td><td>Person Account demographics.</td></tr><tr><td>10</td><td><strong>Current Attestation Date</strong></td><td>Most recent <strong>CAQH Attestation</strong> field-change date for the practitioner across all their cases</td><td>Pulled from history, not a single field. Blank if the practitioner has never had an attestation event tracked.</td></tr><tr><td>11</td><td><strong>Review Name</strong></td><td>Individual Application History — Field</td><td>Friendly name (we strip the <code>PRM_</code> prefix and <code>__c</code> suffix). See §3 for the full list of 38 tracked fields.</td></tr><tr><td>12</td><td><strong>Review Previous Value</strong></td><td>Individual Application History — Old Value</td><td>What the field was before the change. Blank when this is the first time the field was set. Boolean fields show as <code>~</code> (legacy convention).</td></tr><tr><td>13</td><td><strong>Review Current Value</strong></td><td>Individual Application History — New Value</td><td>What the field changed to. The full list of values matches what users see in the Salesforce UI (e.g. <code>Data Looks Good</code>, <code>Not Applicable</code>, <code>PSV QC</code>, etc.).</td></tr><tr><td>14</td><td><strong>Review Date</strong></td><td>Individual Application History — Created Date<br/><em>(date portion, GMT)</em></td><td>When that specific field changed — the calendar date in GMT.</td></tr><tr><td>15</td><td><strong>Review Time</strong></td><td>Individual Application History — Created Date<br/>*(time portion <code>HH:mm:ss</code>, GMT)*</td><td>The time-of-day the field changed, in the same GMT timezone as Review Date so the two columns describe a single consistent moment. Together columns 14+15 give the full audit timestamp.</td></tr><tr><td>16</td><td><strong>Applied Date</strong></td><td>Individual Application — Applied Date</td><td>When the practitioner submitted their application.</td></tr><tr><td>17</td><td><strong>Decision Date</strong></td><td>Individual Application — Decision Date</td><td>Custom field on the case. The official decision date used for SLA reporting.</td></tr><tr><td>18</td><td><strong>Processing Time</strong></td><td>Individual Application — Case Manager Age</td><td>The case age in days, sourced directly from the Salesforce-managed <em>Case Manager Age</em> field (<code>PRM_CaseManagerAge__c</code>). The leading number is shown without the trailing <code>&quot; days&quot;</code> text so the column matches the legacy integer format.</td></tr><tr><td>19</td><td><strong>Applied After Decision Flag</strong></td><td><em>Computed:</em> <code>Yes</code> if the field changed after the case was decided, else <code>No</code></td><td>Audit signal — flags any review activity that happened after the case was closed.</td></tr></tbody></table>
+<hr/>
+<h2>3. The 38 tracked fields (column 11 detail)</h2>
+<p>These are the only Individual Application fields whose changes appear in the <strong>Review Name</strong> column. Anything outside this list is filtered out so the export stays focused on credentialing-relevant activity.</p>
+<h3>Application Review (10)</h3>
+<table><thead><tr><th>Review Name in export</th><th>Field on Individual Application</th></tr></thead><tbody><tr><td>Attestation Verification</td><td><code>PRM_AttestationVerification__c</code></td></tr><tr><td>License Verification</td><td><code>PRM_LicenseVerification__c</code></td></tr><tr><td>Education Verification</td><td><code>PRM_EducationVerification__c</code></td></tr><tr><td>Specialty Verification</td><td><code>PRM_SpecialtyVerification__c</code></td></tr><tr><td>Malpractice Coverage Verification</td><td><code>PRM_MalpracticeCoverageVerification__c</code></td></tr><tr><td>DEA Verification</td><td><code>PRM_DEAVerification__c</code></td></tr><tr><td>CDS Verification</td><td><code>PRM_CDSVerification__c</code></td></tr><tr><td>Work History Verification</td><td><code>PRM_WorkHistoryVerification__c</code></td></tr><tr><td>NPDB Verified On</td><td><code>PRM_NPDBVerifiedOn__c</code></td></tr><tr><td>NPDB Error Message</td><td><code>PRM_NPDBErrorMessage__c</code></td></tr></tbody></table>
+<h3>PSV / Reviews (17)</h3>
+<table><thead><tr><th>Review Name in export</th><th>Field on Individual Application</th></tr></thead><tbody><tr><td>PSV Outcome</td><td><code>PRM_PSVOutcome__c</code></td></tr><tr><td>Contract Status</td><td><code>PRM_ContractStatus__c</code></td></tr><tr><td>CAQH Attestation</td><td><code>PRM_CAQHAttestation__c</code></td></tr><tr><td>Service Area PSV</td><td><code>PRM_ServiceAreaPSV__c</code></td></tr><tr><td>License PSV</td><td><code>PRM_LicensePSV__c</code></td></tr><tr><td>Specialty PSV</td><td><code>PRM_SpecialtyPSV__c</code></td></tr><tr><td>Admitting Privileges Review</td><td><code>PRM_AdmittingPrivilegesReview__c</code></td></tr><tr><td>Insurance PSV</td><td><code>PRM_InsurancePSV__c</code></td></tr><tr><td>Education PSV</td><td><code>PRM_EducationPSV__c</code></td></tr><tr><td>Work History PSV</td><td><code>PRM_WorkHistoryPSV__c</code></td></tr><tr><td>CDS PSV</td><td><code>PRM_CDSPSV__c</code></td></tr><tr><td>DEA PSV</td><td><code>PRM_DEAPSV__c</code></td></tr><tr><td>Board Certification PSV</td><td><code>PRM_BoardCertificationPSV__c</code></td></tr><tr><td>Disclosure Review</td><td><code>PRM_DisclosureReview__c</code></td></tr><tr><td>Medicare Opt-Out Review</td><td><code>PRM_MedicareOptOutReview__c</code></td></tr><tr><td>FSMB PSV</td><td><code>PRM_FSMBPSV__c</code></td></tr><tr><td>SAM Review</td><td><code>PRM_SAMReview__c</code></td></tr><tr><td>CMS Preclusion Review</td><td><code>PRM_CMSPreclusionReview__c</code></td></tr></tbody></table>
+<h3>Operational / Administrative (11)</h3>
+<table><thead><tr><th>Review Name in export</th><th>Field on Individual Application</th></tr></thead><tbody><tr><td>Approved Date</td><td><code>ApprovedDate</code> <em>(standard)</em></td></tr><tr><td>Approved Date (custom)</td><td><code>PRM_ApprovedDate__c</code></td></tr><tr><td>Re-Cred Due Date</td><td><code>PRM_ReCredDueDate__c</code></td></tr><tr><td>Created By Id</td><td><code>CreatedById</code> <em>(standard)</em></td></tr><tr><td>Case Data Manager</td><td><code>PRM_CaseDataManager__c</code></td></tr><tr><td>Display Cap Sites</td><td><code>PRM_DisplayCapSites__c</code></td></tr><tr><td>NPDB Received</td><td><code>PRM_NPDBReceived__c</code></td></tr><tr><td>NPDB Verified</td><td><code>PRM_NPDBVerified__c</code></td></tr><tr><td>Role Change Request</td><td><code>PRM_RoleChangeRequest__c</code></td></tr><tr><td>First Name</td><td><code>PRM_FirstName__c</code></td></tr><tr><td>Last Name</td><td><code>PRM_LastName__c</code></td></tr></tbody></table>
+<hr/>
+<h2>4. Sample row (illustrative)</h2>
+<blockquote><table><thead><tr><th>Column</th><th>Value</th></tr></thead><tbody><tr><td>Case ID</td><td><code>IA-0000021599</code></td></tr><tr><td>Cred Body</td><td><code>Individual Physician</code></td></tr><tr><td>Status</td><td><code>Approved</code></td></tr><tr><td>Credentialing Type</td><td><code>Full/Initial</code></td></tr><tr><td>Practitioner ID</td><td><code>10000237353</code></td></tr><tr><td>Practitioner NPI</td><td><code>1083292528</code></td></tr><tr><td>First Name</td><td><code>Aleksandr</code></td></tr><tr><td>Last Name</td><td><code>Abakulov</code></td></tr><tr><td>Current Attestation Date</td><td><code>2025-12-29</code></td></tr><tr><td>Review Name</td><td><code>License Verification</code></td></tr><tr><td>Previous Value</td><td><em>(blank — first time set)</em></td></tr><tr><td>Current Value</td><td><code>Data Looks Good</code></td></tr><tr><td>Review Date</td><td><code>2026-02-17</code></td></tr><tr><td>Review Time</td><td><code>15:16:14</code> <em>(GMT)</em></td></tr><tr><td>Applied Date</td><td><code>2025-07-31</code></td></tr><tr><td>Decision Date</td><td><code>2026-03-26</code></td></tr><tr><td>Processing Time <em>(Case Age)</em></td><td><code>306</code></td></tr><tr><td>Applied After Decision</td><td><code>No</code></td></tr></tbody></table></blockquote>
+</body>
+</html>

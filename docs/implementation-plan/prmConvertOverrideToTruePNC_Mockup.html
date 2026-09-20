@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Convert Override → True PNC — Address Mgmt + Effective Dates + PNC Case Manager (SLDS Mockup)</title>
+<style>
+  :root{
+    --brand:#0176d3; --brand-dark:#014486; --brand-100:#eef4ff;
+    --page-bg:#f3f3f3; --card:#fff; --border:#dddbda; --border-2:#c9c9c9;
+    --txt:#181818; --txt-2:#5c5c5c; --txt-3:#747474;
+    --green:#2e844a; --green-bg:#ddf3e4; --green-bd:#91db8b;
+    --red:#ba0517;   --red-bg:#feded8;  --red-bd:#fe9a91;
+    --orange:#a86403;--orange-bg:#fef3e6;--orange-bd:#fec574;
+    --purple:#5a1ba9;--purple-bg:#efe7fb;--purple-bd:#c9aaf0;
+    --blue:#0176d3;  --blue-bg:#eef4ff; --blue-bd:#90d0fe;
+    --radius:.25rem; --shadow:0 2px 3px rgba(0,0,0,.16);
+    font-family:'Salesforce Sans','Segoe UI',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);color:var(--txt);font-size:13px;line-height:1.4;}
+
+  .ghead{background:#032d60;color:#fff;padding:.35rem .9rem;display:flex;align-items:center;gap:.7rem;}
+  .ghead .waffle{width:1.5rem;height:1.5rem;display:grid;grid-template-columns:repeat(3,4px);grid-gap:2px;align-content:center;justify-content:center;opacity:.9;}
+  .ghead .waffle i{width:4px;height:4px;background:#fff;border-radius:1px;display:block;}
+  .ghead .app{font-weight:700;font-size:.95rem;}
+  .ghead .search{flex:1 1 auto;max-width:520px;background:#fff;border-radius:1rem;height:1.7rem;display:flex;align-items:center;padding:0 .7rem;color:var(--txt-3);font-size:.8rem;}
+  .ghead .sp{margin-left:auto;display:flex;gap:.9rem;opacity:.9;}
+  .otab{background:#fff;border-bottom:1px solid var(--border);padding:0 1rem;display:flex;align-items:center;gap:.6rem;height:2.3rem;}
+  .otab .oi{width:1.4rem;height:1.4rem;border-radius:var(--radius);background:#f59331;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;}
+  .otab .on{font-weight:700;} .otab .oc{color:var(--txt-3);}
+
+  .wrap{max-width:1120px;margin:0 auto;padding:1rem;}
+
+  .hl{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);display:flex;align-items:center;gap:.9rem;padding:.8rem 1rem;margin-bottom:1rem;}
+  .hl .av{width:2.6rem;height:2.6rem;border-radius:50%;background:#f59331;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+  .hl .eyebrow{font-size:.72rem;color:var(--txt-3);text-transform:uppercase;letter-spacing:.04em;}
+  .hl .nm{font-size:1.1rem;font-weight:700;}
+  .hl .hlf{margin-left:auto;display:flex;gap:1.4rem;}
+  .hl .hlf .k{font-size:.68rem;color:var(--txt-3);}
+  .hl .hlf .v{font-weight:600;margin-top:.15rem;}
+
+  .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.1rem .5rem;border-radius:12px;font-size:.7rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .badge .dot{width:.5rem;height:.5rem;border-radius:50%;}
+  .b-pnc{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);} .b-pnc .dot{background:#dd7a01;}
+  .b-no{background:#f3f3f3;color:var(--txt-2);border-color:var(--border-2);} .b-no .dot{background:var(--txt-3);}
+  .b-over{background:var(--purple-bg);color:var(--purple);border-color:var(--purple-bd);} .b-over .dot{background:#7526e3;}
+  .b-primary{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);} .b-primary .dot{background:var(--blue);}
+  .b-term{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);} .b-term .dot{background:var(--red);}
+  .b-add{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);} .b-add .dot{background:var(--green);}
+
+  .card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:1rem;overflow:hidden;}
+  .card-h{display:flex;align-items:center;gap:.5rem;padding:.7rem 1rem;border-bottom:1px solid var(--border);}
+  .card-h .ci{width:1.5rem;height:1.5rem;border-radius:var(--radius);background:#5867e8;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.85rem;}
+  .card-h .ct{font-weight:700;font-size:1rem;}
+  .card-h .actions{margin-left:auto;display:flex;gap:.4rem;}
+  .card-b{padding:1rem;}
+
+  .btn{border:1px solid var(--border-2);background:#fff;color:var(--brand);border-radius:var(--radius);padding:.35rem .8rem;font-size:.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;}
+  .btn:hover{background:#f3f8ff;}
+  .btn--brand{background:var(--brand);border-color:var(--brand);color:#fff;} .btn--brand:hover{background:var(--brand-dark);}
+  .btn--neutral{color:var(--txt);}
+  .btn--success{background:var(--green);border-color:var(--green);color:#fff;} .btn--success:hover{filter:brightness(.95);}
+  .btn--destructive{color:var(--red);border-color:var(--red-bd);} .btn--destructive:hover{background:var(--red-bg);}
+  .btn[disabled]{opacity:.5;cursor:not-allowed;}
+  .btn svg{width:.85rem;height:.85rem;fill:currentColor;}
+
+  .roll{border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem;}
+  .roll .rh{padding:.5rem .85rem;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-2);background:#f7f9fb;border-bottom:1px solid var(--border);}
+  .roll .rb{padding:.85rem;}
+  .meter{height:.85rem;border-radius:6px;background:#f0f0f0;overflow:hidden;display:flex;margin:.5rem 0;}
+  .meter i{display:block;height:100%;}
+  .meter .mp{background:linear-gradient(90deg,#f9a825,#dd7a01);}
+  .meter .mn{background:#e0e0e0;}
+  .rollstat{display:flex;gap:1.6rem;flex-wrap:wrap;font-size:.82rem;}
+  .rollstat b{font-size:1.05rem;}
+  .verdict{margin-top:.7rem;padding:.6rem .8rem;border-radius:var(--radius);font-size:.85rem;border:1px solid transparent;display:flex;gap:.55rem;align-items:flex-start;}
+  .verdict .vi{width:1.2rem;height:1.2rem;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.8rem;}
+  .v-hold{background:var(--purple-bg);border-color:var(--purple-bd);color:#3d1272;} .v-hold .vi{background:#7526e3;}
+  .v-ready{background:var(--green-bg);border-color:var(--green-bd);color:#0a4f2c;} .v-ready .vi{background:var(--green);}
+
+  .tabset{border-bottom:1px solid var(--border);display:flex;gap:1.4rem;margin-bottom:.9rem;}
+  .tabx{padding:.55rem .1rem;font-weight:600;color:var(--txt-2);border-bottom:2px solid transparent;cursor:pointer;font-size:.86rem;}
+  .tabx.active{color:var(--brand);border-bottom-color:var(--brand);}
+
+  .infob{border-radius:var(--radius);padding:.55rem .8rem;margin-bottom:.85rem;display:flex;gap:.55rem;align-items:flex-start;font-size:.82rem;border:1px solid transparent;}
+  .infob .bi{flex:0 0 auto;font-weight:800;width:1.15rem;height:1.15rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.78rem;}
+  .ib-info{background:var(--blue-bg);border-color:var(--blue-bd);color:#032d60;} .ib-info .bi{background:var(--brand);}
+  .ib-warn{background:var(--orange-bg);border-color:var(--orange-bd);color:#5c3a00;} .ib-warn .bi{background:#dd7a01;}
+  .ib-success{background:var(--green-bg);border-color:var(--green-bd);color:#0a4f2c;} .ib-success .bi{background:var(--green);}
+
+  table{width:100%;border-collapse:collapse;font-size:.83rem;}
+  thead th{text-align:left;background:#fafaf9;color:var(--txt-2);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.02em;padding:.5rem .7rem;border-bottom:1px solid var(--border);}
+  tbody td{padding:.55rem .7rem;border-bottom:1px solid #eee;vertical-align:middle;}
+  tbody tr.nonpnc{background:#fffaf5;}
+  tbody tr.removed{background:#fff5f5;}
+  tbody tr.removed .facname{text-decoration:line-through;color:var(--txt-3);}
+  tbody tr.added{background:#f4fbf6;}
+  .addr{color:var(--txt-2);font-size:.78rem;}
+  .center{text-align:center;}
+  .dates{font-size:.76rem;color:var(--txt-2);white-space:nowrap;}
+  .dates .to{color:var(--red);font-weight:600;}
+  .dates .from{color:var(--green);font-weight:600;}
+  .chk{width:1.05rem;height:1.05rem;border:2px solid var(--border-2);border-radius:3px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#fff;vertical-align:middle;}
+  .chk.on{background:var(--brand);border-color:var(--brand);}
+  .chk svg{width:.72rem;height:.72rem;fill:#fff;display:none;} .chk.on svg{display:block;}
+
+  .filters{display:grid;grid-template-columns:repeat(3,1fr) auto;gap:.6rem;align-items:end;margin-bottom:.85rem;}
+  .fe label{display:block;font-size:.72rem;color:var(--txt-3);margin-bottom:.2rem;font-weight:600;}
+  .fe input,.fe select{width:100%;padding:.4rem .55rem;border:1px solid var(--border-2);border-radius:var(--radius);font-size:.82rem;}
+  .muted{color:var(--txt-3);}
+  .req{color:var(--red);}
+
+  /* review list */
+  .rev{display:grid;gap:.5rem;}
+  .revrow{display:flex;align-items:center;gap:.6rem;padding:.5rem .7rem;border:1px solid var(--border);border-radius:var(--radius);background:#fff;}
+  .revrow .rn{font-weight:600;} .revrow .ra{color:var(--txt-2);font-size:.78rem;}
+  .revrow .rd{margin-left:auto;font-size:.78rem;white-space:nowrap;}
+
+  /* modal */
+  .backdrop{position:fixed;inset:0;background:rgba(3,45,96,.45);display:none;align-items:center;justify-content:center;padding:1rem;z-index:50;}
+  .modal{background:#fff;border-radius:.4rem;box-shadow:0 12px 32px rgba(0,0,0,.35);width:100%;max-width:480px;overflow:hidden;}
+  .m-head{padding:.85rem 1.1rem;border-bottom:1px solid var(--border);font-weight:700;font-size:1rem;display:flex;align-items:center;gap:.5rem;}
+  .m-body{padding:1.1rem;}
+  .m-foot{display:flex;justify-content:flex-end;gap:.5rem;padding:.75rem 1.1rem;border-top:1px solid var(--border);background:#fafaf9;}
+  .fld-row{margin-bottom:.85rem;}
+  .fld-row label{display:block;font-size:.75rem;color:var(--txt-2);font-weight:600;margin-bottom:.25rem;}
+  .fld-row input,.fld-row select{width:100%;padding:.45rem .6rem;border:1px solid var(--border-2);border-radius:var(--radius);font-size:.85rem;}
+  .foot-note{font-size:.72rem;color:var(--txt-3);text-align:center;padding:.3rem 0 0;}
+</style>
+</head>
+<body>
+
+<div class="ghead">
+  <div class="waffle"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="app">Provider Network Mgmt</div>
+  <div class="search">Search Salesforce</div>
+  <div class="sp"><span>?</span><span>&#9733;</span><span>&#128276;</span><span>&#128100;</span></div>
+</div>
+<div class="otab">
+  <span class="oi">&#128100;</span><span class="on">Practitioners</span>
+  <span class="oc">&nbsp;›&nbsp; Dr. Aisha Rahman</span>
+</div>
+
+<div class="wrap">
+
+  <div class="hl">
+    <div class="av">AR</div>
+    <div>
+      <div class="eyebrow">Practitioner · Person Account</div>
+      <div class="nm">Dr. Aisha Rahman</div>
+      <div class="muted">Cardiology · NPI 1730214785</div>
+    </div>
+    <div class="hlf">
+      <div><div class="k">PNC</div><div class="v" id="hlPnc"></div></div>
+      <div><div class="k">Bypass PNC (Override)</div><div class="v" id="hlBypass"></div></div>
+      <div><div class="k">Credentialing Status</div><div class="v" id="hlStatus"></div></div>
+    </div>
+  </div>
+
+  <div class="infob ib-info">
+    <div class="bi">i</div>
+    <div>
+      <b>Goal — turn an Override PNC into a “true” PNC.</b>
+      Make every participating practice location PNC: <b>remove</b> the non-PNC locations (capture an <b>Effective To</b> / term date)
+      and <b>add</b> PNC ones (capture an <b>Effective From</b> date). When all participating locations are PNC, <b>create a PNC Case Manager</b>
+      to carry these dated changes through activation — after which PNC becomes system-calculated and the Override is removed.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-h">
+      <div class="ci">&#128205;</div>
+      <div class="ct">Address Management</div>
+      <div class="actions">
+        <button class="btn btn--brand"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zM20.7 7.04a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.58z"/></svg>Update / Edit Address Details</button>
+      </div>
+    </div>
+    <div class="card-b">
+
+      <div class="roll">
+        <div class="rh">PNC Rollup Preview</div>
+        <div class="rb">
+          <div class="rollstat">
+            <div><div class="muted">Participating locations</div><b id="rTotal">0</b></div>
+            <div><div class="muted">PNC</div><b style="color:var(--orange)" id="rPnc">0</b></div>
+            <div><div class="muted">Non-PNC</div><b style="color:var(--txt-2)" id="rNon">0</b></div>
+          </div>
+          <div class="meter"><i class="mp" id="mp" style="width:0%"></i><i class="mn" id="mn" style="width:100%"></i></div>
+          <div id="verdict"></div>
+        </div>
+      </div>
+
+      <div class="tabset">
+        <div class="tabx active" data-tab="active" id="tabActive">Active Locations (<span id="cntActive">0</span>)</div>
+        <div class="tabx" data-tab="add" id="tabAdd">Add New</div>
+      </div>
+
+      <!-- ACTIVE -->
+      <div id="paneActive">
+        <div class="infob ib-warn">
+          <div class="bi">!</div>
+          <div>Click <b>Remove</b> to term a location — you’ll capture an <b>Effective To</b> date + reason. The <b>Primary</b> location can’t be removed. Non-PNC rows are highlighted.</div>
+        </div>
+        <table>
+          <thead><tr>
+            <th>Practice / Facility</th><th>Address</th><th class="center">Primary</th><th class="center">Location PNC</th><th class="center">Directory</th><th>Effective Dates</th><th class="center">Action</th>
+          </tr></thead>
+          <tbody id="activeBody"></tbody>
+        </table>
+      </div>
+
+      <!-- ADD -->
+      <div id="paneAdd" style="display:none;">
+        <div class="infob ib-info"><div class="bi">i</div><div>Search the group, select PNC locations, then <b>Add Selected</b> — you’ll capture an <b>Effective From</b> date for the new link(s).</div></div>
+        <div class="filters">
+          <div class="fe"><label>Group NPI</label><input value="1730214785" /></div>
+          <div class="fe"><label>Group Tax ID</label><input value="88-2093451" /></div>
+          <div class="fe"><label>Group Name</label><input value="Metro Cardiology Network" /></div>
+          <div class="fe"><button class="btn btn--brand" id="searchBtn"><svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27a6.5 6.5 0 10-.7.7l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0A4.5 4.5 0 1114 9.5 4.5 4.5 0 019.5 14z"/></svg>Search</button></div>
+        </div>
+        <div id="searchResultsWrap" style="display:none;">
+          <table>
+            <thead><tr>
+              <th class="center" style="width:2.5rem;"></th><th>Facility</th><th>Address</th><th class="center">Location PNC</th>
+            </tr></thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+          <div style="margin-top:.8rem;">
+            <button class="btn btn--brand" id="addSelectedBtn" disabled><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg><span id="addSelLabel">Add Selected (0)</span></button>
+            <span class="muted" style="margin-left:.6rem;">Only PNC locations move you toward a true PNC.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- REVIEW + CREATE PNC CASE MANAGER -->
+  <div class="card" id="reviewCard" style="display:none;">
+    <div class="card-h">
+      <div class="ci" style="background:#f59331;">&#128203;</div>
+      <div class="ct">Review Changes &amp; Create PNC Case Manager</div>
+    </div>
+    <div class="card-b" id="reviewBody"></div>
+  </div>
+
+  <p class="foot-note">Mockup mirroring <b>prmAddressGroupManager</b> / <b>PRM_AddressManagementService</b>. Adds effective-date capture (HCPF <b>EffectiveTo</b> on remove, <b>EffectiveFrom</b> on add), <b>Directory</b> suppression for PNC affiliations (<code>IsDirectoryPrint=false</code> — US-AR6), and <b>PNC Case Manager</b> (IndividualApplication, RT <code>PRM_PNC</code>) creation. Visual only.</p>
+</div>
+
+<!-- generic modal -->
+<div class="backdrop" id="backdrop">
+  <div class="modal">
+    <div class="m-head" id="cmTitle"></div>
+    <div class="m-body" id="cmBody"></div>
+    <div class="m-foot">
+      <button class="btn btn--neutral" id="cmCancel">Cancel</button>
+      <button class="btn btn--brand" id="cmConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const el = id => document.getElementById(id);
+const CHK = '<svg viewBox="0 0 52 52"><path d="M20 34 9 23l3-3 8 8 20-20 3 3z"/></svg>';
+const today = new Date().toISOString().slice(0,10);
+const fmt = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-US') : '—';
+
+let prac = { pnc:true, bypass:true, status:'' };
+
+let active = [
+  {id:'L1', name:'Downtown Cardiology Group',   addr:'123 Main St, Philadelphia, PA 19103', primary:true,  pnc:true,  effFrom:'2022-01-15', effTo:null, termReason:null, removed:false, added:false},
+  {id:'L2', name:'Riverside Medical Associates',addr:'88 River Rd, Camden, NJ 08102',        primary:false, pnc:false, effFrom:'2023-03-01', effTo:null, termReason:null, removed:false, added:false},
+  {id:'L3', name:'Lakeview Heart Center',       addr:'42 Lake Ave, Trenton, NJ 08608',       primary:false, pnc:false, effFrom:'2023-06-10', effTo:null, termReason:null, removed:false, added:false},
+];
+
+let results = [
+  {id:'R1', name:'Metro Heart PNC Clinic',     addr:'900 Market St, Philadelphia, PA 19107',    pnc:true},
+  {id:'R2', name:'Summit Cardiology Partners', addr:'55 Summit Blvd, King of Prussia, PA 19406', pnc:true},
+  {id:'R3', name:'Eastside Family Practice',   addr:'12 East Rd, Cherry Hill, NJ 08003',        pnc:false},
+];
+let selected = new Set();
+let cmCreated = false;
+
+function badgePnc(v){ return v ? '<span class="badge b-pnc"><span class="dot"></span>PNC</span>' : '<span class="badge b-no"><span class="dot"></span>Non-PNC</span>'; }
+function badgeYesNo(v){ return v ? '<span class="badge b-pnc"><span class="dot"></span>Yes</span>' : '<span class="badge b-no"><span class="dot"></span>No</span>'; }
+/* Directory indicator = OFF when the location is PNC (US-AR6: HCPF.IsDirectoryPrint=false), ON otherwise */
+function badgeDir(pnc){ return pnc ? '<span class="badge b-term" title="IsDirectoryPrint=false — PNC locations are suppressed from the directory"><span class="dot"></span>Off</span>' : '<span class="badge b-add"><span class="dot"></span>On</span>'; }
+
+function participating(){ return active.filter(a=>!a.removed); }
+function rollupIsPnc(){ const p=participating(); return p.length>0 && p.every(a=>a.pnc); }
+function terms(){ return active.filter(a=>a.removed); }
+function adds(){ return active.filter(a=>a.added && !a.removed); }
+function hasStaged(){ return terms().length>0 || adds().length>0; }
+
+/* generic modal */
+let onConfirm = null;
+function openModal(title, body, confirmLabel, variant, cb){
+  el('cmTitle').innerHTML = title;
+  el('cmBody').innerHTML = body;
+  el('cmConfirm').textContent = confirmLabel;
+  el('cmConfirm').className = 'btn '+(variant||'btn--brand');
+  onConfirm = cb;
+  el('backdrop').style.display='flex';
+}
+function closeModal(){ el('backdrop').style.display='none'; onConfirm=null; }
+el('cmCancel').onclick = closeModal;
+el('cmConfirm').onclick = ()=>{ if(onConfirm && onConfirm()===false) return; };
+
+function renderHighlight(){
+  el('hlPnc').innerHTML = badgeYesNo(prac.pnc) + (prac.bypass?' <span class="muted" style="font-size:.72rem;">(override)</span>':' <span class="muted" style="font-size:.72rem;">(rollup)</span>');
+  el('hlBypass').innerHTML = prac.bypass ? '<span class="badge b-over"><span class="dot"></span>ON (manual)</span>' : '<span class="badge b-no"><span class="dot"></span>Off</span>';
+  el('hlStatus').innerHTML = prac.status ? '<span class="badge b-add"><span class="dot"></span>'+prac.status+'</span>' : '<span class="muted">— (blank)</span>';
+}
+
+function renderRollup(){
+  const p = participating();
+  const pnc = p.filter(a=>a.pnc).length, non = p.length-pnc;
+  el('rTotal').textContent=p.length; el('rPnc').textContent=pnc; el('rNon').textContent=non;
+  const pct = p.length ? Math.round(pnc/p.length*100):0;
+  el('mp').style.width=pct+'%'; el('mn').style.width=(100-pct)+'%';
+  if(rollupIsPnc()){
+    el('verdict').innerHTML = `<div class="verdict v-ready"><div class="vi">&#10003;</div><div>
+      <b>System rollup would set PNC = Yes.</b> Every participating location is PNC — this will become a true PNC once the case manager’s changes activate.</div></div>`;
+  }else{
+    el('verdict').innerHTML = `<div class="verdict v-hold"><div class="vi">!</div><div>
+      <b>System rollup would set PNC = No</b> (${non} non-PNC participating). The Override is holding PNC = <b>Yes</b>. Remove/replace the non-PNC location${non!==1?'s':''}.</div></div>`;
+  }
+}
+
+function renderActive(){
+  el('cntActive').textContent = participating().length;
+  el('activeBody').innerHTML = active.map(a=>{
+    const dates = `<span class="dates">From <b>${fmt(a.effFrom)}</b>${a.added?' <span class="badge b-add" style="margin-left:.2rem;"><span class="dot"></span>New</span>':''}${a.removed?`<br>To <span class="to">${fmt(a.effTo)}</span>`:''}</span>`;
+    const action = a.removed
+      ? `<button class="btn btn--neutral" data-undo="${a.id}">Undo term</button>`
+      : (a.primary ? '<span class="muted" title="Primary cannot be removed">🔒 Locked</span>'
+                   : `<button class="btn btn--destructive" data-remove="${a.id}">Remove</button>`);
+    return `<tr class="${a.pnc?'':'nonpnc'} ${a.removed?'removed':''} ${a.added?'added':''}">
+      <td class="facname"><b>${a.name}</b></td>
+      <td class="addr">${a.addr}</td>
+      <td class="center">${a.primary?'<span class="badge b-primary"><span class="dot"></span>Primary</span>':'<span class="muted">—</span>'}</td>
+      <td class="center">${badgePnc(a.pnc)}</td>
+      <td class="center">${badgeDir(a.pnc)}</td>
+      <td>${dates}</td>
+      <td class="center">${action}</td>
+    </tr>`;
+  }).join('');
+  el('activeBody').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>openRemoveModal(b.dataset.remove));
+  el('activeBody').querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{ const a=active.find(x=>x.id===b.dataset.undo); a.removed=false; a.effTo=null; a.termReason=null; renderAll(); });
+}
+
+/* remove -> capture Effective To + reason */
+function openRemoveModal(id){
+  const a = active.find(x=>x.id===id);
+  openModal(
+    '<span style="color:var(--red)">&#9888;</span> Term location — capture Effective To',
+    `<p style="margin:0 0 .8rem;">Terming <b>${a.name}</b> from this practitioner. Capture the date the practitioner stops at this facility.</p>
+     <div class="fld-row"><label>Effective To (term date) <span class="req">*</span></label><input type="date" id="effToIn" value="${today}" min="${a.effFrom}"></div>
+     <div class="fld-row"><label>Termination Reason <span class="req">*</span></label>
+       <select id="termReasonIn">
+         <option value="">-- Select --</option>
+         <option>No longer at location</option>
+         <option>Non-PNC location removed for PNC conversion</option>
+         <option>Practice closed</option>
+         <option>Provider request</option>
+       </select></div>
+     <div class="infob ib-warn" style="margin:0;"><div class="bi">!</div><div>Effective To must be on/after Effective From (${fmt(a.effFrom)}). Sets HCPF <code>EffectiveTo</code> + <code>TerminationDate</code>; the link deactivates when the date passes.</div></div>`,
+    'Confirm Term','btn--destructive',
+    ()=>{
+      const d = el('effToIn').value, r = el('termReasonIn').value;
+      if(!d || !r){ alert('Effective To and Termination Reason are required.'); return false; }
+      if(d < a.effFrom){ alert('Effective To must be on/after Effective From.'); return false; }
+      a.removed=true; a.effTo=d; a.termReason=r; closeModal(); renderAll();
+    });
+}
+
+function renderResults(){
+  el('resultsBody').innerHTML = results.map(r=>{
+    const on = selected.has(r.id);
+    return `<tr class="${r.pnc?'':'nonpnc'}">
+      <td class="center"><span class="chk ${on?'on':''}" data-sel="${r.id}">${CHK}</span></td>
+      <td><b>${r.name}</b></td><td class="addr">${r.addr}</td><td class="center">${badgePnc(r.pnc)}</td></tr>`;
+  }).join('');
+  el('resultsBody').querySelectorAll('[data-sel]').forEach(c=>c.onclick=()=>{ const id=c.dataset.sel; selected.has(id)?selected.delete(id):selected.add(id); renderResults(); });
+  el('addSelLabel').textContent=`Add Selected (${selected.size})`;
+  el('addSelectedBtn').disabled = selected.size===0;
+}
+
+/* add -> capture Effective From */
+el('searchBtn').onclick=()=>{ el('searchResultsWrap').style.display='block'; renderResults(); };
+el('addSelectedBtn').onclick=()=>{
+  const chosen = results.filter(r=>selected.has(r.id));
+  const names = chosen.map(c=>c.name).join(', ');
+  openModal(
+    '<span style="color:var(--green)">&#10133;</span> Add location(s) — capture Effective From',
+    `<p style="margin:0 0 .8rem;">Adding <b>${chosen.length}</b> location(s): ${names}. Capture the date the practitioner becomes effective at the new location(s).</p>
+     <div class="fld-row"><label>Effective From <span class="req">*</span></label><input type="date" id="effFromIn" value="${today}"></div>
+     <div class="infob ib-info" style="margin:0 0 .5rem;"><div class="bi">i</div><div>Sets HCPF <code>EffectiveFrom</code> on the new link(s); the link stays pending until the case manager’s changes are activated.</div></div>
+     ${chosen.some(c=>c.pnc)?`<div class="infob ib-warn" style="margin:0;"><div class="bi">!</div><div><b>Directory suppression:</b> ${chosen.filter(c=>c.pnc).length} PNC location(s) will have the PPL directory indicator set to <b>Off</b> (<code>IsDirectoryPrint=false</code>) automatically — US-AR6.</div></div>`:''}`,
+    'Add','btn--success',
+    ()=>{
+      const d = el('effFromIn').value;
+      if(!d){ alert('Effective From is required.'); return false; }
+      chosen.forEach(r=>{ if(!active.find(a=>a.id===r.id)) active.push({id:r.id,name:r.name,addr:r.addr,primary:false,pnc:r.pnc,effFrom:d,effTo:null,termReason:null,removed:false,added:true}); });
+      results = results.filter(r=>!selected.has(r.id)); selected.clear();
+      closeModal(); renderResults(); renderAll(); el('tabActive').click();
+    });
+};
+
+/* review + create PNC case manager */
+function renderReview(){
+  if(cmCreated) return;
+  if(!hasStaged()){ el('reviewCard').style.display='none'; return; }
+  el('reviewCard').style.display='block';
+  const t = terms(), ad = adds(), kept = active.filter(a=>!a.removed && !a.added);
+  const rows = arr => arr.map(a=>`
+    <div class="revrow">
+      <span>${a.removed?'<span class="badge b-term"><span class="dot"></span>Term</span>':(a.added?'<span class="badge b-add"><span class="dot"></span>Add</span>':'<span class="badge b-primary"><span class="dot"></span>Keep</span>')}</span>
+      <span><span class="rn">${a.name}</span> &nbsp;<span class="ra">${a.addr}</span></span>
+      <span class="rd">${a.removed?`Effective To <b style="color:var(--red)">${fmt(a.effTo)}</b> · ${a.termReason}`:(a.added?`Effective From <b style="color:var(--green)">${fmt(a.effFrom)}</b>`:`Since ${fmt(a.effFrom)}`)} · ${badgePnc(a.pnc)}</span>
+    </div>`).join('');
+  const ready = rollupIsPnc();
+  el('reviewBody').innerHTML = `
+    ${t.length?`<div class="infob ib-warn" style="margin-bottom:.5rem;"><div class="bi">!</div><div><b>${t.length}</b> termination(s) with Effective To dates.</div></div>`:''}
+    <div class="rev">${rows(t)}${rows(ad)}${rows(kept)}</div>
+    <div class="${ready?'infob ib-success':'infob ib-warn'}" style="margin:.9rem 0 .3rem;">
+      <div class="bi">${ready?'&#10003;':'!'}</div>
+      <div>${ready
+        ? 'All participating locations will be PNC. Creating the PNC Case Manager will carry these dated changes to activation; on activation PNC becomes system-calculated (Yes) and the Override is removed.'
+        : 'Some participating locations are still non-PNC — the Override will remain until they are termed/replaced. You can still create the case manager for the dated changes.'}</div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:.5rem;margin-top:.6rem;">
+      <button class="btn btn--brand" id="createCmBtn"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg>Create PNC Case Manager</button>
+    </div>`;
+  el('createCmBtn').onclick = openCreateCm;
+}
+
+function openCreateCm(){
+  const t = terms(), ad = adds();
+  openModal(
+    '<span style="color:var(--brand)">&#128203;</span> Create PNC Case Manager',
+    `<p style="margin:0 0 .8rem;">A <b>PNC Case Manager</b> (IndividualApplication, RecordType <code>PRM_PNC</code>) will be created for <b>Dr. Aisha Rahman</b> and the changes below linked to it (<code>HCPF.PRM_CaseManager__c</code>):</p>
+     <ul style="margin:0 0 .8rem;padding-left:1.1rem;font-size:.83rem;">
+       <li><b>${t.length}</b> termination(s) — HCPF <code>EffectiveTo</code> + <code>TerminationDate</code> set</li>
+       <li><b>${ad.length}</b> addition(s) — HCPF <code>EffectiveFrom</code> set, pending activation</li>
+       <li><b>${adds().filter(a=>a.pnc).length}</b> PNC affiliation(s) — PPL <code>IsDirectoryPrint</code> forced to <b>Off</b> (US-AR6)</li>
+     </ul>
+     <div class="fld-row"><label>Case Manager Priority</label>
+       <select id="cmPriority"><option>Standard</option><option>Rush</option></select></div>
+     <div class="infob ib-info" style="margin:0;"><div class="bi">i</div><div>The case manager routes through PNC review/activation. On activation the rollup recomputes PNC and the Override is cleared automatically.</div></div>`,
+    'Create Case Manager','btn--brand',
+    ()=>{ closeModal(); createCm(); });
+}
+
+function createCm(){
+  cmCreated = true;
+  const t = terms(), ad = adds();
+  const cmId = 'IA-004' + Math.floor(1000+Math.random()*8999);
+  el('reviewCard').style.display='block';
+  el('reviewBody').innerHTML = `
+    <div style="text-align:center;padding:.5rem 0;">
+      <div style="width:3rem;height:3rem;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin:0 auto .5rem;">&#10003;</div>
+      <h3 style="margin:.2rem 0;">PNC Case Manager created</h3>
+      <p class="muted" style="margin:0;">${cmId} · RecordType <code>PRM_PNC</code> · Dr. Aisha Rahman</p>
+    </div>
+    <div class="rev" style="margin-top:.8rem;">
+      <div class="revrow"><span class="rn">Terminations linked</span><span class="rd"><b>${t.length}</b> · Effective To dates set</span></div>
+      <div class="revrow"><span class="rn">Additions linked</span><span class="rd"><b>${ad.length}</b> · Effective From dates set · pending activation</span></div>
+      <div class="revrow"><span class="rn">Directory suppressed</span><span class="rd"><b>${adds().filter(a=>a.pnc).length}</b> PNC affiliation(s) · <span class="badge b-term"><span class="dot"></span>Off</span> (US-AR6)</span></div>
+      <div class="revrow"><span class="rn">On activation</span><span class="rd">${rollupIsPnc()?'PNC → <b style="color:var(--orange)">Yes (system-calculated)</b>, Override removed':'Override remains (non-PNC locations present)'}</span></div>
+    </div>
+    <div class="infob ib-success" style="margin:.9rem 0 0;"><div class="bi">&#10003;</div><div>Changes staged against ${cmId}. Track progress on the Case Manager record; activation runs on the effective dates.</div></div>`;
+  // reflect pending state on practitioner (override still on until activation)
+  renderHighlight();
+}
+
+function renderAll(){ renderHighlight(); renderRollup(); renderActive(); renderReview(); }
+
+el('tabActive').onclick=()=>{ el('tabActive').classList.add('active'); el('tabAdd').classList.remove('active'); el('paneActive').style.display='block'; el('paneAdd').style.display='none'; };
+el('tabAdd').onclick=()=>{ el('tabAdd').classList.add('active'); el('tabActive').classList.remove('active'); el('paneAdd').style.display='block'; el('paneActive').style.display='none'; };
+
+renderAll();
+</script>
+</body>
+</html>

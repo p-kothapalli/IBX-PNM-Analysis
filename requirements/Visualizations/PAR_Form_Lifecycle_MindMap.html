@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PNM Guided Flows — End-to-End Life-Cycle Diagrams</title>
+<style>
+  :root{
+    --ibx-blue:#005b94; --ibx-blue-dark:#003e66; --ibx-blue-light:#e8f2f9;
+    --phase:#005b94; --step:#0e8a6e; --process:#6a4bbc; --decision:#c9821a;
+    --record:#4a5b73; --defect:#c0392b;
+    --bg:#eef2f6; --panel:#ffffff; --ink:#1d2733; --muted:#5a6b7b; --line:#cdd8e3;
+    --shadow:0 1px 3px rgba(0,0,0,.08),0 8px 26px rgba(0,0,0,.07);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;overflow:hidden}
+  header{background:linear-gradient(135deg,var(--ibx-blue-dark),var(--ibx-blue));color:#fff;
+    padding:13px 20px;box-shadow:var(--shadow);position:relative;z-index:30}
+  header h1{margin:0;font-size:17px;font-weight:650}
+  header p{margin:2px 0 0;font-size:12px;opacity:.9}
+  .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 18px;background:#fbfdff;border-bottom:1px solid var(--line);position:relative;z-index:20}
+  .toolbar input[type=search]{flex:1;min-width:160px;max-width:320px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 11px;font-size:12.5px;cursor:pointer;font-weight:600;color:var(--ibx-blue-dark)}
+  .btn:hover{background:var(--ibx-blue-light)}
+  .btn.active{background:var(--defect);color:#fff;border-color:var(--defect)}
+  .legend{display:flex;gap:11px;flex-wrap:wrap;margin-left:auto;font-size:11.5px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+  .app{display:flex;height:calc(100vh - 112px)}
+  /* sidebar */
+  .sidebar{width:236px;flex:none;background:#fff;border-right:1px solid var(--line);overflow:auto;padding:14px 12px}
+  .sidebar h2{font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:4px 8px 10px}
+  .flowbtn{display:block;width:100%;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;
+    padding:10px 12px;margin-bottom:9px;cursor:pointer;transition:.12s}
+  .flowbtn:hover{background:var(--ibx-blue-light);border-color:#b9cee0}
+  .flowbtn.active{background:var(--ibx-blue);border-color:var(--ibx-blue-dark);color:#fff;box-shadow:var(--shadow)}
+  .flowbtn .fn{font-weight:700;font-size:13px}
+  .flowbtn .fs{font-size:11.3px;color:var(--muted);margin-top:2px}
+  .flowbtn.active .fs{color:#dceaf4}
+  .flowbtn .fmeta{font-size:10.5px;margin-top:5px;color:var(--ibx-blue-dark);font-weight:600}
+  .flowbtn.active .fmeta{color:#cfe6f5}
+  .sidenote{font-size:10.5px;color:var(--muted);margin:8px 8px;line-height:1.45}
+  /* stage */
+  .stage{flex:1.15;overflow:auto;position:relative;
+    background-image:radial-gradient(rgba(120,140,160,.10) 1px,transparent 1px);background-size:26px 26px;
+    background-color:#f4f7fb}
+  .zoombar{position:absolute;right:14px;bottom:14px;z-index:15;display:flex;flex-direction:column;gap:4px;
+    background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+  .zoombar button{border:none;background:#fff;width:34px;height:32px;font-size:16px;cursor:pointer;color:var(--ibx-blue-dark)}
+  .zoombar button:hover{background:var(--ibx-blue-light)}
+  .canvas-vp{transform-origin:0 0;position:relative}
+  .canvas{position:relative;margin:0 auto}
+  svg.edges{position:absolute;left:0;top:0;pointer-events:none;overflow:visible}
+  svg.edges path.road-sh{fill:none;stroke:#000;opacity:.06;stroke-width:18;stroke-linecap:round;stroke-linejoin:round}
+  svg.edges path.road{fill:none;stroke:#b7ada3;stroke-width:11;stroke-linecap:round;stroke-linejoin:round}
+  svg.edges path.road-dot{fill:none;stroke:#b7ada3;stroke-width:4;stroke-linecap:round;stroke-dasharray:1 12}
+  /* journey stations */
+  .station{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;cursor:pointer;width:160px;z-index:3}
+  .station:hover{z-index:7}
+  .cwrap{position:relative;width:58px;height:58px}
+  .circle{width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:800;font-size:19px;border:4px solid #fff;box-shadow:0 3px 9px rgba(0,0,0,.20);transition:.12s}
+  .station:hover .circle{transform:scale(1.09)}
+  .station.sel .circle{outline:3px solid var(--ibx-blue-dark);outline-offset:3px}
+  .badge{position:absolute;top:-5px;right:-5px;width:19px;height:19px;border-radius:50%;background:var(--defect);
+    color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+  .slabel{margin-top:9px;font-size:12px;font-weight:600;text-align:center;color:#1d2733;line-height:1.22;max-width:154px;
+    text-shadow:0 1px 0 #fff,0 0 4px #fff}
+  .station.dim{opacity:.20}
+  .phasetag{position:absolute;font-size:11px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+    color:#9aa7b4;transform:translate(-50%,-50%);z-index:2;pointer-events:none}
+  .station .stnum{position:absolute;left:50%;top:-2px;transform:translate(-50%,-115%);font-size:10px;font-weight:800;color:#9aa7b4}
+  .station .hint{font-size:10px;color:var(--ibx-blue);font-weight:700;margin-top:3px;opacity:0;transition:.12s}
+  .station:hover .hint{opacity:1}
+  /* ---- detailed (stage) flowchart shapes ---- */
+  svg.edges text{font-size:11px;font-weight:700;fill:var(--muted);font-family:inherit}
+  svg.edges text.no{fill:var(--defect)}
+  .n{position:absolute;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;
+    padding:6px 12px;font-size:12.5px;font-weight:600;line-height:1.22;transition:.12s;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.07)}
+  .n:hover{box-shadow:var(--shadow);filter:brightness(1.02);z-index:6}
+  .n .lbl{pointer-events:none}
+  .n.sel{outline:3px solid var(--ibx-blue);outline-offset:2px;z-index:7}
+  .n.dim{opacity:.26}
+  .n.process{border-radius:11px;border:1.5px solid var(--line);border-left:5px solid var(--process)}
+  .n.step{border-radius:11px;border:1.5px solid var(--line);border-left:5px solid var(--step)}
+  .n.phase{border-radius:11px;border:1.5px solid var(--line);border-left:5px solid var(--phase)}
+  .n.terminator{border-radius:999px;border:1.5px solid var(--ibx-blue);background:var(--ibx-blue-light);color:var(--ibx-blue-dark);font-weight:700}
+  .n.decision{background:#fbf2e0;border:1.5px solid var(--decision);color:#7a4e08;font-weight:700;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);border-radius:0}
+  .n.data{background:#eef1f5;border:1.5px solid var(--record);color:#33425a;clip-path:polygon(11% 0,100% 0,89% 100%,0 100%)}
+  .n.record{border-radius:9px;border:1px solid #d7dde6;background:#f3f6fa;color:#33425a;font-weight:600;font-size:11.8px}
+  .n.defect{border-radius:9px;border:1.5px solid #e3a39c;background:#fdecea;color:#922b21;font-weight:600;font-size:11.8px}
+  .n.defect::before{content:"!";position:absolute;left:8px;top:6px;background:var(--defect);color:#fff;width:15px;height:15px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center}
+  /* breadcrumb / back */
+  #backBtn{display:none;align-items:center;gap:5px;background:var(--ibx-blue);color:#fff;border-color:var(--ibx-blue-dark)}
+  #backBtn:hover{background:var(--ibx-blue-dark)}
+  .crumb{margin-left:6px;font-size:12px;color:var(--muted);font-weight:600;align-self:center}
+  .crumb b{color:var(--ibx-blue-dark)}
+  .detail{flex:1;min-width:320px;max-width:520px;overflow:auto;background:var(--panel);border-left:1px solid var(--line);padding:18px 20px 60px}
+  .detail .dkind{font-size:10px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:#fff;border-radius:5px;padding:2px 9px}
+  .kb-phase{background:var(--phase)} .kb-step{background:var(--step)} .kb-process{background:var(--process)}
+  .kb-decision{background:var(--decision)} .kb-record{background:var(--record)} .kb-defect{background:var(--defect)}
+  .detail h2{margin:10px 0 4px;font-size:18px;line-height:1.25}
+  .detail .dsum{font-size:13.2px;margin:6px 0 14px;background:var(--ibx-blue-light);border-left:3px solid var(--ibx-blue);padding:10px 12px;border-radius:0 8px 8px 0}
+  .sec{margin:13px 0}
+  .sec h3{font-size:11px;letter-spacing:.7px;text-transform:uppercase;color:var(--ibx-blue-dark);margin:0 0 7px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .sec ul{margin:0;padding-left:18px}
+  .sec li{margin:5px 0;font-size:12.8px}
+  .sec.comp li,.sec.rec li{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.4px;background:#f5f7fa;border:1px solid #eef1f5;border-radius:5px;padding:4px 7px;list-style:none;margin:4px 0;word-break:break-word}
+  .sec.got li{background:#fdeceb;border:1px solid #f6cfcb;border-radius:6px;padding:6px 9px;list-style:none;margin:5px 0;font-size:12.3px}
+  .sec.kids li{list-style:none;margin:5px 0}
+  .sec.kids a{color:var(--ibx-blue);cursor:pointer;font-weight:600;text-decoration:none;font-size:12.6px}
+  .sec.kids a:hover{text-decoration:underline}
+  .sev{font-weight:800;font-size:10px;border-radius:4px;padding:0 5px;margin-right:5px;color:#fff}
+  .sev.h{background:var(--defect)} .sev.m{background:var(--decision)} .sev.l{background:var(--step)}
+  .src{font-size:11.2px;color:var(--muted)}
+  .src code{background:#eef2f6;border-radius:4px;padding:1px 5px;font-size:11px}
+  .empty-detail{color:var(--muted);font-style:italic;margin-top:40px;text-align:center}
+  @media(max-width:980px){.app{flex-direction:column;height:auto}.sidebar{width:auto;display:flex;gap:8px;overflow-x:auto}.flowbtn{min-width:220px}.stage{height:58vh}.detail{max-width:none;border-left:none;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hTitle">PNM Guided Flows — End-to-End Life-Cycle Diagrams</h1>
+  <p id="hSub">Pick a flow on the left · click any box for its rules, components, records, and known defects · Independence Blue Cross · Provider Network Management</p>
+</header>
+
+<div class="toolbar">
+  <button class="btn" id="backBtn">&larr; Journey</button>
+  <span class="crumb" id="crumb"></span>
+  <input type="search" id="search" placeholder="Search the active flow — rule, IP, DataRaptor, object, defect…" />
+  <button class="btn" id="defectsOnly">Highlight defects</button>
+  <button class="btn" id="reset">Reset</button>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <h2>Guided Flows</h2>
+    <!-- flow buttons injected here -->
+    <div class="sidenote">Each flow is built from the <code>requirements/</code> analysis. Add more flows by appending to the <code>FLOWS</code> array in the source.</div>
+  </div>
+  <div class="stage" id="stage">
+    <div class="canvas-vp" id="vp"><div class="canvas" id="canvas"></div></div>
+    <div class="zoombar">
+      <button id="zin" title="Zoom in">+</button>
+      <button id="zout" title="Zoom out">&minus;</button>
+      <button id="zfit" title="Fit" style="font-size:11px">fit</button>
+    </div>
+  </div>
+  <div class="detail" id="detail"><div class="empty-detail">Select a box to see its details.</div></div>
+</div>
+
+<script>
+/* =========================================================================
+   FLOWS — each entry has: id, name, subtitle, meta, detail (cited content
+   tree, root id="root"), and flow (the ordered diagram spine + side callouts).
+   Add a new guided flow by appending another object here.
+   ========================================================================= */
+const FLOWS = [
+/* ===================================================================== PAR */
+{
+ id:"par",
+ name:"Practitioner Participation (PAR) Form",
+ subtitle:"New practitioner / new group intake",
+ meta:"OmniScript · PRM_PractitionerParticipationForm_English",
+ journey:[
+  {id:"j-par",      label:"PAR Form (Intake & Submission)", cat:"intake",
+     nodes:["start","pf-init","p2","pf-credcheck","pf-rolespec","pf-license","pf-telehealth","p2-q5","p3","p3-pncvalidate","pf-groupval","pf-doc","p4","pf-provinfo","pf-lang","pf-pronouns","pf-affirming","p5","pf-review","p6","p7","p8"]},
+  {id:"j-appreview",label:"Application Review",              cat:"review",     nodes:["p9"]},
+  {id:"j-psv",      label:"Primary Source Verification (PSV)",cat:"review",    nodes:["p10"]},
+  {id:"j-qc",       label:"QC Review",                       cat:"decision",   nodes:["p11"]},
+  {id:"j-committee",label:"Committee Review",                cat:"decision",   nodes:["p12"]},
+  {id:"j-pda",      label:"PDA Review & NMQC / Activation",  cat:"creation",   nodes:["p13"]},
+  {id:"j-complete", label:"Complete — Active in Network",    cat:"activation", nodes:["activeEnd"]},
+ ],
+ detail:{
+  id:"root", title:"Practitioner Participation (PAR) Form — Life Cycle", kind:"phase",
+  summary:"Self-service application used by a Sr. Data Reporting Analyst to add a practitioner (and their group / practice locations) into the IBX network. The OmniScript PRM_PractitionerParticipationForm_English (v111) collects data step-by-step, then a sub-IP chain creates 5–9 records per location, produces an IndividualApplication / Case Manager, and feeds the credentialing review pipeline.",
+  source:["Practitioner_Participation_Form_Complete_Record_Creation_Analysis.md","PARFormPerformance/00_Overview_PARForm_BatchRefactor_Roadmap.md"],
+  children:[
+   {id:"p1", title:"Initiation & Access", kind:"phase",
+    summary:"The PAR form is the standard intake path for low-volume, straightforward practitioner additions. Three intake paths share the downstream pipeline: PAR, Recred PDA, and PSV 'Add a Location'.",
+    components:["OmniScript: PRM_PractitionerParticipationForm_English (v111)","Launch: 'Practitioner Participation Form' button on the analyst Home screen"],
+    rules:["Used for low-volume / straightforward cases; high-volume location processing is paused (see defects)."],
+    source:["PAR_Form_PNC_Path_User_Stories.md","Recred_PAR_Business_Status_Summary_2026-06-08.md"]},
+   {id:"p2", title:"Step 1 — Practitioner", kind:"step",
+    summary:"Analyst enters the practitioner NPI. The form looks up the NPI, prefills demographics read-only, determines credentialing status, and (for credentialed providers) asks the PNC question Q5 that routes the rest of the flow.",
+    components:["OmniScript step: PractitionerForm","LWC: FetchExistingNPIInfo (prmGetInfoBasedOnNPI)","IP: PRM_FetchExistingNPIInfo"],
+    source:["PAR_Form_PNC_Path_User_Stories.md"],
+    children:[
+      {id:"p2-npi", title:"NPI lookup & prefill", kind:"process",
+       summary:"On NPI entry the LWC calls PRM_FetchExistingNPIInfo. Known NPI → demographics prefill read-only and CredentialingStatus + IsCredentialedPNCDelegated flags are set.",
+       rules:["New practitioner (no NPI record): all fields editable, Q5 not shown.","Known NPI: prefill fields should be readOnly=true.","IP must return IsCredentialedPNCDelegated (false for credentialed non-PNC)."],
+       components:["IP: PRM_FetchExistingNPIInfo","Sets: PractitionerForm:CredentialingStatus, PractitionerForm:IsCredentialedPNCDelegated"],
+       source:["PAR_Form_PNC_Path_User_Stories.md (Story 1)"]},
+      {id:"p2-q5", title:"Participation Questions — Q3 / Q4 / Q5 (decision)", kind:"decision",
+       summary:"Three radio questions on Step 1 route the rest of the flow. Q3 'Are you joining an existing group?' (always shown). Q4 'Are you purchasing a practice?' (shown only when Q3='No' AND closed-network — isAddSpecUnderClosedNetwork OR FRML_ClosedNetwork). Q5 'Is the Practitioner joining a PNC Group?' (shown only when CredentialingStatus='Credentialed'). 'No' for a PNC-delegated provider hard-blocks with a redirect to PCR / Off-Cycle.",
+       rules:["Q3 (PractitionerParticipationQuestion3) is always required.","Q4 (PractitionerParticipationQuestion4) shows when Q3=='No' AND (isAddSpecUnderClosedNetwork==true OR FRML_ClosedNetwork==true).","Q5 (PractitionerParticipationQuestion5) shows only when CredentialingStatus=='Credentialed'.","Warning shows when Credentialed AND (IsCredentialedPNCDelegated==true OR Q5=='No').","SetErrorsCredentialingStatus fires (hard block) when Credentialed AND IsCredentialedPNCDelegated==true AND Q5=='No'.","All shown questions are required — Next blocked until answered."],
+       components:["Radios: PractitionerParticipationQuestion3 / 4 / 5","Element: SetErrorsCredentialingStatus (Set Errors)","Formula: FRML_ClosedNetwork","Validation: ExistingNPICredentialed"],
+       gotchas:["UC-5 ambiguity (MEDIUM): IsCredentialedPNCDelegated==true AND Q5=='Yes' still shows the warning — business rule undecided."],
+       source:["PAR_Form_PNC_Path_User_Stories.md (Story 1, UC-2…UC-5)","OmniScript elements PractitionerParticipationQuestion3/4/5"]},
+    ]},
+   {id:"p3", title:"Step 2 — Group", kind:"step",
+    summary:"Analyst finds the group via a TIN/NPI type-ahead. When the practitioner declared PNC intent (Q5=Yes), the selected group must be a PNC group — this is the single biggest validation gap in the form today.",
+    components:["OmniScript step: PractionerGroup","IP: PRM_IPExtractGroupNameBasedOnTINNPI","Elements: GroupTypeAhead, IsPNCGroup (Formula), pnc (Formula), MSG_PNCGroup (Validation), SetErrorNonPNCGroup (Set Errors)"],
+    rules:["Max 5 groups per submission (GroupInformation repeatLimit=4)."],
+    source:["PAR_Form_PNC_Path_User_Stories.md (Story 2)"],
+    children:[
+      {id:"p3-typeahead", title:"Group type-ahead (TIN / NPI)", kind:"process",
+       summary:"Type-ahead calls PRM_IPExtractGroupNameBasedOnTINNPI with {IsPNC, NPI, TaxId}. IsPNCGroup formula = true when Q5=Yes.",
+       rules:["IsPNCGroup = IF(Q5=='Yes', true, false) → passed as IsPNC.","When IsPNC=true the IP should filter results to Account.PRM_PNC__c=true (must be confirmed/enforced)."],
+       components:["IP payload: { IsPNC:%IsPNCGroup%, NPI:%GroupNPI%, TaxId:%GroupTaxId% }"],
+       gotchas:["If the IP does not filter by PRM_PNC__c when IsPNC=true, non-PNC groups appear and can be selected."],
+       source:["PAR_Form_PNC_Path_User_Stories.md (Story 2, Scenario 4/5)"]},
+      {id:"p3-pncvalidate", title:"Selected group is PNC? (decision)", kind:"decision",
+       summary:"When Q5=Yes the selected group must be PNC. The validation today only confirms a group was selected, not that it is PNC — so a conflicting case can be submitted.",
+       rules:["pnc formula = IF(ExistingGroupSelected==false, false, GroupInformation|n:pnc).","Target fix: MSG_PNCGroup.validateExpression must add GroupInformation|n:pnc == true.","Target fix: SetErrorNonPNCGroup must fire on Q5=Yes AND ExistingGroupSelected==true AND pnc==false.","Validation must fire per repeat group instance."],
+       components:["Validation: MSG_PNCGroup ('Please select an existing PNC group.')","Set Errors: SetErrorNonPNCGroup","Formula: pnc"],
+       gotchas:["CRITICAL GAP (HIGH): MSG_PNCGroup.validateExpression does NOT check pnc==true → a non-PNC group with a valid ExistingGroupId passes validation.","BUG (HIGH): SetErrorNonPNCGroup show condition is Q5=='No' (the opposite scenario) and its error map clears rather than sets a blocking error."],
+       source:["PAR_Form_PNC_Path_User_Stories.md (Story 2)"]},
+    ]},
+   {id:"p4", title:"Step 3 — Address / Practice Location", kind:"step",
+    summary:"Analyst enters the primary office address and any additional addresses for each group. This step feeds the heaviest record creation and is where address standardization happens.",
+    components:["OmniScript: PRM_PractitionerParticipationAddressForm_English (v54)","Blocks: GroupInformation (primary office), AdditionalAddress","Custom LWCs: prmPrimarySpecialtyLogicForAddressScreen (taxonomy), prmAssisstiveAids"],
+    rules:["County is a State-dependent dropdown (PRM_CountyForUserInterface__c dependent on PRM_StateCounty__c).","'Telehealth Enabled' (offers telehealth) is distinct from 'Telehealth Only' (no physical visits).","Max 10 locations per group (repeatLimit=9); worst case 5×10 ≈ 490 DB rows / ~15 object types per submission."],
+    source:["Par_Form_vs_Our_Implementation_UI_Comparison.md","PARFormPerformance/US_PAR_ScaleAudit_5Groups_10Locations.md"],
+    children:[
+      {id:"p4-precisely", title:"Address standardization (Precisely)", kind:"process",
+       summary:"Addresses are standardized/validated via the Precisely API. Today this runs as single-address callouts; at max scale that is ~50 callouts and is the key performance bottleneck.",
+       rules:["PRM_AddressValidationService.validateAddress() is single-address only today.","Target (US-PAR-03): move callouts to a pre-submit phase (TX1) before any DML, using a bulk endpoint + dedup."],
+       components:["Apex: PRM_AddressValidationService","IP: PRM_IPPreciselyAPICall"],
+       gotchas:["BLOCKER (target-state): unknown whether Precisely 'verify' accepts a batch payload of up to 50 addresses — gates US-PAR-03/US-PAR-01."],
+       source:["PARFormPerformance/00_Overview_PARForm_BatchRefactor_Roadmap.md (§7 Q8)","PARFormPerformance/US_PAR03_PreSubmitCalloutPhase.md"]},
+    ]},
+   {id:"p5", title:"Contact Information (step)", kind:"step",
+    summary:"Captures the office contacts before review/submit: a Primary Contact (name, role, phone, email), an optional Secondary Contact block, the company website link, and 'Form Completed By'.",
+    rules:["Primary contact required; Secondary contact is an optional toggled block.","Contact role / phone / email captured per contact.","'Form Completed By' identifies the submitter."],
+    components:["Step: ContactInformation","Blocks: PrimaryContact, SecondaryContactBlock","Fields: ContactPersonRole, ContactPhone, ContactEmail, CompanyWebsiteLink, FormCompletedBy"],
+    source:["OmniScript step ContactInformation"]},
+   {id:"p6", title:"Submit → Record Creation", kind:"process",
+    summary:"On Submit, a synchronous Integration Procedure chain creates 5–9 records per location in a fixed sequence. This is the heaviest and most failure-prone part of the lifecycle today (5–15s spin, partial data on failure).",
+    components:["IP chain: PRM_CreateParFormRecordsContainer → PRM_CreateParFormRecords (Procedure_29) → PRM_CreatePractitionerAddressRecords","Main DR: PRMDRCreatePractitionerNewAddressRecords"],
+    rules:["S1 existing address/same NPI → reuse Location/Address/HCF, create only the PPL link.","S2 new address/same NPI → full 5-record chain.","S3 new address/different NPI (new group) → full chain + networks/features."],
+    source:["Practitioner_Participation_Form_Complete_Record_Creation_Analysis.md"],
+    children:[
+      {id:"p6-core", title:"Core records (seq 1–5)", kind:"record",
+       summary:"For a new practice location the chain creates Location → Address → HealthcareProviderNpi → HealthcareFacility → HealthcarePractitionerFacility in sequence, all stamped Pending.",
+       records:["1 Location: Name, LocationType='Site', PRM_CaseManager__c, PRM_EffectiveFrom__c, PRM_Pending__c=true, PRM_TelehealthOnly__c",
+         "2 Address: ParentId=Location, AddressLine1/2, City/State/Zip/Zip4/County, Phone/Ext/Fax, PRM_Active__c=false, PRM_Pending__c=true",
+         "3 HealthcareProviderNpi: Name='NPI - '+npi, ParentRecordId=Location, PRM_Type__c='NPI', IdValue=npi (GROUP/location NPI)",
+         "4 HealthcareFacility: AccountId=Group, LocationId, PRM_Primary__c, PRM_Active__c=false, PRM_Pending__c=true",
+         "5 HealthcarePractitionerFacility (PPL): RecordType=PRM_PractitionerLocationAffiliation, PractitionerId, HealthcareFacilityId, IsPrimaryFacility, EffectiveFrom, PRM_AttestationDate__c=today, PRM_Pending__c=true"],
+       source:["Practitioner_Participation_Form_Complete_Record_Creation_Analysis.md (Records 1–5)"]},
+      {id:"p6-conditional", title:"Conditional records (seq 6–9)", kind:"record",
+       summary:"Depending on scenario, additional records are created for networks, affiliations, affirming-care categories and provider features.",
+       records:["6 HealthcareFacilityNetwork (network assignment)","7 PractitionerFacilityAffiliation (PFAA)","8 AffirmingCareCategory (ACC)","9 ProviderFeature (assistive aids etc.)"],
+       source:["Practitioner_Participation_Form_Complete_Record_Creation_Analysis.md (Records 6–9)"]},
+    ]},
+   {id:"p7", title:"Target-State — Async Submission (not yet live)", kind:"process",
+    summary:"Proposed refactor cloning the proven Delegated/Network Envelope→Helper→Batch pattern: Submit returns in <3s after enqueue, heavy DML moves to a Batchable, failures become observable and retryable.",
+    components:["PRM_ParFormSubmissionHelper.enqueueParFormSubmission()","PRM_ParFormSubmissionBatch (chunkSize=1)","IndividualApplication.PRM_ParFormSubmissionStatus__c"],
+    rules:["TX1: pre-callouts + idempotency guard + enqueue, returns immediately, navigate to Case Manager.","TX2..N: one submission per chunk inside a Savepoint → atomic; per-row DML allOrNone=false; bump failureCount BEFORE DML.","finish(): roll up IA status + bell notification; failed rows get a Retry quick action."],
+    gotchas:["Target-state only — none of the 5 US-PAR stories are live yet."],
+    source:["PARFormPerformance/00_Overview_PARForm_BatchRefactor_Roadmap.md"],
+    children:[
+      {id:"p7-tx2", title:"Atomic batch + retry (US-PAR-01/05)", kind:"process",
+       summary:"Each chunk = one submission in a Savepoint; on failure the whole submission rolls back (no orphans), stages to PRM_FailedRecordStaging__c, and publishes a rollback-safe Platform Event.",
+       components:["PRM_FailedRecordStaging__c (PRM_SourceFlow__c='PRM_ParFormSubmissionBatch')","PRM_ExceptionLogEvent__e → PRM_ExceptionLogEventTrigger"],
+       source:["PARFormPerformance/00_Overview_PARForm_BatchRefactor_Roadmap.md (§5)"]},
+    ]},
+   {id:"p8", title:"IndividualApplication / Case Manager", kind:"record",
+    summary:"Submission produces an IndividualApplication (the 'Case Manager' record). Records created on the form are stamped PRM_CaseManager__c = the IA Id, tying them to the case (the 'case association' foundation).",
+    rules:["Record-creation half of case association is live and connected to PAR & PSV.","The 'read' side (review screens using the association) is NOT yet live."],
+    components:["Object: IndividualApplication","Field stamped on children: PRM_CaseManager__c"],
+    source:["Recred_PAR_Business_Status_Summary_2026-06-08.md (§1, §2)"]},
+   {id:"p9", title:"Application Review", kind:"process",
+    summary:"A specialist reviews the submitted application — completeness, primary practice location / address, adverse-action log — before primary source verification. Shared with the Recredentialing guided review flows.",
+    rules:["Primary practice location / primary address must resolve correctly; missing primary address blocks Adverse Action Log creation.","Pending primary address should be honored when no active primary exists."],
+    components:["LWC redesign: Application_Review_LWC_Redesign","AdverseActionLog flow"],
+    gotchas:["Multiple App Review cases with missing primary address → AAL failures.","In-flight terminated-location handling causes 'Required Fields Missing' (Defect)."],
+    source:["PDM Flows/US_AppReview_AAL_HonorPendingPrimaryAddress.md","SOQL/2026-06-16_AppReview_5Cases_PrimaryAddressFix.md"]},
+   {id:"p10", title:"Primary Source Verification (PSV)", kind:"process",
+    summary:"Credentials (license, education, sanctions, NPDB) are verified against primary sources. The PSV route also supports 'add a practice location'.",
+    rules:["PSV 'add a location' is part of the paused high-volume work — safe only for low-volume today.","Effective-date accuracy across location add/remove is a known open item."],
+    components:["Shared credentialing PSV review screens","NPDB / T180 validation"],
+    gotchas:["High-volume PSV add-location times out (100+ locations) — paused."],
+    source:["Recred_PAR_Business_Status_Summary_2026-06-08.md","NPDB_T180/00_Overview_NPDB_T180_Validation.md"]},
+   {id:"p11", title:"Quality Control (QC)", kind:"decision",
+    summary:"QC reviews the verified file and selects an outcome ('No Errors' or 'Errors Found') before committee. Shared with Recred QC.",
+    rules:["'Errors Found' path should NOT display the 'Removed Practitioner at Practice Location' table.","Committee bypass logic governs whether a case skips committee."],
+    gotchas:["QA Bug 1216120 (MEDIUM): Recred QC shows the wrong table on the 'Errors Found' path."],
+    source:["Recred_PAR_Business_Status_Summary_2026-06-08.md (Defect #6)","Duplicate_QC_Cases_RootCause_Analysis.md"]},
+   {id:"p12", title:"Committee Review", kind:"decision",
+    summary:"The credentialing committee approves or denies the application (cases may be bypassed per business rules). Outcome drives final network status.",
+    rules:["Committee may be bypassed for qualifying cases.","Outcome: Approved → activation; Denied → termination."],
+    gotchas:["Committee-bypass defect observed (IA-0000043391)."],
+    source:["SOQL/2026-06-05_IA0000043391_CommitteeBypassDefect.md"]},
+   {id:"p13", title:"Network Activation", kind:"process",
+    summary:"On approval, the Pending records are activated (PRM_Pending__c=false / PRM_Active__c=true) and network effective-from dates are set per location.",
+    rules:["Activation flips Pending→Active and stamps network EffectiveFrom (per location).","Future-dated termination push-out must take effect (currently a defect)."],
+    components:["HealthcareFacilityNetwork.EffectiveFrom"],
+    gotchas:["Future-dated termination changes are silently ignored (HIGH)."],
+    source:["Recred_PAR_Business_Status_Summary_2026-06-08.md (Defect #5)"]},
+   /* defect + extra detail nodes */
+   {id:"d_block", title:"Hard block → PCR / Off-Cycle", kind:"defect",
+    summary:"A credentialed PNC-delegated practitioner who answers 'No' to Q5 is hard-blocked and redirected to submit a Provider Change Request or Off-Cycle Request.",
+    rules:["SetErrorsCredentialingStatus fires when Credentialed AND IsCredentialedPNCDelegated==true AND Q5=='No'."],
+    source:["PAR_Form_PNC_Path_User_Stories.md (UC-4)"]},
+   {id:"d3", title:"Partial / orphaned records on failure", kind:"defect",
+    summary:"When the synchronous IP chain fails partway, leftover records remain and cause downstream errors. 'Recurring and growing.'",
+    gotchas:["HIGH. Fix = atomic submission (US-PAR-01 Savepoint).","36 updatePPLAddresesForPAR() null throws / 30d; 48 setPracFacilityIdentifier NPEs / 30d; 277 HCPT duplicate-junction pairs."],
+    source:["PAR_Form_PartialDataRollback_Investigation_FixPlan.md"]},
+   {id:"d4", title:"Duplicate-record errors on re-submission", kind:"defect",
+    summary:"Existing provider/vendor combinations are blocked by duplicate errors; some need a code fix (idempotent triggers).",
+    gotchas:["16 documented production failures. Fix = trigger idempotency (US-PAR-04)."],
+    source:["PAR_Form_ExistingRecord_DuplicateErrors_UserStory.md"]},
+   {id:"d6", title:"No success/failure feedback", kind:"defect",
+    summary:"OmniScript final response gives no status and no Case Manager redirect → 15–20 'did it work?' tickets/week and a double-submit storm.",
+    gotchas:["MEDIUM. Fix = Navigate-to-Case-Manager + bell notification (US-PAR-01)."],
+    source:["PARFormPerformance/00_Overview_PARForm_BatchRefactor_Roadmap.md"]},
+   {id:"d7", title:"PNC-path validation gap", kind:"defect",
+    summary:"Q5=Yes + non-PNC group selected is not hard-blocked, so a case can carry conflicting PNC intent vs. group affiliation.",
+    gotchas:["HIGH. Fix = MSG_PNCGroup pnc==true check + SetErrorNonPNCGroup show condition + IP PNC filter."],
+    source:["PAR_Form_PNC_Path_User_Stories.md (Story 2)"]},
+   {id:"d2", title:"Terminated-location 'Required Fields Missing'", kind:"defect",
+    summary:"Providers tied to a terminated location hit a hard error that blocks credentialing; a nightly script re-stamps stale records.",
+    gotchas:["HIGH. Warning banner detects it; actual fix not deployed. Example IA-0000096229."],
+    source:["PAR_AppReview_TerminatedLocation_InFlight_BugFix.md"]},
+   {id:"d8", title:"High-volume add-location timeout (paused)", kind:"defect",
+    summary:"Providers with 100+ locations time out on the PSV add-location route — the #1 reason guided location processing was paused.",
+    gotchas:["HIGH. Background processing designed but not built."],
+    source:["Recred_PAR_Business_Status_Summary_2026-06-08.md (Outstanding #1)"]},
+   {id:"d1", title:"Removing a location terminates ALL practitioners", kind:"defect",
+    summary:"In Recred Update, removing one location stamps an Effective-To date on every practitioner at that location.",
+    gotchas:["QA Bug 1216121 (HIGH) — 'the major issue'. Not fixed."],
+    source:["Recred_PAR_Business_Status_Summary_2026-06-08.md (Defect #1)"]},
+   {id:"denied", title:"Denied / Terminated", kind:"decision",
+    summary:"Committee denial closes/terminates the records. Denied or terminated providers must be able to cleanly re-submit later (record reuse), currently impeded by leftover colliding records.",
+    gotchas:["Denied/terminated re-submit blocked by leftover colliding records (MEDIUM)."],
+    source:["PAR_DeniedTerminated_RecordReuse_User_Stories.md"]},
+   {id:"start", title:"Analyst opens PAR Form", kind:"step",
+    summary:"A Sr. Data Reporting Analyst launches PRM_PractitionerParticipationForm_English from the Home screen to begin a new practitioner participation request.",
+    source:["PAR_Form_PNC_Path_User_Stories.md"]},
+   {id:"activeEnd", title:"Practitioner Active in Network", kind:"step",
+    summary:"End state: the practitioner / location records are Active with network effective-from dates, completing the participation request.",
+    source:["Recred_PAR_Business_Status_Summary_2026-06-08.md"]},
+   /* ---- Step-level nodes recovered from the OmniScript (PRM_PractitionerParticipationForm_English v111) ---- */
+   {id:"pf-init", title:"Initialize — Feature Config & Closed-Network MDT", kind:"process",
+    summary:"Before Step 1 renders, the script seeds variables and configuration: SetValues1 / SV_InitVars set defaults, DRGetFeatureConfigSetting pulls feature flags, and PRMExtractClosedNetworkMdt loads the closed-network custom metadata that later gates Q4 (purchasing a practice) and SetErrorsClosedNetwork.",
+    components:["Elements: SetValues1, SV_InitVars, SetValues2","DataRaptor: DRGetFeatureConfigSetting","Remote/MDT: PRMExtractClosedNetworkMdt","Formula: FRML_ClosedNetwork"],
+    rules:["Closed-network metadata drives the Q4 'purchasing a practice' branch and SetErrorsClosedNetwork."],
+    source:["OmniScript pre-step elements SetValues1 → PRMExtractClosedNetworkMdt → SetValues2"]},
+   {id:"pf-credcheck", title:"Credentialing-status gate (Step 1)", kind:"decision",
+    summary:"After the NPI lookup the form classifies the practitioner by CredentialingStatus and routes accordingly: a brand-new practitioner proceeds; a credentialed PNC-delegated practitioner who answers Q5='No' is hard-blocked; a practitioner already 'Credentialing In Progress' at PSV / QC / Committee is redirected to a Provider Change Request / Off-Cycle. Individual NPI and CAQH ID are validated here too.",
+    rules:["CredentialingStatus is derived in PRM_FetchExistingNPIInfo (sets IsCredentialedPNCDelegated).","Credentialed + IsCredentialedPNCDelegated + Q5='No' → SetErrorsCredentialingStatus (hard block).","CredentialingStatus='Credentialing In Progress' AND ExistingCaseManagerStage ∈ {PSV, QC Review, Committee Review} → NavigateToOffCycle redirect.","Closed-network selections → SetErrorsClosedNetwork."],
+    components:["Set Errors: SetErrorsCredentialingStatus, SetErrorsCredInProgressWithPSV, SetErrorsCredInProgressWithAppReview, SetErrorsClosedNetwork","Validations: ValidateIndividualNPI/SetErrorsIndividualNPI, ValidateCAQHId/SetErrors_CAQHId"],
+    gotchas:["Several mutually-exclusive blocks share Step 1 — show-conditions must stay disjoint or two banners can appear at once."],
+    source:["OmniScript elements CredentialingStatus, NavigateToOffCycle, SetErrorsCred*","PAR_Form_PNC_Path_User_Stories.md"]},
+   {id:"pf-offcycle", title:"Redirect → PCR / Off-Cycle (Cred In Progress)", kind:"defect",
+    summary:"When the practitioner is 'Credentialing In Progress' and the existing case is already at Committee Review / PSV / QC Review, a banner (NavigateToOffCycle) tells the analyst to submit a Provider Change Request instead — the PAR form cannot proceed.",
+    rules:["Show when CredentialingStatus='Credentialing In Progress' AND ExistingCaseManagerStage ∈ {Committee Review, PSV, QC Review}.","Backed by SetErrorsCredInProgressWithPSV / SetErrorsCredInProgressWithAppReview."],
+    components:["Text Block: NavigateToOffCycle (links to OffCycleCredentialing OmniScript)"],
+    source:["OmniScript element NavigateToOffCycle"]},
+   {id:"pf-npicaqh", title:"Individual NPI + CAQH ID validation", kind:"process",
+    summary:"The entered individual NPI and CAQH ID are validated before the analyst can move on; failures raise Set Errors and block Next.",
+    components:["IP/Action: ValidateIndividualNPI → SetErrorsIndividualNPI","Action: ValidateCAQHId → SetErrors_CAQHId","Formula: CAQHFormula / CAQHValue"],
+    source:["OmniScript elements ValidateIndividualNPI, ValidateCAQHId"]},
+   {id:"pf-rolespec", title:"Role · Provider Type · Specialty · Taxonomy · Degree", kind:"step",
+    summary:"Still within Step 1, the analyst selects the provider role, provider type (type-ahead), primary + additional specialties, taxonomy code, and degree. Reference data is loaded by supporting IPs / DataRaptors and validated.",
+    components:["Fields: ProviderRole, PractitionerType (IPTypeAheadProviderTypeForPractitioner), ProviderSpecialty (GetSpecialtyData), TaxonomyCode, PractitionerDegree (GetDegree), AdditionalSpeciality","Remote: IPFetchCareTaxonomyProviderTypes","RemoteAction: RAUniqueSpecialties"],
+    rules:["Multiple specialty / degree rows supported; uniqueness enforced via RAUniqueSpecialties.","Provider type must resolve from the type-ahead list."],
+    source:["OmniScript elements ProviderRole → SpecialtyGroupingFormula"]},
+   {id:"pf-specialtyerr", title:"Specialty / Degree / Provider-Type errors", kind:"defect",
+    summary:"Validation Set-Errors block Next when specialty, degree, or provider type are missing/invalid.",
+    components:["Set Errors: SetErrorsSpecialty, SetErrorsDegree, SetErrorsPractitionerType","Element: PractitionerTypeError / PRTypeErrorMessage"],
+    source:["OmniScript elements SetErrorsSpecialty/Degree/PractitionerType"]},
+   {id:"pf-license", title:"Licenses (up to 4)", kind:"step",
+    summary:"The AddLicenseBlock captures professional licenses — State + License Number — for the practitioner.",
+    rules:["Max 4 licenses (AddLicenseBlock repeatLimit=3)."],
+    components:["Block: AddLicenseBlock","Fields: PractitionerState, PractitionerLicenseNumber"],
+    source:["OmniScript element AddLicenseBlock"]},
+   {id:"pf-telehealth", title:"Telehealth + Patient-Fee questions (Q1 / Q2)", kind:"step",
+    summary:"Captures the telehealth question and two patient-fee participation questions before the participation routing questions.",
+    components:["Fields: PractitionerTelehealth (+ PractitionerTelehealthMessage)","Confirm: Confirm2 / ConfirmButton1","Questions: PractitionerPatientFeeQuestion1 / 2 (+ PatientFeeQuestion1Error)"],
+    source:["OmniScript elements PractitionerTelehealth, PractitionerPatientFeeQuestion1/2"]},
+   {id:"pf-closednet", title:"Closed-Network / purchase-practice path (Q4)", kind:"process",
+    summary:"When Q3='No' and a closed-network condition is true, Q4 'Are you purchasing a practice?' appears; closed-network selections can raise SetErrorsClosedNetwork.",
+    rules:["Q4 show: Q3=='No' AND (isAddSpecUnderClosedNetwork==true OR FRML_ClosedNetwork==true).","SetErrorsClosedNetwork blocks ineligible closed-network combinations."],
+    components:["Radio: PractitionerParticipationQuestion4","Formula: FRML_ClosedNetwork","Set Errors: SetErrorsClosedNetwork"],
+    source:["OmniScript element PractitionerParticipationQuestion4"]},
+   {id:"pf-groupval", title:"Group validations (Step 2)", kind:"process",
+    summary:"After a group is chosen, Step 2 runs several validations before allowing Next: delegated-group detection, duplicate / terminated account detection, group-specialty validation, and multiple-Group-NPI handling.",
+    components:["Validate: ValidateDuplicateAccount, PRMGetNPIDetails / PRM_GetMultipleNPIDetails","Set Errors: SetErrorsGroupSpecialty, SetErrorsGroupNPI, SetErrorsGroupStep"],
+    source:["OmniScript Step 2 (PractionerGroup) validation elements"]},
+   {id:"pf-delegated", title:"Delegated-group detection", kind:"process",
+    summary:"If the selected group is delegated, a message is shown and delegated-group data fetched (delegated providers are handled outside the PAR intake).",
+    components:["Elements: CheckDelegatedGroup, DelegatedGroupMessage, FetchDelegatedGroup"],
+    source:["OmniScript elements CheckDelegatedGroup / FetchDelegatedGroup"]},
+   {id:"pf-dupacct", title:"Duplicate / Termed account errors", kind:"defect",
+    summary:"Selecting an account that is a duplicate or terminated raises a blocking error on Step 2.",
+    components:["Validate: ValidateDuplicateAccount","Errors: DuplicateAccountError, TermedAccountError"],
+    source:["OmniScript elements ValidateDuplicateAccount, DuplicateAccountError, TermedAccountError"]},
+   {id:"pf-groupspec", title:"Group specialty & multiple Group-NPI checks", kind:"process",
+    summary:"Group-specialty validation plus specialty-specific messaging (chiropractor, podiatry, pathology) and handling when a group has multiple NPIs.",
+    components:["Formula: FormulaGroupSpecialtyValdiation","Elements: MultipleGroupNPIS, GroupChiroPractorMessage, GroupPodiatryMessage, PathologyTextBlock","Set Errors: SetErrorsGroupSpecialty"],
+    source:["OmniScript Step 2 specialty-validation elements"]},
+   {id:"pf-doc", title:"Documentation upload (conditional)", kind:"step",
+    summary:"A conditional Documentation step shown only when FormType = 'AmeriHealth - Universal'. The analyst uploads a single PDF (≤1MB).",
+    rules:["Step show-condition: FormType == 'AmeriHealth - Universal'.","Single file, PDF format, ≤1MB."],
+    components:["Step: PractitionerDocumentation","Elements: UploadDocument, PdfDocumentMsg, MSG_OnlySingleFileUpload, PdfCheckFormula"],
+    source:["OmniScript step PractitionerDocumentation (show: FormType='AmeriHealth - Universal')"]},
+   {id:"pf-provinfo", title:"Provider Information — DE&I", kind:"step",
+    summary:"A demographics / diversity step capturing Hispanic origin, racial identity and cultural identity (each with 'prefer not to share' options and confirmation questions).",
+    components:["Step: ProviderInformation","Sections: IdentifyasHispanic / HispanicOrigin, RacialIdentity, CulturalIdentity","Set Errors: SetErrorsHispanic"],
+    source:["OmniScript step ProviderInformation"]},
+   {id:"pf-lang", title:"Languages Spoken (step)", kind:"step",
+    summary:"Captures languages spoken (with a default language and 'prefer not to share' option); answers are persisted via a DataRaptor.",
+    components:["Step: ProviderInformationLanguageSpoken","Elements: DefaultLanguage, LanguageSpoken, LanguageAnswerDT","Set Errors: SetErrorsLanguageSpoken"],
+    source:["OmniScript step ProviderInformationLanguageSpoken"]},
+   {id:"pf-pronouns", title:"Personal Pronouns (step)", kind:"step",
+    summary:"Captures personal pronouns (with 'not listed' and 'prefer not to share' options and a confirmation question); persisted via a DataRaptor.",
+    components:["Step: ProviderInformationPersonalPronouns","Elements: PersonalPronouns, PronounNotListed, PronounAnswerDT"],
+    source:["OmniScript step ProviderInformationPersonalPronouns"]},
+   {id:"pf-affirming", title:"Affirming Care Category (step)", kind:"step",
+    summary:"Captures affirming-care categories (or 'does not apply'), with a confirmation question and validation.",
+    components:["Step: ProviderInformationAffirmingCategory","Elements: AffirmingCareCategory, DoesNotApply, AffirmingConfirmQuestion","Set Errors: SetErrorsAffirmingCategory"],
+    source:["OmniScript step ProviderInformationAffirmingCategory"]},
+   {id:"pf-review", title:"Review Screen (embedded OmniScript)", kind:"step",
+    summary:"A read-only review step (embedded OmniScript PRM_PractitionerParticipationReviewScreen) lets the analyst confirm everything before submit. ExistingPrimaryAddressLogic resolves the primary practice address just before record creation.",
+    components:["Embedded OS: PRM|PractitionerParticipationReviewScreen|English","Element: ExistingPrimaryAddressLogic"],
+    source:["OmniScript element PractitionerParticipationReviewScreen (Type=OmniScript)"]},
+   {id:"pf-navcm", title:"Navigate to Case Manager", kind:"process",
+    summary:"After CreateParFormRecords completes, NavigateToCaseManager routes the analyst to the IndividualApplication (Case Manager). On failure ErrorScreen / ErrorMsg are shown instead. (Today the navigation/feedback is unreliable — see defect 'No success/failure feedback'.)",
+    components:["Elements: NavigateToCaseManager, ErrorScreen, ErrorMsg"],
+    source:["OmniScript elements NavigateToCaseManager, ErrorScreen"]},
+  ]
+ },
+ flow:[
+  {ref:"start",          shape:"terminator", k:"phase",   label:"Analyst opens PAR Form"},
+  {ref:"pf-init",        shape:"process",    k:"process", label:"Initialize — Feature Config · Closed-Network MDT"},
+  {ref:"p2",             shape:"step",       k:"step",    label:"Step 1 — Practitioner (NPI & demographics)",
+     side:[{ref:"p2-npi", label:"NPI lookup & prefill (PRM_FetchExistingNPIInfo)", k:"process"}]},
+  {ref:"pf-credcheck",   shape:"decision",   k:"decision",label:"Credentialing-status gate", spineEdge:"New / OK to proceed",
+     side:[{ref:"pf-offcycle", label:"Cred In Progress @ PSV/QC/Committee → PCR / Off-Cycle", k:"defect", edge:"In progress"},
+           {ref:"d_block", label:"Credentialed + Q5=No (PNC-deleg.) → hard block", k:"defect", edge:"Blocked"},
+           {ref:"pf-npicaqh", label:"Validate Individual NPI + CAQH ID", k:"process"}]},
+  {ref:"pf-rolespec",    shape:"step",       k:"step",    label:"Role · Provider Type · Specialty · Taxonomy · Degree",
+     side:[{ref:"pf-specialtyerr", label:"SetErrors: Specialty · Degree · Provider Type", k:"defect"}]},
+  {ref:"pf-license",     shape:"step",       k:"step",    label:"Licenses (up to 4) — State + License #"},
+  {ref:"pf-telehealth",  shape:"step",       k:"step",    label:"Telehealth + Patient-Fee questions (Q1 / Q2)"},
+  {ref:"p2-q5",          shape:"decision",   k:"decision",label:"Participation Qs — Q3 group? · Q4 purchase? · Q5 PNC?", spineEdge:"Q5 Yes / N/A",
+     side:[{ref:"pf-closednet", label:"Q4 purchasing practice → Closed-Network check", k:"process", edge:"Q4 / closed net"}]},
+  {ref:"p3",             shape:"step",       k:"step",    label:"Step 2 — Group",
+     side:[{ref:"p3-typeahead", label:"Group type-ahead (PRM_IPExtractGroupName)", k:"process"}]},
+  {ref:"p3-pncvalidate", shape:"decision",   k:"decision",label:"Selected group is PNC?", spineEdge:"PNC / OK",
+     side:[{ref:"d7", label:"Non-PNC + Q5=Yes → must block (VALIDATION GAP)", k:"defect", edge:"Non-PNC"}]},
+  {ref:"pf-groupval",    shape:"process",    k:"process", label:"Group validations (duplicate · termed · delegated · specialty)",
+     side:[{ref:"pf-delegated", label:"Delegated-group message / fetch", k:"process"},
+           {ref:"pf-dupacct", label:"Duplicate / Termed account errors", k:"defect"},
+           {ref:"pf-groupspec", label:"Group specialty + multiple Group-NPI checks", k:"process"}]},
+  {ref:"pf-doc",         shape:"step",       k:"step",    label:"Documentation upload (AmeriHealth-Universal only)"},
+  {ref:"p4",             shape:"step",       k:"step",    label:"Step 3 — Address / Practice Location (embedded OS v54)",
+     side:[{ref:"p4-precisely", label:"Address standardization (Precisely API)", k:"process"}]},
+  {ref:"pf-provinfo",    shape:"step",       k:"step",    label:"Provider Information — DE&I (Hispanic · Racial · Cultural)"},
+  {ref:"pf-lang",        shape:"step",       k:"step",    label:"Languages Spoken"},
+  {ref:"pf-pronouns",    shape:"step",       k:"step",    label:"Personal Pronouns"},
+  {ref:"pf-affirming",   shape:"step",       k:"step",    label:"Affirming Care Category"},
+  {ref:"p5",             shape:"step",       k:"step",    label:"Contact Information (primary & secondary)"},
+  {ref:"pf-review",      shape:"step",       k:"step",    label:"Review Screen (embedded OS)"},
+  {ref:"p6",             shape:"process",    k:"process", label:"Submit → Record Creation (IP chain)",
+     side:[{ref:"p6-core", label:"Core records: Location → Address → NPI → HCF → PPL", k:"record"},
+           {ref:"p6-conditional", label:"Conditional: Network · PFAA · ACC · ProviderFeature", k:"record"},
+           {ref:"d3", label:"Partial / orphaned records on failure", k:"defect"},
+           {ref:"d4", label:"Duplicate-record errors on re-submit", k:"defect"},
+           {ref:"d6", label:"No success/failure feedback to analyst", k:"defect"}]},
+  {ref:"p7",             shape:"process",    k:"process", label:"Target-State — Async Batch (not yet live)",
+     side:[{ref:"p7-tx2", label:"Atomic per-submission batch + retry", k:"process"}]},
+  {ref:"p8",             shape:"data",       k:"record",  label:"IndividualApplication / Case Manager",
+     side:[{ref:"pf-navcm", label:"NavigateToCaseManager after submit", k:"process"}]},
+  {ref:"p9",             shape:"process",    k:"process", label:"Application Review",
+     side:[{ref:"d2", label:"Terminated-location 'Required Fields Missing'", k:"defect"}]},
+  {ref:"p10",            shape:"process",    k:"process", label:"Primary Source Verification (PSV)",
+     side:[{ref:"d8", label:"High-volume add-location timeout (paused)", k:"defect"}]},
+  {ref:"p11",            shape:"decision",   k:"decision",label:"QC outcome", spineEdge:"No Errors"},
+  {ref:"p12",            shape:"decision",   k:"decision",label:"Committee: Approve / Deny?", spineEdge:"Approve",
+     side:[{ref:"denied", label:"Denied / Terminated  (re-submit issues)", k:"defect", edge:"Deny"}]},
+  {ref:"p13",            shape:"process",    k:"process", label:"Network Activation (Pending → Active)",
+     side:[{ref:"d1", label:"Removing a location terminates ALL practitioners", k:"defect"}]},
+  {ref:"activeEnd",      shape:"terminator", k:"phase",   label:"Practitioner Active in Network"},
+ ]
+},
+
+/* =============================================================== OFF-CYCLE */
+{
+ id:"offcycle",
+ name:"Off-Cycle Credentialing",
+ subtitle:"Mid-cycle change for an existing practitioner",
+ meta:"OmniScript · PRM_OffCycleCredentialing_English (v58)",
+ journey:[
+  {id:"j-oc-req",     label:"Off-Cycle Request (Intake & Submission)", cat:"intake",
+     nodes:["oc-start","oc-search","oc-groupselect","oc-reqtype","oc-collect","oc-address","oc-validate","oc-submit","oc-async","oc-case"]},
+  {id:"j-oc-pda",     label:"PDA Review & NMQC",      cat:"creation",   nodes:["oc-pda"]},
+  {id:"j-oc-decision",label:"Committee Outcome",      cat:"decision",   nodes:["oc-decision"]},
+  {id:"j-oc-active",  label:"Activation — Live in Network", cat:"activation", nodes:["oc-activate","oc-end"]},
+ ],
+ detail:{
+  id:"root", title:"Off-Cycle Credentialing — Guided Flow Life Cycle", kind:"phase",
+  summary:"Path an analyst takes when an already-credentialed practitioner needs an out-of-cycle change — Role / Specialty / New State / New Region / Demographics / Name / Address / Add Group-NPI / Reinstate / Term. The OmniScript PRM_OffCycleCredentialing_English (v58) loads the practitioner, collects the change, validates addresses (Precisely), then a 40-element orchestrator IP writes a MIXED insert+update record set, opens an Off-Cycle case, and feeds PDA Review post-committee.",
+  source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md","Concierge_Off_Cycle_End_to_End_User_Stories.md","OffCycle_GroupSelection_Filter_Redesign_User_Stories.md"],
+  children:[
+   {id:"oc1", title:"Initiation & Provider Search", kind:"phase",
+    summary:"The flow starts with a provider search (NPI / Tax ID / Group Name). Off-Cycle is for existing, already-credentialed practitioners making a mid-cycle change.",
+    components:["OmniScript: PRM_OffCycleCredentialing_English (v58)","LWC: prmGroupSelectionOffCycle","Apex: PRM_OffCycleProviderSearch.getOffcycleProviderSearch","Form load IPs: PRM_FetchOffCycleDetailsParent → PRM_FetchOffCycleDetails (34 elements)"],
+    rules:["Single-shot read hydrates the form: HCF / HCPF / HFN / Address / Identifier in one load."],
+    source:["Concierge_Off_Cycle_End_to_End_User_Stories.md","Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§1.1)"],
+    children:[
+      {id:"oc-search", title:"Provider search (NPI / Tax ID / Group)", kind:"process",
+       summary:"Analyst searches for the existing group / practitioner. Results feed the group & practice-location selection screen.",
+       components:["Apex: PRM_ProviderSearchHelper.getGroupAccount / getFacilityOffcycle","Apex: PRM_OffCycleProviderSearch"],
+       source:["OffCycle_GroupSelection_Filter_Redesign_User_Stories.md"]},
+    ]},
+   {id:"oc-groupselect", title:"Group & Practice Location Selection", kind:"step",
+    summary:"Analyst selects the main group plus the practice locations to act on, or chooses 'add a location not listed'. A filter governs which accounts/locations are eligible.",
+    rules:["Exclude Terminated groups (IsActive=FALSE AND PRM_EffectiveTo__c != NULL).","Exclude Facility practice locations (PRM_PracticeClassification__c='Facility').","Exclude Delegated locations (PRM_IsDelegated__c=TRUE).","Exclude Error accounts/locations (PRM_IsErrorRecord__c=TRUE).","E1: terminated group entered → 'Please select a different group.' · E2: all-delegated group → 'only contains Delegated Practice Locations.'"],
+    components:["LWC: prmGroupSelectionOffCycle","Apex: PRM_ProviderSearchHelper (getGroupAccount, getFacilityOffcycle)"],
+    gotchas:["CRITICAL: getFacilityOffcycle() is missing PRM_IsDelegated__c=false and PRM_IsErrorRecord__c=false filters and uses PRM_Active__c=true (too restrictive) → delegated/error locations shown, valid inactive hidden."],
+    source:["OffCycle_GroupSelection_Filter_Redesign_User_Stories.md (GAP 1/2)"]},
+   {id:"oc-reqtype", title:"Select Off-Cycle Request Type", kind:"decision",
+    summary:"OffCycleRequestType (multi-select) is the variant axis that drives which records get created/updated downstream. Conditions use LIKE (it's multi-select).",
+    rules:["Role Change → role list + taxonomy create.","Specialty Change → PersonEducation, specialty data, multi-role explosion, HCFN clone+insert, taxonomy.","New State / New Region → NRS network list (Pending=true), HCFN clone+insert, taxonomy.","Name / Demographics → contact delta filter, Account upsert, legal-name Identifier rows.","Address Change → address transforms + the big Location/HCF/HCPF/Address DR.","Add Group / NPI → existing-NPI dup check, Vendor Account + Group NPI, affiliation HCPF.","Reinstate → reactivation path (Pending=true) + Account un-Expedite.","Term → mostly a FLAG at submit; actual deactivation happens in Off-Cycle PDA Review."],
+    components:["Picklist: OffCycleRequestType","CB: RoleSpecialtyNewStateRegionChangeBlock [17]"],
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§2.3)"]},
+   {id:"oc-collect", title:"Collect & Verify New Information", kind:"step",
+    summary:"Captures the new information for the chosen request type — new specialties / degrees, role/region/state network rows, demographics / contacts.",
+    components:["OmniScript block: CollectAndVerifyNewInformation","OmniScript: PRM_OffCycleVerification_English (v36 — internal verification mid-flow)"],
+    rules:["New degrees create PersonEducation rows (SpecialtyChange).","Changed contacts filtered by ContactsToUpdate Set Values → only name/phone/email/role/website changes."],
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§1.1 [03][07])"]},
+   {id:"oc-address", title:"Add / Edit Practice Location & Address", kind:"step",
+    summary:"For address/location changes the analyst adds or edits the practice location(s). A per-location concierge-medicine question should be captured here (currently a gap).",
+    rules:["AdditionalAddress + NewPracticeForExisitingGrp rows are merged for creation.","Existing-facility path links the practitioner to existing locations and rolls the NPI forward."],
+    components:["Blocks: AdditionalAddress, PrimaryPractice","DR Transforms: PRMTransformPrimaryAddressForOffCycle, PRMTransformOffCycleAddressForCreation"],
+    gotchas:["GAP: no concierge question when adding a practice location — needed to create PPL-level Info Code Assignments (Pending=true)."],
+    source:["Concierge_Off_Cycle_End_to_End_User_Stories.md (Story 1)"],
+    children:[
+      {id:"oc-concierge", title:"Concierge question (gap)", kind:"defect",
+       summary:"'Do you practice concierge medicine at this Practice Location?' should appear after address entry and before submit, and create PPL-level Info Code Assignments with PRM_Pending__c=true.",
+       gotchas:["Currently missing. Must be added after PRM_OffCyclePreciselyAPI validation, before submit."],
+       source:["Concierge_Off_Cycle_End_to_End_User_Stories.md (AC 1.1.1)"]},
+    ]},
+   {id:"oc-validate", title:"Address Validation + Duplicate Check", kind:"process",
+    summary:"Each address (Primary + Mailing + Billing + each Additional) is shaped and validated against Precisely USPS, then a duplicate-address check runs before submit.",
+    components:["IP: PRM_OffCycleAddressPrep (v5, 7 elements) → IP: PRM_OffCyclePreciselyAPI (v5, 11 elements) → PRM_IPContainerPreciselyAPICall","IP: PRM_DuplicateAddCheck"],
+    rules:["AddressPrep shapes Primary/Mailing/Billing/Additional into one list; PreciselyAPI loops the list through the shared callout."],
+    gotchas:["Up to 5 sequential Precisely callouts per submit → ~3s of perceived latency; target collapses to 1 batched call (PRM_PreciselyAdapter)."],
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§1.1, §8)","Concierge_Off_Cycle_End_to_End_User_Stories.md"]},
+   {id:"oc-submit", title:"Submit → Record Creation (40-element IP)", kind:"process",
+    summary:"The orchestrator PRM_OffCycleRecordCreation (v18, 40 elements) writes a MIXED insert+update set driven by OffCycleRequestType: always opens Case + IndividualApplication + Identifier + ContentDocumentLink; everything else conditional.",
+    components:["Container: PRM_OffCycleRecordCreationParent (v1)","Orchestrator: PRM_OffCycleRecordCreation (v18, 40 elements)","Big DR: PRMDRPHCPractFacHCFacilityLocationAddress","RAs: PRM_OmniUtils.cloneBasisMultipleRole / cloneHCFNRecords"],
+    rules:["Group dedup: existing&&active → reuse; existing&&inactive → reactivate; absent → insert.","Role/Specialty/State/Region → cartesian role-explosion → HCFN clone+insert (Pending=true) + HealthcareProviderTaxonomy.","Final element stamps 14 CaseDataManager flags on IndividualApplication for downstream PDA."],
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§1.1, §2)"],
+    children:[
+      {id:"oc-insert", title:"INSERT inventory (worst case)", kind:"record",
+       summary:"The unconditional + conditional inserts produced by the orchestrator.",
+       records:["Case (RecordType OffCycleRequest) ×1","IndividualApplication (CaseManager) ×1","Identifier__c (+ ContentDocumentLink) ×1","Account (PersonAccount — changed contacts) ×0..N",
+         "Account (Vendor — new Group) + Group Identifier + HealthcareProviderNpi ×0..1","PersonEducation ×0..N (new degrees)","Location / HealthcareFacility / HealthcarePractitionerFacility / Address ×0..N (per new address)",
+         "PRM_ProviderFeature__c ×0..N (assistive aids)","HealthcareFacilityNetwork ×0..N (per Role/Specialty/State/Region, Pending=true)","HealthcareProviderTaxonomy ×0..N (per taxonomy×role×specialty)","HCPF (practitioner↔vendor affiliation) ×0..1"],
+       source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§2.1)"]},
+      {id:"oc-update", title:"UPDATE inventory", kind:"record",
+       summary:"The updates produced for demographics, existing facilities and case flags.",
+       records:["Account (practitioner) — Expedite flag (PRMDREExpediatedAccount)","Account (contact) — demographics upsert","Case — link IndividualApplicationId","IndividualApplication — 14 CaseDataManager flags (final element)",
+         "HealthcareFacility — NPI / EffectiveDate (existing-group path)","LocationNPIHistory — close prior NPI period","HealthcareFacility — Pending=true / IsActive=false (Role/Specialty/State/Region)","HealthcareFacilityNetwork (existing) — clone + flag pending"],
+       source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§2.2)"]},
+      {id:"oc-cpu", title:"OffCycle CPU exceeded / timeout", kind:"defect",
+       summary:"The 40-element synchronous orchestrator is the single largest contributor to 'OffCycle CPU exceeded' exceptions; heavy submits time out (~11s) with no breadcrumb beyond 'Apex CPU time limit exceeded'.",
+       gotchas:["HIGH. Worst case 200–400 DML rows, 3.8–6.5s CPU sync. Target splits TX1 (sync critical path) / TX2 (Queueable fan-out)."],
+       source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§6.1, §8)"]},
+      {id:"oc-omniutils", title:"OmniUtils role-explosion bugs", kind:"defect",
+       summary:"PRM_OmniUtils.cloneBasisMultipleRole / cloneHCFNRecords (the role-explosion logic) is reportedly the top source of OmniUtils production tickets; a naïve re-implementation risks losing BasisOfPractice multi-pick / RecordType demerge / capitation semantics.",
+       gotchas:["HIGH. Target moves logic into PRM_OffCycleNetworkService with 10 regression fixtures + 2-sprint shadow mode."],
+       source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§6.2, §10)"]},
+    ]},
+   {id:"oc-async", title:"Target-State — Apex Services (TX1 / TX2)", kind:"process",
+    summary:"Proposed refactor: 40-element IP collapses to a 3-element shell (SetValues → PRM_ServiceInvoker → Response) backed by PRM_OffCycleSubmitService. TX1 commits everything the next reader sees; TX2 (Queueable) handles per-facility/network/role fan-out.",
+    components:["PRM_OffCycleSubmitService (+ 8 sub-services)","PRM_OffCycleAsyncJob (Queueable)","PRM_OffCycleAddressValidationService (1 batched Precisely call)","Feature flag: PRM_FeatureConfig__mdt.OffCycle_UseApexService"],
+    rules:["TX1 (sync <1s): Case, IndividualApplication, Identifier, contact Account, Group, Location+Address+HCF+HCPF, existing-facility NPI rollover, 'Async-In-Flight' stamp.","TX2 (async <60s): ProviderFeature, HCFN (after role-explosion), Taxonomy, Expedite, affiliation HCPF clones, 'Async-Complete' stamp + PRM_AsyncComplete__e.","~62% class reuse (75% by LOC) from Par Form + PDA Review framework."],
+    gotchas:["Target-state only — depends on Par Form + PDA Review Apex services landing first."],
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§3–§6, §9)"],
+    children:[
+      {id:"oc-asyncjob", title:"PRM_OffCycleAsyncJob (TX2 Queueable)", kind:"process",
+       summary:"Re-instantiates PRM_OffCycleSubmitService and runs the SAME runHeavyWork() in a fresh governor context; publishes PRM_AsyncComplete__e on finish so LWC bell / Flow / IP can subscribe.",
+       components:["Queueable, Database.AllowsCallouts","Gate: PRM_AsyncEnqueueGuard.safeEnqueue","Event: PRM_AsyncComplete__e"],
+       source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§6.4)"]},
+    ]},
+   {id:"oc-case", title:"Off-Cycle Case / IndividualApplication", kind:"record",
+    summary:"Submission opens a Case (RecordType OffCycleRequest) and an IndividualApplication (Case Manager, RecordType Off-Cycle) with the CaseDataManager flags marking which entities were touched.",
+    components:["Case (OffCycleRequest)","IndividualApplication (Off-Cycle Case Manager)","DR: PRMLoadOffCycleCaseMgrDatMgr (14 flags)"],
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§2)"]},
+   {id:"oc-pda", title:"PDA Review & Update (post-committee)", kind:"process",
+    summary:"After the case works through review/committee, the Off-Cycle PDA Review activates the pending records — including flipping Info Code Assignments PRM_Pending__c=false on approval (Term deactivation also happens here).",
+    components:["IP: PRM_OffCyclePDAReviewUpdate","Apex: PRM_InfoCodeAssignmentUtility, PRM_CaseManagerDenialUtility"],
+    rules:["Approve → activate PPL-level Info Code Assignments (PRM_Pending__c=false).","Term request types are realized here (HCFN/HCPF deactivation), not at submit."],
+    source:["Concierge_Off_Cycle_End_to_End_User_Stories.md (Story 2/3)","Enhancements/PNM_OffCycle_PDA_ReviewUpdate_Apex_Service_Architecture.md"]},
+   {id:"oc-decision", title:"Committee Outcome", kind:"decision",
+    summary:"Approve → records and Info Code Assignments activated. Deny → assignments marked denied (not active) via PRM_CaseManagerDenialUtility.",
+    rules:["Approved → PRM_Pending__c=false on pending rows.","Denied → Info Code Assignments denied, pending records not activated."],
+    source:["Concierge_Off_Cycle_End_to_End_User_Stories.md (Story 3)"]},
+   {id:"oc-activate", title:"Records Activated (Pending → Active)", kind:"process",
+    summary:"On approval the Off-Cycle changes go live — HCFN / HCPF / taxonomy / Info Code Assignments flip from Pending to Active and become effective in the network.",
+    rules:["PRM_Pending__c=false / IsActive=true on the affected rows.","Network effective dates set per location/role."],
+    source:["Concierge_Off_Cycle_End_to_End_User_Stories.md","Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md"]},
+   /* extra nodes */
+   {id:"oc-start", title:"Analyst opens Off-Cycle flow", kind:"step",
+    summary:"An analyst launches PRM_OffCycleCredentialing_English to make a mid-cycle change for an existing, already-credentialed practitioner.",
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§0)"]},
+   {id:"oc-term", title:"Term = flag at submit", kind:"record",
+    summary:"A Term request is largely a flag captured at submit; the actual row deactivation (HCFN / HCPF) is performed in the Off-Cycle PDA Review flow post-committee.",
+    source:["Enhancements/PNM_OffCycle_Process_Apex_Service_Architecture.md (§2.3 note)"]},
+   {id:"oc-denied", title:"Denied — Info Codes denied", kind:"defect",
+    summary:"On denial the pending records are not activated and PPL-level Info Code Assignments are marked denied via PRM_CaseManagerDenialUtility.",
+    source:["Concierge_Off_Cycle_End_to_End_User_Stories.md (Story 3)"]},
+   {id:"oc-end", title:"Change Live in Network", kind:"step",
+    summary:"End state: the off-cycle change (new location / role / specialty / region / demographics / group) is active and effective in the network.",
+    source:["Concierge_Off_Cycle_End_to_End_User_Stories.md"]},
+  ]
+ },
+ flow:[
+  {ref:"oc-start",     shape:"terminator", k:"phase",   label:"Analyst opens Off-Cycle flow"},
+  {ref:"oc-search",    shape:"step",       k:"step",    label:"Provider Search (NPI / Tax ID / Group)",
+     side:[{ref:"oc1", label:"Form load: PRM_FetchOffCycleDetails (34 elements)", k:"process"}]},
+  {ref:"oc-groupselect",shape:"step",      k:"step",    label:"Group & Practice Location Selection",
+     side:[{ref:"oc-groupselect", label:"Filter: exclude Terminated / Facility / Delegated / Error", k:"process"}]},
+  {ref:"oc-reqtype",   shape:"decision",   k:"decision",label:"Select Off-Cycle Request Type", spineEdge:"per type",
+     side:[{ref:"oc-term", label:"Term → flag now, deactivate in PDA Review", k:"record", edge:"Term"}]},
+  {ref:"oc-collect",   shape:"step",       k:"step",    label:"Collect & Verify New Information"},
+  {ref:"oc-address",   shape:"step",       k:"step",    label:"Add / Edit Practice Location & Address",
+     side:[{ref:"oc-concierge", label:"Concierge question missing (Info Code gap)", k:"defect"}]},
+  {ref:"oc-validate",  shape:"process",    k:"process", label:"Address Validation (Precisely) + Duplicate Check",
+     side:[{ref:"oc-validate", label:"Up to 5 sequential Precisely callouts (~3s)", k:"defect"}]},
+  {ref:"oc-submit",    shape:"process",    k:"process", label:"Submit → Record Creation (40-element IP)",
+     side:[{ref:"oc-insert", label:"INSERT: Case · IA · Group · Location/HCF/HCPF · HCFN · Taxonomy", k:"record"},
+           {ref:"oc-update", label:"UPDATE: Account · HCF/NPI history · IA flags", k:"record"},
+           {ref:"oc-cpu", label:"OffCycle CPU exceeded / ~11s timeout", k:"defect"},
+           {ref:"oc-omniutils", label:"OmniUtils role-explosion bugs (cloneBasisMultipleRole)", k:"defect"}]},
+  {ref:"oc-async",     shape:"process",    k:"process", label:"Target-State — Apex Services (TX1/TX2)",
+     side:[{ref:"oc-asyncjob", label:"PRM_OffCycleAsyncJob (Queueable fan-out)", k:"process"}]},
+  {ref:"oc-case",      shape:"data",       k:"record",  label:"Off-Cycle Case / IndividualApplication"},
+  {ref:"oc-pda",       shape:"process",    k:"process", label:"PDA Review & Update (post-committee)"},
+  {ref:"oc-decision",  shape:"decision",   k:"decision",label:"Committee Outcome: Approve / Deny?", spineEdge:"Approve",
+     side:[{ref:"oc-denied", label:"Deny → Info Code Assignments denied", k:"defect", edge:"Deny"}]},
+  {ref:"oc-activate",  shape:"process",    k:"process", label:"Records Activated (Pending → Active)"},
+  {ref:"oc-end",       shape:"terminator", k:"phase",   label:"Change Live in Network"},
+ ]
+},
+
+/* ============================================================= RECREDENTIALING */
+{
+ id:"recred",
+ name:"Recredentialing",
+ subtitle:"Periodic re-verification of an existing practitioner",
+ meta:"OmniScript · PRM_RecredQC_English + NonRoutineCommitteeReview",
+ journey:[
+  {id:"j-rc-init",     label:"Recred Case (Initiation)",          cat:"intake",     nodes:["rc-start","rc-bootstrap"]},
+  {id:"j-rc-appreview",label:"Application Review",                cat:"review",     nodes:["rc-appreview"]},
+  {id:"j-rc-psv",      label:"Primary Source Verification (PSV)", cat:"review",     nodes:["rc-psv","rc-summary"]},
+  {id:"j-rc-qc",       label:"QC Review",                         cat:"decision",   nodes:["rc-qc"]},
+  {id:"j-rc-committee",label:"Committee Review",                  cat:"decision",   nodes:["rc-mdr","rc-route","rc-committee"]},
+  {id:"j-rc-pda",      label:"ReCred PDA & NMQC",                 cat:"creation",   nodes:["rc-pda","rc-pdaqc"]},
+  {id:"j-rc-complete", label:"Complete — Cred Maintained",        cat:"activation", nodes:["rc-activate","rc-end"]},
+ ],
+ detail:{
+  id:"root", title:"Recredentialing — Guided Review Life Cycle", kind:"phase",
+  summary:"Periodic re-verification of an already-credentialed practitioner as the Recred Due Date approaches. A single guided flow (PRM_RecredQC_English) collapses App Review + PSV + QC + MDR and produces a routing decision; the committee (PRM_NonRoutineCommitteeReview_English) then approves/denies. On 'Nonroutine Committee Approved' the case moves to PRM_Stage__c='Recred Updates' (ReCred PDA), is updated and QC'd, then cred is maintained. Lane membership is driven by IndividualApplication.PRM_Stage__c.",
+  source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md","Recred_PSV_QC_Committee_Lucid_Flowchart.md","Recred_PAR_Business_Status_Summary_2026-06-08.md"],
+  children:[
+   {id:"rc1", title:"Initiation — Recred Due", kind:"phase",
+    summary:"A recredentialing Case (IndividualApplication, RecordType PRM_ReCredentialing) is generated as the practitioner's Recred Due Date approaches and is opened from the Case page via the 'Recred PSV QC Review' button.",
+    components:["Object: IndividualApplication (RecordType PRM_ReCredentialing)","Stage field: PRM_Stage__c","Launch: 'Recred PSV QC Review' button on the Case"],
+    rules:["The case lifecycle field PRM_Stage__c drives lane membership (e.g. 'PSV Review', 'QC Review', 'Committee Review', 'Recred Updates')."],
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§0)"],
+    children:[
+      {id:"rc-bootstrap", title:"Bootstrap & validation", kind:"process",
+       summary:"On launch the flow sets variables, fetches PAR info and transforms group data; an invalid case stops the flow.",
+       components:["Elements: SetFlowVariables → IPFetchParInformation → DRTransformGroupData","Invalid: InvalidCase → InvalidCaseError"],
+       source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§1)"]},
+    ]},
+   {id:"rc-appreview", title:"Application Review (ReviewPractitioner)", kind:"step",
+    summary:"Reviewer confirms demographics & directory-style data: NPI/CAQH ID, name/DOB/gender, role, specialties & degrees, group NPI/TIN, all addresses + capabilities, DE&I, languages, pronouns, affirming care, contacts.",
+    components:["Step: ReviewPractitioner","ConfirmationToProceed → SetPractitionerSpecialtyFields"],
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§3)"]},
+   {id:"rc-psv", title:"Primary Source Verification (PSV)", kind:"process",
+    summary:"The largest phase: each credential is verified against primary sources and mirrored against CAQH — practitioner/CAQH identity, service area, licenses, specialty, role, admitting privileges, insurance (COI), work history, education, DEA, CDS, disclosures, sanctions/NPDB, board cert, Medicare opt-out, and external checks (FSMB/SAM/CMS).",
+    components:["Transforms: DRTransformPSVScreenData, DRTransformReCredData","Validate: IPValidateNPI, IPValidateCAQHAppReviewParent","Recred-specific: ReCredServiceAreaVerification, ReCredBoardCert","Sanctions: IPFetchSanctionLogs, NPDBResults, LWCNPDBResult"],
+    rules:["Multiple primary taxonomies → error (IPToCountPrimaryTaxonomy).","Specialty verification failure → IPUpdateSpecailtyReviewResult / NavigateCaseManagerPSV."],
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§4)"],
+    children:[
+      {id:"rc-psv-caqh", title:"CAQH attestation & signature", kind:"process",
+       summary:"CAQH-sourced data is pulled and the practitioner's signature/attestation is captured and viewed from SDS.",
+       components:["IPGetPracticeLocationForAdmittingCAQH → DRTransformCAQHPSVResponse","CAQHSignatureAttestionStep, prmViewFileFromSDS"],
+       source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§4)"]},
+      {id:"rc-psv-specialty", title:"Specialty OK? (decision)", kind:"decision",
+       summary:"Specialty verification outcome gates progress; a failure routes back to the case manager.",
+       rules:["No → IPUpdateSpecailtyReviewResult / UpdateFailedPSVReview / NavigateCaseManagerPSV.","Yes → continue to work history / education / DEA / CDS / NPDB / board cert."],
+       source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§4)"]},
+    ]},
+   {id:"rc-summary", title:"PSV / ReCred Summary", kind:"process",
+    summary:"A read-only roll-up of every verification result (contract, attestation, SAV, license, specialty, admitting, insurance, WH, education, DEA, CDS, disclosure, board, FSMB, Medicare, CMS, SAM, NPDB) feeds the QC step.",
+    components:["Steps: PSVSummary, ReCredPSVSummary","ProceedTo / ReCredProceedTo / ReCredQCNote"],
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§5)"]},
+   {id:"rc-qc", title:"QC Review — Proceed or Return?", kind:"decision",
+    summary:"Network Management QC reviews the verified file and either proceeds toward committee/MDR or returns the case to PSV. A missing-info ContentNote can be attached.",
+    rules:["QCReturnTo → bounce back to PSV (loops the review).","QCProceedTo → continue; QCReadyForCommittee / QCReadyForMedicalReview flags set.","Optional: SetCreateMissingInfoNote / SetContentNoteForReCred."],
+    components:["Step: QCReviewSummary","Radios: QCProceedTo vs QCReturnTo"],
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§6)"]},
+   {id:"rc-mdr", title:"Medical Director Review (MDR)", kind:"step",
+    summary:"When routed for medical review, the MD records sanction review, dates settled, amounts, NPDB action/dates and approval. MDR lands the case at committee.",
+    components:["Step: MDRFormStep","ReCredMDRHeading + sanction/NPDB/approval fields"],
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§7)"]},
+   {id:"rc-route", title:"Routing decision (ReCredProceedTo)", kind:"decision",
+    summary:"On the ReCredPSVSummary step the reviewer picks the routing outcome that persists the next stage. There is NO direct path from PSV/QC into ReCred PDA — only committee approval (or the RCAT termination path) reaches 'Recred Updates'.",
+    rules:["Committee Review → SetRecordRecredQC_CR: PRM_Stage__c='Committee Review', PRM_RoutineCommittee__c=true.","Medical Director Review → SetRecordRecredQC_MDR: Stage='Committee Review', MedicalDirectorReview=true.","Route to Final Development → SetRecordRecredQC_FD: Stage='QC Review', Status='Pending Closure', PRM_RecredTerm__c=true (RCAT path).","Route to PSV → bounce back."],
+    components:["Radio: ReCredProceedTo (on ReCredPSVSummary)","IP: IPUpdateRecredReviewUpdate → NavigateToCaseManager"],
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§2)"]},
+   {id:"rc-committee", title:"Non-Routine Committee Review", kind:"decision",
+    summary:"The committee (separate OmniScript) records the outcome on the recred case. 'Nonroutine Committee Approved' is the single decision point that flips the case into the ReCred PDA 'Recred Updates' lane and spawns a Recred Updates case.",
+    components:["OmniScript: PRM_NonRoutineCommitteeReview_English","Elements: CaseStatusRecred, RecredDueDate, NCApprovedDate, IPNonroutineRecordsUpdate"],
+    rules:["Approved → PRM_Stage__c='Recred Updates' + new Recred Updates case (PRM_PDAInitialCredQueue).","MD Approved → back to committee.","Denied/Closed → denial (appeal / due-process branches available)."],
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§1)","Recred_PSV_QC_Committee_Lucid_Flowchart.md (Committee flow)"]},
+   {id:"rc-pda", title:"ReCred PDA — Recred Updates", kind:"process",
+    summary:"The ReCred PDA Update guided flow performs the actual data updates on the approved 'Recred Updates' case (cred maintained).",
+    components:["OmniScript: PRM_ReCredUpdate_English","Stage: PRM_Stage__c='Recred Updates'"],
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§0)","Enhancements/PNM_PDA_ReviewUpdate_Apex_Service_Architecture.md"]},
+   {id:"rc-pdaqc", title:"ReCred PDA QC (Network Management QC)", kind:"process",
+    summary:"Network Management QC of the PDA update. Both open recred QA defects live in this script.",
+    components:["OmniScript: PRM_ReCredQCUpdate_English"],
+    gotchas:["QA Bug 1216121 (HIGH): removing one location terminates ALL practitioners at that location.","QA Bug 1216120 (MEDIUM): 'Errors Found' path still shows the 'Removed Practitioner at Practice Location' table."],
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§0)","Recred_PAR_Business_Status_Summary_2026-06-08.md (Defects #1, #6)"],
+    children:[
+      {id:"rc-bug1216121", title:"Remove location → terminates ALL", kind:"defect",
+       summary:"Removing a location during ReCred PDA QC stamps an Effective-To date on every practitioner at that location, not just the one being removed.",
+       gotchas:["QA Bug 1216121 (HIGH) — 'the major issue'. Confirmed present, not fixed."],
+       source:["Recred_PAR_Business_Status_Summary_2026-06-08.md (Defect #1)"]},
+      {id:"rc-bug1216120", title:"QC 'Errors Found' wrong table", kind:"defect",
+       summary:"When QC selects 'Errors Found', the 'Removed Practitioner at Practice Location' table still displays even though it shouldn't.",
+       gotchas:["QA Bug 1216120 (MEDIUM). Confirmed present, not fixed."],
+       source:["Recred_PAR_Business_Status_Summary_2026-06-08.md (Defect #6)"]},
+    ]},
+   {id:"rc-activate", title:"Close & Maintain Cred", kind:"process",
+    summary:"On clean QC the recred case is closed and the practitioner's credential is maintained with the new Recred Due Date; the termination path instead closes the cred.",
+    rules:["Approval path: cred maintained, RecredDueDate advanced.","Termination path (RecredTerm): RCAT batch lands a Recred Updates (termination) case."],
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§1)"]},
+   /* extra + defect nodes */
+   {id:"rc-start", title:"Recred Due → Recred Case opened", kind:"step",
+    summary:"A recredentialing IndividualApplication (RecordType PRM_ReCredentialing) is created as the Recred Due Date approaches and opened via the 'Recred PSV QC Review' button.",
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§0)"]},
+   {id:"rc-invalid", title:"Invalid case (stop)", kind:"defect",
+    summary:"If the case fails validation at bootstrap, the flow shows InvalidCaseError and stops.",
+    components:["Elements: InvalidCase → InvalidCaseError"],
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§1)"]},
+   {id:"rc-returnpsv", title:"Return to PSV", kind:"decision",
+    summary:"QC can return the case toward PSV (QCReturnTo), looping the review until verification is clean.",
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (§6)"]},
+   {id:"rc-finaldev", title:"Route to Final Development (Term / RCAT)", kind:"defect",
+    summary:"Choosing 'Route to Final Development' sets PRM_RecredTerm__c=true and Pending Closure; the RCAT termination batch then lands the work as a Recred Updates (termination) case.",
+    rules:["SetRecordRecredQC_FD: Stage='QC Review', Status='Pending Closure', PRM_RecredTerm__c=true."],
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§2)","ReCred_PSV_to_RCAT_DirectPush_Guide.md"]},
+   {id:"rc-mdr2", title:"MDR → Committee", kind:"process",
+    summary:"Medical Director Review routes the case to committee (Stage='Committee Review', MedicalDirectorReview=true).",
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md (§2)"]},
+   {id:"rc-denied", title:"Denied / Closed", kind:"defect",
+    summary:"Committee denial closes the case; appeal-open, appealed, denied-closed, and due-process-hearing branches exist on the committee script.",
+    components:["SVNRCommitteeDeniedAppealOpen, SVNRCommitteeAppealed, NRCommitteeDeniedClosed, NonCommiteeDueProcessHearing"],
+    source:["Recred_PSV_QC_Committee_Lucid_Flowchart.md (Committee flow)"]},
+   {id:"rc-rollback", title:"Committee → QC rollback (manual)", kind:"defect",
+    summary:"Business occasionally needs to pull cases back from 'Committee Review In Progress' to 'QC Review' (e.g. 13 cases reassigned to Franklin Holt) via an admin Apex script — there is no in-app reverse transition.",
+    gotchas:["Manual remediation only (scripts/ReCredCommitteeToQCReview.apex)."],
+    source:["ReCred_CommitteeToQCReview_Rollback_Guide.md"]},
+   {id:"rc-end", title:"Recredentialed — Cred Maintained", kind:"step",
+    summary:"End state: the practitioner is recredentialed with an advanced Recred Due Date (or terminated on the Final Development path).",
+    source:["Recred_GuidedFlow_to_ReCredPDA_Routing_Audit_2026-06-08.md"]},
+  ]
+ },
+ flow:[
+  {ref:"rc-start",      shape:"terminator", k:"phase",   label:"Recred Due → Recred Case opened"},
+  {ref:"rc-bootstrap", shape:"process",    k:"process", label:"Bootstrap & Validation",
+     side:[{ref:"rc-invalid", label:"Invalid case → stop", k:"defect", edge:"Invalid"}]},
+  {ref:"rc-appreview", shape:"step",       k:"step",    label:"Application Review (ReviewPractitioner)"},
+  {ref:"rc-psv",       shape:"process",    k:"process", label:"Primary Source Verification (PSV)",
+     side:[{ref:"rc-psv-caqh", label:"CAQH attestation & signature", k:"process"},
+           {ref:"rc-psv-specialty", label:"Specialty failure → back to Case Manager", k:"defect"}]},
+  {ref:"rc-summary",   shape:"process",    k:"process", label:"PSV / ReCred Summary"},
+  {ref:"rc-qc",        shape:"decision",   k:"decision",label:"QC Review — Proceed or Return?", spineEdge:"Proceed",
+     side:[{ref:"rc-returnpsv", label:"Return to PSV (loop)", k:"defect", edge:"Return"}]},
+  {ref:"rc-mdr",       shape:"step",       k:"step",    label:"Medical Director Review (MDR)"},
+  {ref:"rc-route",     shape:"decision",   k:"decision",label:"Routing decision (ReCredProceedTo)", spineEdge:"Committee Review",
+     side:[{ref:"rc-mdr2", label:"MDR → Committee", k:"process", edge:"MDR"},
+           {ref:"rc-finaldev", label:"Route to Final Development → RCAT term", k:"defect", edge:"Term"}]},
+  {ref:"rc-committee", shape:"decision",   k:"decision",label:"Non-Routine Committee Review", spineEdge:"Approved",
+     side:[{ref:"rc-denied", label:"Denied / Closed (appeal · due process)", k:"defect", edge:"Deny"}]},
+  {ref:"rc-pda",       shape:"process",    k:"process", label:"ReCred PDA — Recred Updates (Stage flip)",
+     side:[{ref:"rc-rollback", label:"Committee → QC rollback (manual script)", k:"defect"}]},
+  {ref:"rc-pdaqc",     shape:"process",    k:"process", label:"ReCred PDA QC (Network Management QC)",
+     side:[{ref:"rc-bug1216121", label:"Remove location → terminates ALL practitioners", k:"defect"},
+           {ref:"rc-bug1216120", label:"QC 'Errors Found' shows wrong table", k:"defect"}]},
+  {ref:"rc-activate",  shape:"process",    k:"process", label:"Close & Maintain Cred"},
+  {ref:"rc-end",       shape:"terminator", k:"phase",   label:"Recredentialed — Cred Maintained"},
+ ]
+},
+];
+
+/* ===================== engine ===================== */
+const KINDS={phase:"START / END",step:"USER STEP",process:"SYSTEM",decision:"DECISION",record:"RECORD",defect:"DEFECT"};
+const NS="http://www.w3.org/2000/svg";
+
+/* journey-map phase categories (color-coded stations, like a journey map) */
+const CATS={
+  intake:    {label:"Intake & Submission",    color:"#e0457b"},
+  creation:  {label:"Record Creation",        color:"#8e44ad"},
+  review:    {label:"Review & Verification",  color:"#2477b3"},
+  decision:  {label:"QC & Committee",         color:"#e08a1e"},
+  activation:{label:"Decision & Activation",  color:"#16a085"}
+};
+/* map each main flow station -> category (refs are globally unique across flows) */
+const CAT_BY_REF={
+  /* PAR */
+  start:"intake",p2:"intake","p2-q5":"intake",p3:"intake","p3-pncvalidate":"intake",p4:"intake",p5:"intake",
+  p6:"creation",p7:"creation",p8:"creation",
+  p9:"review",p10:"review",
+  p11:"decision",p12:"decision",
+  p13:"activation",activeEnd:"activation",
+  /* Off-Cycle */
+  "oc-start":"intake","oc-search":"intake","oc-groupselect":"intake","oc-reqtype":"intake",
+  "oc-collect":"intake","oc-address":"intake","oc-validate":"intake",
+  "oc-submit":"creation","oc-async":"creation","oc-case":"creation",
+  "oc-pda":"review","oc-decision":"decision","oc-activate":"activation","oc-end":"activation",
+  /* Recredentialing */
+  "rc-start":"intake","rc-bootstrap":"intake",
+  "rc-appreview":"review","rc-psv":"review","rc-summary":"review",
+  "rc-qc":"decision","rc-mdr":"decision","rc-route":"decision","rc-committee":"decision",
+  "rc-pda":"creation","rc-pdaqc":"decision",
+  "rc-activate":"activation","rc-end":"activation"
+};
+/* journey (parent) layout */
+const JW=1080, JPAD=130, JCOLS=4, JROWH=176, JTOP=92, JR=29;
+/* detailed (stage) flowchart layout */
+const MAINW=300, MAINCX=200, SIDEX=420, SIDEW=300, MIDX=384;
+const SH={process:64,step:64,decision:96,terminator:54,data:62};
+const SIDEH=58, SIDEGAP=12, ROWGAP=42, FTOP=26;
+
+const canvas=document.getElementById('canvas');
+const detail=document.getElementById('detail');
+const stage=document.getElementById('stage'), vp=document.getElementById('vp');
+const sidebar=document.getElementById('sidebar');
+const hTitle=document.getElementById('hTitle'), hSub=document.getElementById('hSub');
+
+let byId={}, sideMap={}, pts=[], boxes=[], mains=[], targets=[],
+    selEl=null, scale=1, svg=null, activeFlow=null, activeStage=null, view="journey";
+
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+
+function catColor(ref){const c=CATS[CAT_BY_REF[ref]];return c?c.color:"#6a4bbc";}
+
+/* a station carries a defect badge if it (or its children / side notes) flags a defect or gotcha */
+function hasDefect(ref){
+  const n=byId[ref]||{};
+  if(n.gotchas&&n.gotchas.length) return true;
+  if((n.children||[]).some(c=>c.kind==='defect'||(c.gotchas&&c.gotchas.length))) return true;
+  return (sideMap[ref]||[]).some(s=>{
+    if(s.k==='defect') return true;
+    const sn=byId[s.ref]||{};
+    return sn.kind==='defect'||(sn.gotchas&&sn.gotchas.length);
+  });
+}
+
+function catColorKey(key){const c=CATS[key];return c?c.color:"#6a4bbc";}
+/* a parent stage shows a defect badge if ANY of its member nodes flags a defect */
+function stageHasDefect(stage){return (stage.nodes||[]).some(r=>hasDefect(r));}
+/* aggregate searchable text for a parent stage (all its nodes + their children/sides) */
+function stageHay(stage){
+  const out=[];
+  (stage.nodes||[]).forEach(r=>{
+    const collect=n=>{ if(!n)return; out.push(n.title,n.summary,(n.rules||[]).join(' '),(n.components||[]).join(' '),(n.records||[]).join(' '),(n.gotchas||[]).join(' ')); (n.children||[]).forEach(collect); };
+    collect(byId[r]);
+    (sideMap[r]||[]).forEach(s=>collect(byId[s.ref]));
+  });
+  out.push(stage.label);
+  return out.join(' ').toLowerCase();
+}
+
+/* serpentine (boustrophedon) layout over the PARENT journey stages */
+function layoutJourney(STAGES){
+  pts=[];
+  const cols=Math.min(JCOLS,Math.max(2,STAGES.length)), innerW=JW-2*JPAD, colGap=innerW/(cols-1);
+  STAGES.forEach((s,i)=>{
+    const row=Math.floor(i/cols), j=i%cols;
+    const x = (row%2===0) ? JPAD + j*colGap : JPAD + (cols-1-j)*colGap;
+    const y = JTOP + row*JROWH + Math.sin(i*0.9)*15;
+    pts.push({ref:s.id,label:s.label,cat:s.cat,stage:s,x,y,idx:i,row});
+  });
+  const rows=Math.ceil(STAGES.length/cols);
+  return {CW:JW, CH:JTOP + (rows-1)*JROWH + 150, rows, cols, colGap};
+}
+
+/* Catmull-Rom → cubic-Bezier: one flowing "road" through every station center */
+function roadPath(P){
+  if(P.length<2) return P.length?('M'+P[0].x+','+P[0].y):'';
+  let d='M'+P[0].x+','+P[0].y;
+  for(let i=0;i<P.length-1;i++){
+    const p0=P[i-1]||P[i], p1=P[i], p2=P[i+1], p3=P[i+2]||p2;
+    const c1x=p1.x+(p2.x-p0.x)/6, c1y=p1.y+(p2.y-p0.y)/6;
+    const c2x=p2.x-(p3.x-p1.x)/6, c2y=p2.y-(p3.y-p1.y)/6;
+    d+=' C'+c1x.toFixed(1)+','+c1y.toFixed(1)+' '+c2x.toFixed(1)+','+c2y.toFixed(1)+' '+p2.x.toFixed(1)+','+p2.y.toFixed(1);
+  }
+  return d;
+}
+
+/* ---- detailed (stage) flowchart: vertical spine + side callouts ---- */
+function layout(FLOW){
+  boxes=[]; mains=[]; let y=FTOP;
+  FLOW.forEach((f,idx)=>{
+    const mh=SH[f.shape]||64;
+    const sides=f.side||[];
+    const blockH = sides.length ? sides.length*SIDEH+(sides.length-1)*SIDEGAP : 0;
+    const rowH=Math.max(mh, blockH);
+    const cy=y+rowH/2;
+    const main={kind:"main",idx,ref:f.ref,label:f.label,shape:f.shape,k:f.k,spineEdge:f.spineEdge,
+      x:MAINCX-MAINW/2, y:cy-mh/2, w:MAINW, h:mh, cx:MAINCX, cy};
+    boxes.push(main); mains.push(main);
+    let sy=cy-blockH/2;
+    sides.forEach(s=>{
+      boxes.push({kind:"side",ref:s.ref,label:s.label,k:s.k,edge:s.edge,
+        x:SIDEX, y:sy, w:SIDEW, h:SIDEH, cx:SIDEX+SIDEW/2, cy:sy+SIDEH/2, parent:main});
+      sy+=SIDEH+SIDEGAP;
+    });
+    y+=rowH+ROWGAP;
+  });
+  return {CW:SIDEX+SIDEW+30, CH:y+10};
+}
+function edge(d,opt){opt=opt||{};const p=document.createElementNS(NS,'path');p.setAttribute('d',d);p.setAttribute('fill','none');
+  p.setAttribute('stroke',opt.color||'#7c8a99');p.setAttribute('stroke-width',opt.w||2);
+  if(opt.dash)p.setAttribute('stroke-dasharray','5 4');p.setAttribute('marker-end','url(#'+(opt.dash?'arrd':'arr')+')');svg.appendChild(p);}
+function elabel(x,yy,txt,cls){const t=document.createElementNS(NS,'text');t.setAttribute('x',x);t.setAttribute('y',yy);if(cls)t.setAttribute('class',cls);t.textContent=txt;svg.appendChild(t);}
+
+/* enter a flow → always start on its parent journey */
+function buildFlow(def){
+  activeFlow=def; activeStage=null;
+  byId={}; (function f(n){byId[n.id]=n;(n.children||[]).forEach(f);})(def.detail);
+  sideMap={}; def.flow.forEach(f=>{ if(f.side&&f.side.length) sideMap[f.ref]=f.side; });
+  renderJourney(def);
+}
+
+/* LEVEL 1 — parent journey (winding road of macro stages) */
+function renderJourney(def){
+  view="journey"; activeStage=null;
+  document.getElementById('backBtn').style.display='none';
+  document.getElementById('crumb').innerHTML='';
+  const stages=def.journey||[{id:"all",label:def.name,cat:"intake",nodes:def.flow.map(f=>f.ref)}];
+  const dim=layoutJourney(stages);
+  hTitle.textContent=def.name+' — Life-Cycle Journey';
+  hSub.textContent=def.meta+' · click a stage to open its detailed flow diagram';
+  canvas.innerHTML=''; canvas.style.width=dim.CW+'px'; canvas.style.height=dim.CH+'px';
+
+  /* the road */
+  svg=document.createElementNS(NS,'svg'); svg.setAttribute('class','edges');
+  svg.setAttribute('width',dim.CW); svg.setAttribute('height',dim.CH);
+  const d=roadPath(pts);
+  ['road-sh','road','road-dot'].forEach(cls=>{const p=document.createElementNS(NS,'path');p.setAttribute('class',cls);p.setAttribute('d',d);svg.appendChild(p);});
+  canvas.appendChild(svg);
+
+  /* stations = macro stages */
+  selEl=null; targets=[];
+  pts.forEach(p=>{
+    const stg=p.stage;
+    const st=document.createElement('div'); st.className='station'; st.dataset.ref=p.ref;
+    st.style.left=p.x+'px'; st.style.top=p.y+'px';
+    const badge=stageHasDefect(stg)?'<div class="badge" title="Known defect / risk in this stage">!</div>':'';
+    st.innerHTML='<div class="cwrap"><div class="stnum">STAGE '+(p.idx+1)+'</div><div class="circle" style="background:'+catColorKey(p.cat)+'">'+(p.idx+1)+'</div>'+badge+'</div>'+
+      '<div class="slabel">'+esc(p.label)+'</div><div class="hint">open flow ▸</div>';
+    st.onclick=()=>enterStage(def,stg);
+    canvas.appendChild(st);
+    targets.push({el:st,hay:stageHay(stg),def:stageHasDefect(stg)});
+  });
+
+  buildLegend();
+  fit();
+  /* right panel: flow overview */
+  renderDetail(def.detail);
+}
+
+/* LEVEL 2 — detailed flowchart for one parent stage (the diagram we had before) */
+function enterStage(def,stage){
+  view="stage"; activeStage=stage;
+  const sub=def.flow.filter(f=>stage.nodes.indexOf(f.ref)>-1);
+  document.getElementById('backBtn').style.display='inline-flex';
+  document.getElementById('crumb').innerHTML='<b>'+esc(def.name)+'</b> &nbsp;▸&nbsp; '+esc(stage.label);
+  hTitle.textContent=def.name+' ▸ '+stage.label;
+  hSub.textContent='Detailed flow diagram · click any box for its rules, components, records & defects';
+  renderStageChart(sub);
+  /* lead the right panel with the stage's first node */
+  const lead=byId[stage.nodes[0]]; if(lead) renderDetail(lead);
+}
+
+function renderStageChart(FLOW){
+  const dim=layout(FLOW);
+  canvas.innerHTML=''; canvas.style.width=dim.CW+'px'; canvas.style.height=dim.CH+'px';
+  svg=document.createElementNS(NS,'svg'); svg.setAttribute('class','edges'); svg.setAttribute('width',dim.CW); svg.setAttribute('height',dim.CH);
+  svg.innerHTML='<defs><marker id="arr" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L7,3 L0,6 Z" fill="#7c8a99"/></marker>'+
+    '<marker id="arrd" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L7,3 L0,6 Z" fill="#c0392b"/></marker></defs>';
+  canvas.appendChild(svg);
+  for(let i=0;i<mains.length-1;i++){const a=mains[i],b=mains[i+1];
+    edge('M'+MAINCX+','+(a.y+a.h)+' L'+MAINCX+','+b.y);
+    if(a.spineEdge) elabel(MAINCX+9,(a.y+a.h+b.y)/2+4,a.spineEdge);}
+  boxes.filter(b=>b.kind==='side').forEach(s=>{const p=s.parent;const isDef=s.k==='defect';
+    edge('M'+(p.x+p.w)+','+p.cy+' H'+MIDX+' V'+s.cy+' H'+s.x,{dash:isDef,color:isDef?'#c0392b':'#7c8a99'});
+    if(s.edge) elabel(MIDX-2,s.cy-7,s.edge,/No|Non-PNC|Deny|Term/.test(s.edge)?'no':null);});
+  selEl=null; targets=[];
+  boxes.forEach(b=>{const el=document.createElement('div');
+    const cls=b.kind==='side'?(b.k==='defect'?'defect':(b.k==='record'?'record':'process')):b.shape;
+    el.className='n '+cls; el.style.left=b.x+'px'; el.style.top=b.y+'px'; el.style.width=b.w+'px'; el.style.height=b.h+'px';
+    el.innerHTML='<span class="lbl">'+esc(b.label)+'</span>'; el.dataset.ref=b.ref;
+    el.onclick=()=>{const node=byId[b.ref]; if(!node)return; if(selEl)selEl.classList.remove('sel'); selEl=el; el.classList.add('sel'); renderDetail(node);};
+    canvas.appendChild(el);
+    targets.push({el,hay:[ (byId[b.ref]||{}).title,(byId[b.ref]||{}).summary,b.label ].join(' ').toLowerCase(),def:hasDefect(b.ref)});});
+  fit();
+}
+
+function renderDetail(n){
+  let h='<span class="dkind kb-'+n.kind+'">'+(KINDS[n.kind]||n.kind)+'</span><h2>'+esc(n.title)+'</h2>';
+  if(n.summary) h+='<div class="dsum">'+esc(n.summary)+'</div>';
+  h+=sec('Rules & logic',n.rules,'');
+  h+=sec('Components',n.components,'comp');
+  h+=sec('Records created / updated',n.records,'rec');
+  h+=secGot(n.gotchas);
+  /* drill-into = direct children + the side-notes / branches / defects attached to this station */
+  const gather=[];
+  (n.children||[]).forEach(c=>gather.push({id:c.id,title:c.title,kind:c.kind}));
+  (sideMap[n.id]||[]).forEach(s=>{ if(!gather.some(g=>g.id===s.ref)){const sn=byId[s.ref]||{}; gather.push({id:s.ref,title:sn.title||s.label,kind:sn.kind||s.k});} });
+  if(gather.length){h+='<div class="sec kids"><h3>Branches, sub-steps &amp; defects</h3><ul>'+gather.map(c=>{
+      const col={phase:'var(--phase)',step:'var(--step)',process:'var(--process)',decision:'var(--decision)',record:'var(--record)',defect:'var(--defect)'}[c.kind]||'var(--muted)';
+      return '<li><a data-go="'+c.id+'"><i class="dot" style="background:'+col+';margin-right:6px"></i>'+esc(c.title)+'</a></li>';
+    }).join('')+'</ul></div>';}
+  if(n.source&&n.source.length){h+='<div class="sec"><h3>Source</h3><div class="src">'+n.source.map(s=>'<code>'+esc(s)+'</code>').join(' · ')+'</div></div>';}
+  detail.innerHTML=h; detail.scrollTop=0;
+  detail.querySelectorAll('a[data-go]').forEach(a=>a.onclick=()=>{const id=a.getAttribute('data-go');const node=byId[id];if(node)renderDetail(node);
+    const tgt=canvas.querySelector('.n[data-ref="'+id+'"],.station[data-ref="'+id+'"]');if(tgt){if(selEl)selEl.classList.remove('sel');selEl=tgt;tgt.classList.add('sel');tgt.scrollIntoView({behavior:'smooth',block:'center'});}});
+}
+function sec(title,arr,cls){if(!arr||!arr.length)return '';return '<div class="sec '+cls+'"><h3>'+title+'</h3><ul>'+arr.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul></div>';}
+function secGot(arr){if(!arr||!arr.length)return '';return '<div class="sec got"><h3>Known defects / gotchas</h3><ul>'+arr.map(x=>{
+  let sev='';if(/\(HIGH\)|HIGH\.|CRITICAL/.test(x))sev='<span class="sev h">HIGH</span>';else if(/\(MEDIUM\)|MEDIUM\./.test(x))sev='<span class="sev m">MED</span>';else if(/\(LOW\)|LOW\./.test(x))sev='<span class="sev l">LOW</span>';
+  return '<li>'+sev+esc(x)+'</li>';}).join('')+'</ul></div>';}
+
+/* zoom */
+function applyZoom(){vp.style.transform='scale('+scale+')';}
+function fit(){const sw=stage.clientWidth-40;const cw=parseFloat(canvas.style.width)||760;scale=Math.min(1,sw/cw);applyZoom();}
+document.getElementById('zin').onclick=()=>{scale=Math.min(1.8,scale+0.12);applyZoom();};
+document.getElementById('zout').onclick=()=>{scale=Math.max(0.4,scale-0.12);applyZoom();};
+document.getElementById('zfit').onclick=fit;
+
+/* legend (built from the phase categories) */
+function buildLegend(){
+  const lg=document.getElementById('legend');
+  lg.innerHTML=Object.keys(CATS).map(k=>'<span><i class="dot" style="background:'+CATS[k].color+'"></i>'+esc(CATS[k].label)+'</span>').join('')+
+    '<span><i class="dot" style="background:var(--defect)"></i>! = defect / risk</span>';
+}
+
+/* back to journey */
+document.getElementById('backBtn').onclick=()=>{ if(activeFlow){search.value='';defOnly=false;document.getElementById('defectsOnly').classList.remove('active');renderJourney(activeFlow);} };
+
+/* search & filters — operate on whatever is currently rendered (stations or boxes) */
+const search=document.getElementById('search');
+search.oninput=()=>{const q=search.value.trim().toLowerCase();
+  targets.forEach(t=>{ if(!q){t.el.classList.remove('dim');return;} t.el.classList.toggle('dim',!t.hay.includes(q)); });};
+let defOnly=false;
+document.getElementById('defectsOnly').onclick=e=>{defOnly=!defOnly;e.target.classList.toggle('active',defOnly);
+  targets.forEach(t=>t.el.classList.toggle('dim',defOnly&&!t.def));};
+document.getElementById('reset').onclick=()=>{search.value='';defOnly=false;document.getElementById('defectsOnly').classList.remove('active');targets.forEach(t=>t.el.classList.remove('dim'));fit();};
+
+/* sidebar */
+function buildSidebar(){
+  FLOWS.forEach((f,i)=>{
+    const b=document.createElement('button'); b.className='flowbtn'+(i===0?' active':''); b.dataset.flow=f.id;
+    b.innerHTML='<div class="fn">'+esc(f.name)+'</div><div class="fs">'+esc(f.subtitle)+'</div><div class="fmeta">'+esc(f.meta)+'</div>';
+    b.onclick=()=>{document.querySelectorAll('.flowbtn').forEach(x=>x.classList.remove('active'));b.classList.add('active');
+      search.value='';defOnly=false;document.getElementById('defectsOnly').classList.remove('active');buildFlow(f);};
+    sidebar.insertBefore(b, sidebar.querySelector('.sidenote'));
+  });
+}
+
+/* init */
+buildSidebar();
+buildFlow(FLOWS[0]);
+</script>
+</body>
+</html>

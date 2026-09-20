@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Update / Override PNC — Screen Flow (SLDS Mockup)</title>
+<style>
+  :root{
+    --brand:#0176d3; --brand-dark:#014486; --brand-100:#eef4ff;
+    --page-bg:#f3f3f3; --card:#fff; --border:#e5e5e5; --border-2:#c9c9c9;
+    --txt:#181818; --txt-2:#5c5c5c; --txt-3:#747474;
+    --green:#2e844a; --green-bg:#ddf3e4; --green-bd:#91db8b;
+    --red:#ba0517;   --red-bg:#feded8;  --red-bd:#fe9a91;
+    --orange:#a86403;--orange-bg:#fef3e6;--orange-bd:#fec574;
+    --blue:#0176d3;  --blue-bg:#eef4ff; --blue-bd:#90d0fe;
+    --radius:.25rem; --shadow:0 2px 3px rgba(0,0,0,.16);
+    font-family:'Salesforce Sans','Segoe UI',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);color:var(--txt);font-size:13px;line-height:1.4;}
+
+  /* ---------- global header ---------- */
+  .ghead{background:#032d60;color:#fff;padding:.35rem .9rem;display:flex;align-items:center;gap:.7rem;}
+  .ghead .waffle{width:1.5rem;height:1.5rem;display:grid;grid-template-columns:repeat(3,4px);grid-gap:2px;align-content:center;justify-content:center;opacity:.9;}
+  .ghead .waffle i{width:4px;height:4px;background:#fff;border-radius:1px;display:block;}
+  .ghead .app{font-weight:700;font-size:.95rem;}
+  .ghead .sub{opacity:.7;font-size:.8rem;}
+  .ghead .search{flex:1 1 auto;max-width:520px;background:#fff;border-radius:1rem;height:1.7rem;display:flex;align-items:center;padding:0 .7rem;color:var(--txt-3);font-size:.8rem;}
+  .ghead .sp{margin-left:auto;display:flex;gap:.9rem;opacity:.9;}
+
+  /* object tab strip */
+  .otab{background:#fff;border-bottom:1px solid var(--border);padding:0 1rem;display:flex;align-items:center;gap:.6rem;height:2.3rem;}
+  .otab .oi{width:1.4rem;height:1.4rem;border-radius:var(--radius);background:#f59331;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;}
+  .otab .on{font-weight:700;}
+  .otab .oc{color:var(--txt-3);}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:1rem;}
+
+  /* scenario switcher */
+  .scen{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.7rem .9rem;margin-bottom:1rem;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;}
+  .scen .lbl{font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--txt-3);}
+  .pill{padding:.35rem .8rem;border:1px solid var(--border-2);border-radius:1rem;background:#fff;color:var(--txt-2);font-weight:600;font-size:.8rem;cursor:pointer;}
+  .pill:hover{background:#f3f8ff;}
+  .pill.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .scen .hint{margin-left:auto;color:var(--txt-3);font-size:.76rem;}
+
+  /* ---------- record page ---------- */
+  .rp{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .hl{display:flex;align-items:center;gap:.9rem;padding:.85rem 1rem;border-bottom:1px solid var(--border);}
+  .hl .av{width:2.6rem;height:2.6rem;border-radius:50%;background:#f59331;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1rem;}
+  .hl .eyebrow{font-size:.72rem;color:var(--txt-3);text-transform:uppercase;letter-spacing:.04em;}
+  .hl .nm{font-size:1.15rem;font-weight:700;}
+  .hl .acts{margin-left:auto;display:flex;gap:.4rem;}
+
+  .fields{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border);}
+  .fld{padding:.7rem 1rem;border-right:1px solid var(--border);}
+  .fld:last-child{border-right:none;}
+  .fld .k{font-size:.72rem;color:var(--txt-3);margin-bottom:.2rem;}
+  .fld .v{font-weight:600;}
+  .fld .v.blank{color:var(--txt-3);font-weight:400;font-style:italic;}
+
+  .tabs{display:flex;gap:1.2rem;padding:0 1rem;border-bottom:1px solid var(--border);}
+  .tab{padding:.6rem .1rem;font-weight:600;color:var(--txt-2);border-bottom:2px solid transparent;cursor:pointer;font-size:.85rem;}
+  .tab.active{color:var(--brand);border-bottom-color:var(--brand);}
+  .rp-body{padding:1rem;color:var(--txt-3);min-height:120px;}
+
+  /* badges */
+  .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.12rem .55rem;border-radius:12px;font-size:.72rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .badge .dot{width:.55rem;height:.55rem;border-radius:50%;}
+  .b-cred{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);} .b-cred .dot{background:var(--green);}
+  .b-pnc{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);} .b-pnc .dot{background:var(--orange);}
+  .b-no{background:#f3f3f3;color:var(--txt-2);border-color:var(--border-2);} .b-no .dot{background:var(--txt-3);}
+  .b-over{background:#efe7fb;color:#5a1ba9;border-color:#c9aaf0;} .b-over .dot{background:#7526e3;}
+
+  /* buttons */
+  .btn{border:1px solid var(--border-2);background:#fff;color:var(--brand);border-radius:var(--radius);padding:.4rem .9rem;font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;}
+  .btn:hover{background:#f3f8ff;}
+  .btn--brand{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .btn--brand:hover{background:var(--brand-dark);}
+  .btn--neutral{color:var(--txt);}
+  .btn[disabled]{opacity:.5;cursor:not-allowed;}
+
+  /* ---------- modal / flow ---------- */
+  .backdrop{position:fixed;inset:0;background:rgba(3,45,96,.45);display:flex;align-items:flex-start;justify-content:center;padding:3.2rem 1rem;z-index:50;}
+  .modal{background:var(--card);border-radius:.4rem;box-shadow:0 12px 32px rgba(0,0,0,.35);width:100%;max-width:640px;overflow:hidden;display:flex;flex-direction:column;max-height:86vh;}
+  .m-head{display:flex;align-items:center;gap:.7rem;padding:.9rem 1.1rem;background:var(--brand);color:#fff;}
+  .m-head .ic{width:2rem;height:2rem;border-radius:var(--radius);background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1rem;}
+  .m-head .t{font-size:1.05rem;font-weight:700;}
+  .m-head .x{margin-left:auto;background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer;line-height:1;opacity:.9;}
+  .m-body{padding:1.1rem 1.2rem;overflow-y:auto;}
+  .m-foot{display:flex;justify-content:flex-end;gap:.5rem;align-items:center;padding:.7rem 1.1rem;border-top:1px solid var(--border);background:#fafaf9;}
+  .m-foot .left{margin-right:auto;}
+
+  /* flow "screen" label */
+  .screen-h{font-size:1.15rem;font-weight:700;margin:0 0 .2rem;}
+  .screen-sub{color:var(--txt-2);margin:0 0 1rem;font-size:.85rem;}
+
+  /* alert / disclaimer */
+  .alert{border-radius:var(--radius);padding:.7rem .85rem;display:flex;gap:.6rem;margin-bottom:1rem;font-size:.83rem;border:1px solid transparent;}
+  .alert .ai{flex:0 0 auto;width:1.3rem;height:1.3rem;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.85rem;}
+  .alert b{display:block;margin-bottom:.15rem;}
+  .alert ul{margin:.35rem 0 0;padding-left:1.1rem;}
+  .alert li{margin:.15rem 0;}
+  .a-warn{background:var(--orange-bg);border-color:var(--orange-bd);color:#5c3a00;} .a-warn .ai{background:#dd7a01;}
+  .a-info{background:var(--blue-bg);border-color:var(--blue-bd);color:#032d60;} .a-info .ai{background:var(--brand);}
+  .a-danger{background:var(--red-bg);border-color:var(--red-bd);color:#640103;} .a-danger .ai{background:var(--red);}
+  .a-success{background:var(--green-bg);border-color:var(--green-bd);color:#0a4f2c;} .a-success .ai{background:var(--green);}
+
+  /* current-state read panel */
+  .stbox{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:1.1rem;overflow:hidden;}
+  .stbox .hd{background:#f7f9fb;padding:.45rem .8rem;font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-2);border-bottom:1px solid var(--border);}
+  .stgrid{display:grid;grid-template-columns:1fr 1fr;}
+  .stcell{padding:.55rem .8rem;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .stgrid .stcell:nth-child(2n){border-right:none;}
+  .stgrid .stcell:nth-last-child(-n+2){border-bottom:none;}
+  .stcell .k{font-size:.72rem;color:var(--txt-3);}
+  .stcell .v{font-weight:600;margin-top:.15rem;}
+  .stcell .v.blank{color:var(--txt-3);font-weight:400;font-style:italic;}
+
+  /* flow checkbox (SLDS) */
+  .fcheck{display:flex;gap:.6rem;align-items:flex-start;padding:.7rem .85rem;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:.7rem;cursor:pointer;background:#fff;}
+  .fcheck:hover{background:#fbfdff;}
+  .fcheck.on{border-color:var(--brand);background:var(--brand-100);}
+  .fcheck.disabled{opacity:.55;cursor:not-allowed;background:#f7f7f7;}
+  .box{flex:0 0 auto;width:1.15rem;height:1.15rem;border:2px solid var(--border-2);border-radius:3px;display:flex;align-items:center;justify-content:center;background:#fff;margin-top:.05rem;}
+  .fcheck.on .box{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .box svg{width:.8rem;height:.8rem;fill:#fff;display:none;}
+  .fcheck.on .box svg{display:block;}
+  .fcheck .cl{font-weight:700;}
+  .fcheck .cd{color:var(--txt-2);font-size:.8rem;margin-top:.15rem;}
+  .req{color:var(--red);margin-left:.15rem;}
+  .pill-tag{font-size:.68rem;font-weight:700;padding:.05rem .4rem;border-radius:10px;margin-left:.4rem;vertical-align:middle;}
+  .pt-lock{background:#f3f3f3;color:var(--txt-2);border:1px solid var(--border-2);}
+  .pt-edit{background:var(--green-bg);color:var(--green);border:1px solid var(--green-bd);}
+
+  .field-error{color:var(--red);font-size:.78rem;margin:.1rem 0 .6rem 1.75rem;display:flex;gap:.3rem;align-items:center;}
+
+  .arrow{color:var(--txt-3);margin:0 .3rem;}
+  .strike{text-decoration:line-through;color:var(--red);}
+  .newval{color:var(--green);font-weight:700;}
+  .muted{color:var(--txt-3);}
+  .foot-note{font-size:.72rem;color:var(--txt-3);text-align:center;padding:.4rem 0 0;}
+  svg.ic-svg{width:1.1rem;height:1.1rem;fill:#fff;}
+</style>
+</head>
+<body>
+
+<!-- global header -->
+<div class="ghead">
+  <div class="waffle"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div><div class="app">Provider Network Mgmt</div></div>
+  <div class="search">Search Salesforce</div>
+  <div class="sp"><span>?</span><span>&#9733;</span><span>&#128276;</span><span>&#128100;</span></div>
+</div>
+<div class="otab">
+  <span class="oi">&#128100;</span>
+  <span class="on">Practitioners</span>
+  <span class="oc">&nbsp;›&nbsp; <span id="crumbName">Dr. Sarah Mitchell</span></span>
+</div>
+
+<div class="wrap">
+
+  <!-- scenario switcher (mockup control, not part of the real UI) -->
+  <div class="scen">
+    <span class="lbl">Preview as:</span>
+    <button class="pill active" data-scen="cred">Credentialed practitioner</button>
+    <button class="pill" data-scen="pnc">Actual PNC practitioner</button>
+    <button class="pill" data-scen="over">Overridden into PNC (Bypass ON)</button>
+    <span class="hint">Switch to see the record + flow behavior for each case</span>
+  </div>
+
+  <!-- record page -->
+  <div class="rp">
+    <div class="hl">
+      <div class="av" id="avatar">SM</div>
+      <div>
+        <div class="eyebrow">Practitioner · Person Account</div>
+        <div class="nm" id="recName">Dr. Sarah Mitchell</div>
+        <div class="muted" id="recSpec">Family Medicine &nbsp;·&nbsp; NPI <span id="recNpi">1861790047</span></div>
+      </div>
+      <div class="acts">
+        <button class="btn btn--neutral">Edit</button>
+        <button class="btn btn--neutral">New Case</button>
+        <button class="btn btn--brand" id="openFlowBtn">Update / Override PNC</button>
+      </div>
+    </div>
+    <div class="fields">
+      <div class="fld"><div class="k">Credentialing Status</div><div class="v" id="fStatus">—</div></div>
+      <div class="fld"><div class="k">PNC (Par Non Cred)</div><div class="v" id="fPnc">—</div></div>
+      <div class="fld"><div class="k">Re-Cred Due Date</div><div class="v" id="fRecred">—</div></div>
+      <div class="fld"><div class="k">Bypass PNC (Override)</div><div class="v" id="fBypass">—</div></div>
+    </div>
+    <div class="tabs">
+      <div class="tab active">Details</div>
+      <div class="tab">Related</div>
+      <div class="tab">Practice Locations</div>
+      <div class="tab">Cases</div>
+    </div>
+    <div class="rp-body">Record detail content…</div>
+  </div>
+
+  <p class="foot-note">Mockup for <b>PRM_UpdateBypassPNC</b> Screen Flow (Quick Action <b>Account.PRM_UpdateBypassPNC</b>). Visual only — SLDS-style. Click “Update / Override PNC”.</p>
+</div>
+
+<!-- ===================== FLOW MODAL ===================== -->
+<div class="backdrop" id="backdrop">
+  <div class="modal">
+    <div class="m-head">
+      <div class="ic">
+        <svg class="ic-svg" viewBox="0 0 24 24"><path d="M12 2 4 6v6c0 5 3.4 8.9 8 10 4.6-1.1 8-5 8-10V6l-8-4zm0 6a2 2 0 110 4 2 2 0 010-4zm0 6c1.7 0 3.5.8 3.5 2v.6H8.5V16c0-1.2 1.8-2 3.5-2z"/></svg>
+      </div>
+      <div class="t">Update / Override PNC</div>
+      <button class="x" id="closeX">&times;</button>
+    </div>
+
+    <div class="m-body" id="flowBody"><!-- rendered by JS --></div>
+
+    <div class="m-foot" id="flowFoot"><!-- rendered by JS --></div>
+  </div>
+</div>
+
+<script>
+/* ---------------- scenario data ---------------- */
+const DATA = {
+  cred: {
+    name:'Dr. Sarah Mitchell', initials:'SM', spec:'Family Medicine', npi:'1861790047',
+    pnc:false, bypass:false, status:'Credentialed', recred:'8/15/2026',
+    pncSource:'System-calculated — all participating practice locations are non-PNC'
+  },
+  pnc: {
+    name:'Dr. James Carter', initials:'JC', spec:'Internal Medicine', npi:'1548367209',
+    pnc:true, bypass:false, status:'', recred:'',
+    pncSource:'System-calculated — at least one participating practice location is PNC'
+  },
+  over: {
+    name:'Dr. Aisha Rahman', initials:'AR', spec:'Cardiology', npi:'1730214785',
+    pnc:true, bypass:true, status:'', recred:'',
+    pncSource:'Manual override — Bypass PNC is ON',
+    overriddenDaysAgo:12, priorStatus:'Credentialed', priorRecred:'9/30/2026'
+  }
+};
+
+let scen = 'cred';        // current scenario key
+let f = null;             // working flow state
+let finished = false;
+
+/* ---------------- helpers ---------------- */
+const el = id => document.getElementById(id);
+const CHECK = '<svg viewBox="0 0 52 52"><path d="M20 34 9 23l3-3 8 8 20-20 3 3z"/></svg>';
+
+function badgeStatus(v){
+  if(!v) return '<span class="badge b-no"><span class="dot"></span>— (blank)</span>';
+  return '<span class="badge b-cred"><span class="dot"></span>'+v+'</span>';
+}
+function badgePnc(v){
+  return v ? '<span class="badge b-pnc"><span class="dot"></span>Yes</span>'
+           : '<span class="badge b-no"><span class="dot"></span>No</span>';
+}
+function badgeBypass(v){
+  return v ? '<span class="badge b-over"><span class="dot"></span>ON (manual)</span>'
+           : '<span class="badge b-no"><span class="dot"></span>Off</span>';
+}
+
+/* ---------------- render record page ---------------- */
+function renderRecord(){
+  const d = DATA[scen];
+  el('crumbName').textContent = d.name;
+  el('recName').textContent = d.name;
+  el('avatar').textContent = d.initials;
+  el('recSpec').innerHTML = d.spec + ' &nbsp;·&nbsp; NPI <span>'+d.npi+'</span>';
+  el('fStatus').innerHTML = badgeStatus(d.status);
+  el('fPnc').innerHTML = badgePnc(d.pnc);
+  el('fRecred').innerHTML = d.recred ? d.recred : '<span class="blank">—</span>';
+  el('fBypass').innerHTML = badgeBypass(d.bypass);
+}
+
+/* ---------------- outcome computation (mirrors the ACs) ---------------- */
+function computeOutcome(){
+  const d = DATA[scen];
+  const turningOn  = f.bypass && !d.bypass;   // Override newly enabled
+  const turningOff = !f.bypass && d.bypass;   // Override being removed
+  let out = { status:d.status, recred:d.recred, pnc:d.pnc, bypass:f.bypass, kind:'noop', notes:[] };
+
+  if(f.bypass){
+    // Override ON — practitioner PNC value is whatever the specialist set
+    out.pnc = f.pnc;
+    if(f.pnc){
+      out.status = ''; out.recred = '';           // forced INTO PNC => blank both
+      out.kind = (d.status || d.recred) ? 'blank' : 'pncOn';
+    }else{
+      // Bypass ON but PNC manually = No -> not PNC; keep existing lifecycle values
+      out.kind = 'manualNo';
+    }
+  }else{
+    // Override OFF — rollup takes over
+    out.pnc = d.pnc;
+    if(turningOff && d.priorStatus === 'Credentialed' && d.overriddenDaysAgo <= 30){
+      out.status = d.priorStatus; out.recred = d.priorRecred; out.kind = 'restore';
+    }else if(turningOff){
+      out.kind = 'noRestore';
+    }else{
+      out.kind = 'rollup';
+    }
+  }
+  return out;
+}
+
+/* validation: destructive blank of a populated Credentialed status needs an ack */
+function needsAck(){
+  const o = computeOutcome();
+  return o.kind === 'blank';
+}
+
+/* ---------------- render flow screen ---------------- */
+function renderFlow(){
+  const d = DATA[scen];
+  finished = false;
+  if(finished) return;
+  const o = computeOutcome();
+
+  /* --- disclaimer (always shown at top) --- */
+  let disclaimer = `
+    <div class="alert a-warn">
+      <div class="ai">!</div>
+      <div>Heads up — turning on Override will move this practitioner into PNC and clear their Credentialing Status and Re-Cred Due Date. Changed your mind? You can undo it within 30 days and we'll put everything back.</div>
+    </div>`;
+
+  /* --- current-state box; PNC scenario gets an info line --- */
+  let stateInfo = (d.pnc && !d.bypass)
+    ? `<div class="alert a-info" style="margin:0 0 1rem;"><div class="ai">i</div><div><b>This practitioner is currently PNC via the location rollup.</b> PNC is system-managed. To change it manually, turn Override ON below.</div></div>`
+    : (d.bypass
+        ? `<div class="alert a-info" style="margin:0 0 1rem;"><div class="ai">i</div><div><b>This practitioner was manually overridden into PNC ${d.overriddenDaysAgo} day(s) ago.</b> Unchecking Override within 30 days restores the prior Credentialed state.</div></div>`
+        : '');
+
+  let stateBox = `
+    <div class="stbox">
+      <div class="hd">Current record</div>
+      <div class="stgrid">
+        <div class="stcell"><div class="k">Credentialing Status</div><div class="v">${d.status?badgeStatus(d.status):'<span class="blank">— (blank)</span>'}</div></div>
+        <div class="stcell"><div class="k">PNC (Par Non Cred)</div><div class="v">${badgePnc(d.pnc)}</div></div>
+        <div class="stcell"><div class="k">Re-Cred Due Date</div><div class="v ${d.recred?'':'blank'}">${d.recred||'— (blank)'}</div></div>
+        <div class="stcell"><div class="k">Override / Bypass PNC</div><div class="v">${badgeBypass(d.bypass)}</div></div>
+      </div>
+    </div>`;
+
+  /* --- the two checkboxes --- */
+  const pncDisabled = !f.bypass;
+  let checks = `
+    <div class="fcheck ${f.bypass?'on':''}" data-cb="bypass">
+      <div class="box">${CHECK}</div>
+      <div>
+        <div class="cl">Override / Bypass PNC</div>
+        <div class="cd">Turn PNC management over to a person instead of the automatic location rollup. Forces this practitioner into PNC.</div>
+      </div>
+    </div>
+
+    <div class="fcheck ${f.pnc?'on':''} ${pncDisabled?'disabled':''}" data-cb="pnc">
+      <div class="box">${CHECK}</div>
+      <div>
+        <div class="cl">PNC (Par Non Cred)
+          ${pncDisabled
+            ? '<span class="pill-tag pt-lock">🔒 Read-only — turn Override on to edit</span>'
+            : '<span class="pill-tag pt-edit">Editable</span>'}
+        </div>
+        <div class="cd">${pncDisabled
+            ? 'System-calculated from the practice locations. '+d.pncSource+'.'
+            : 'Set the participation-without-credentialing flag by hand.'}</div>
+      </div>
+    </div>`;
+
+  let fieldErr = (pncDisabled && f.pncAttempt)
+    ? `<div class="field-error">▲ You can’t set PNC while Override is off. Check “Override / Bypass PNC” first.</div>` : '';
+
+  /* --- live impact / "what happens on Save" --- */
+  let impact = renderImpact(o, d);
+
+  /* --- ack (validation) when destructive --- */
+  let ack = '';
+  if(needsAck()){
+    ack = `
+      <div class="fcheck ${f.ack?'on':''}" data-cb="ack" style="border-color:${f.ack?'var(--brand)':'var(--red-bd)'};background:${f.ack?'var(--brand-100)':'#fff6f5'};">
+        <div class="box" style="${f.ack?'':'border-color:var(--red);'}">${CHECK}</div>
+        <div>
+          <div class="cl">I understand this will blank the Credentialing Status and Re-Cred Due Date <span class="req">*</span></div>
+          <div class="cd">Required to continue because this practitioner is currently Credentialed.</div>
+        </div>
+      </div>
+      ${(!f.ack && f.finishAttempt)?'<div class="field-error">▲ You must acknowledge before you can finish.</div>':''}`;
+  }
+
+  el('flowBody').innerHTML = `
+    <h2 class="screen-h">Manage PNC for ${d.name}</h2>
+    <p class="screen-sub">Set the PNC override for this practitioner. Only Credentialing and PDM specialists can use this action.</p>
+    ${disclaimer}
+    ${stateInfo}
+    ${stateBox}
+    ${checks}
+    ${fieldErr}
+    ${impact}
+    ${ack}
+  `;
+
+  /* footer */
+  const blockFinish = needsAck() && !f.ack;
+  el('flowFoot').innerHTML = `
+    <button class="btn btn--neutral left" data-act="cancel">Cancel</button>
+    <button class="btn btn--neutral" data-act="prev" disabled>Previous</button>
+    <button class="btn btn--brand" data-act="finish">Finish</button>
+  `;
+  wireBody();
+}
+
+function renderImpact(o, d){
+  const line = (label, oldV, newV, changed) =>
+      `<div style="margin:.15rem 0;"><span class="muted">${label}:</span> `
+      + (changed
+          ? `<span class="strike">${oldV||'blank'}</span><span class="arrow">→</span><span class="newval">${newV||'blank'}</span>`
+          : `<span>${oldV||'blank'} <span class="muted">(unchanged)</span></span>`)
+      + `</div>`;
+
+  if(o.kind === 'blank'){
+    return `<div class="alert a-danger"><div class="ai">!</div><div>
+      <b>On Save — this practitioner will be forced into PNC:</b>
+      ${line('PNC', d.pnc?'Yes':'No', 'Yes', !d.pnc)}
+      ${line('Credentialing Status', d.status, '', !!d.status)}
+      ${line('Re-Cred Due Date', d.recred, '', !!d.recred)}
+      <div style="margin-top:.35rem;font-size:.78rem;">Recoverable for 30 days by unchecking Override.</div>
+    </div></div>`;
+  }
+  if(o.kind === 'pncOn'){
+    return `<div class="alert a-warn"><div class="ai">!</div><div>
+      <b>On Save:</b> Override ON, PNC = Yes. Credentialing Status and Re-Cred Due Date stay blank (already blank).
+    </div></div>`;
+  }
+  if(o.kind === 'manualNo'){
+    return `<div class="alert a-info"><div class="ai">i</div><div>
+      <b>On Save:</b> Override ON, PNC = No. This practitioner is held as non-PNC by hand; existing Credentialing Status / Re-Cred Due Date are kept.
+    </div></div>`;
+  }
+  if(o.kind === 'restore'){
+    return `<div class="alert a-success"><div class="ai">&#10003;</div><div>
+      <b>On Save — override removed within the 30-day window, prior Credentialed state will be restored:</b>
+      ${line('Override / Bypass PNC', 'ON', 'Off', true)}
+      ${line('Credentialing Status', 'blank', d.priorStatus, true)}
+      ${line('Re-Cred Due Date', 'blank', d.priorRecred, true)}
+      <div style="margin-top:.35rem;font-size:.78rem;">Restored from field history (overridden ${d.overriddenDaysAgo} days ago; was Credentialed before).</div>
+    </div></div>`;
+  }
+  if(o.kind === 'noRestore'){
+    return `<div class="alert a-warn"><div class="ai">!</div><div>
+      <b>On Save:</b> Override removed. No restore (outside the 30-day window or not previously Credentialed) — PNC returns to the location rollup and status follows the normal lifecycle.
+    </div></div>`;
+  }
+  if(o.kind === 'rollup'){
+    return `<div class="alert a-info"><div class="ai">i</div><div>
+      <b>On Save:</b> No change to Override. PNC stays system-calculated from the practice locations.
+    </div></div>`;
+  }
+  return '';
+}
+
+/* ---------------- finish screen ---------------- */
+function renderFinish(){
+  const d = DATA[scen];
+  const o = computeOutcome();
+  finished = true;
+  el('flowBody').innerHTML = `
+    <div style="text-align:center;padding:1rem 0 .3rem;">
+      <div style="width:3.2rem;height:3.2rem;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto .6rem;">&#10003;</div>
+      <h2 class="screen-h" style="text-align:center;">Changes saved</h2>
+      <p class="screen-sub" style="text-align:center;">${d.name}'s PNC settings were updated.</p>
+    </div>
+    <div class="stbox">
+      <div class="hd">Result</div>
+      <div class="stgrid">
+        <div class="stcell"><div class="k">PNC (Par Non Cred)</div><div class="v">${badgePnc(o.pnc)}</div></div>
+        <div class="stcell"><div class="k">Override / Bypass PNC</div><div class="v">${badgeBypass(o.bypass)}</div></div>
+        <div class="stcell"><div class="k">Credentialing Status</div><div class="v">${o.status?badgeStatus(o.status):'<span class="blank">— (blank)</span>'}</div></div>
+        <div class="stcell"><div class="k">Re-Cred Due Date</div><div class="v ${o.recred?'':'blank'}">${o.recred||'— (blank)'}</div></div>
+      </div>
+    </div>
+    <div class="foot-note">Field history records the change with your user and timestamp.</div>
+  `;
+  el('flowFoot').innerHTML = `<button class="btn btn--brand" data-act="done">Finish</button>`;
+  wireBody();
+
+  /* commit to the record behind the modal so the highlights update */
+  d.pnc = o.pnc; d.bypass = o.bypass; d.status = o.status; d.recred = o.recred;
+  if(o.bypass && o.pnc){ d.overriddenDaysAgo = 0; d.priorStatus = d.priorStatus||'Credentialed'; }
+  renderRecord();
+}
+
+/* ---------------- events ---------------- */
+function wireBody(){
+  document.querySelectorAll('#flowBody [data-cb]').forEach(node=>{
+    node.addEventListener('click', ()=>{
+      const cb = node.getAttribute('data-cb');
+      if(cb==='bypass'){
+        f.bypass = !f.bypass;
+        if(!f.bypass){ f.pnc = DATA[scen].pnc; }   // reset manual PNC when leaving override
+        else { f.pnc = true; }                     // default forced into PNC
+        f.ack=false; f.pncAttempt=false;
+      }
+      if(cb==='pnc'){
+        if(!f.bypass){ f.pncAttempt=true; }        // validation: can't edit while off
+        else { f.pnc=!f.pnc; f.ack=false; }
+      }
+      if(cb==='ack'){ f.ack=!f.ack; }
+      renderFlow();
+    });
+  });
+  el('flowFoot').querySelectorAll('[data-act]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const a=b.getAttribute('data-act');
+      if(a==='cancel'||a==='done'){ closeFlow(); }
+      if(a==='finish'){
+        if(needsAck() && !f.ack){ f.finishAttempt=true; renderFlow(); return; }
+        renderFinish();
+      }
+    });
+  });
+}
+
+function openFlow(){
+  const d = DATA[scen];
+  f = { bypass:d.bypass, pnc:d.pnc, ack:false, pncAttempt:false, finishAttempt:false };
+  el('backdrop').style.display='flex';
+  renderFlow();
+}
+function closeFlow(){ el('backdrop').style.display='none'; }
+
+el('openFlowBtn').addEventListener('click', openFlow);
+el('closeX').addEventListener('click', closeFlow);
+el('backdrop').addEventListener('click', e=>{ if(e.target===el('backdrop')) closeFlow(); });
+
+document.querySelectorAll('.pill[data-scen]').forEach(p=>{
+  p.addEventListener('click',()=>{
+    document.querySelectorAll('.pill[data-scen]').forEach(x=>x.classList.remove('active'));
+    p.classList.add('active');
+    scen = p.getAttribute('data-scen');
+    resetScenario();
+  });
+});
+
+/* keep scenario data pristine across switches by cloning originals */
+const ORIG = JSON.parse(JSON.stringify(DATA));
+function resetScenario(){
+  Object.keys(ORIG).forEach(k=>{ DATA[k]=JSON.parse(JSON.stringify(ORIG[k])); });
+  renderRecord();
+  closeFlow();
+}
+
+/* init */
+renderRecord();
+</script>
+</body>
+</html>

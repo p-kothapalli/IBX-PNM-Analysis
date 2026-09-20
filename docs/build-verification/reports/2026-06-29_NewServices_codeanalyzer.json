@@ -1,0 +1,1734 @@
+{
+  "runDir": "/private/tmp/ibx-origin-main/",
+  "violationCounts": {
+    "total": 70,
+    "sev1": 0,
+    "sev2": 25,
+    "sev3": 21,
+    "sev4": 20,
+    "sev5": 4
+  },
+  "versions": {
+    "code-analyzer": "0.45.0",
+    "regex": "0.34.0",
+    "pmd": "0.39.0",
+    "cpd": "0.39.0"
+  },
+  "violations": [
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 211,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 57,
+          "startColumn": 13,
+          "endLine": 57,
+          "endColumn": 55
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 57,
+          "startColumn": 13,
+          "endLine": 57,
+          "endColumn": 55
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 116,
+          "startColumn": 13,
+          "endLine": 116,
+          "endColumn": 78
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 15,
+          "startColumn": 21,
+          "endLine": 271,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "FieldDeclarationsShouldBeAtStart",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 35,
+          "startColumn": 50,
+          "endLine": 73,
+          "endColumn": 6
+        }
+      ],
+      "message": "Field declaration for 'FIELDS_BY_TOKEN' should be before method declarations in its class",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#fielddeclarationsshouldbeatstart"
+      ]
+    },
+    {
+      "rule": "FieldDeclarationsShouldBeAtStart",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 76,
+          "startColumn": 33,
+          "endLine": 76,
+          "endColumn": 58
+        }
+      ],
+      "message": "Field declaration for 'allBooleanFlagFieldsCache' should be before method declarations in its class",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#fielddeclarationsshouldbeatstart"
+      ]
+    },
+    {
+      "rule": "NcssCount",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Apex",
+        "Custom"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 85,
+          "startColumn": 21,
+          "endLine": 197,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'execute(Map<String, Object>)' has a NCSS line count of 61 (limit: 40).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#ncsscount"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 85,
+          "startColumn": 21,
+          "endLine": 197,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'execute(Map<String, Object>)' has a cognitive complexity of 23, current threshold is 15",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "CyclomaticComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 85,
+          "startColumn": 21,
+          "endLine": 197,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'execute(Map<String, Object>)' has a cyclomatic complexity of 17.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cyclomaticcomplexity"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 167,
+          "startColumn": 13,
+          "endLine": 167,
+          "endColumn": 29
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 200,
+          "startColumn": 13,
+          "endLine": 218,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing or mismatched ApexDoc @param",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 221,
+          "startColumn": 13,
+          "endLine": 225,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing or mismatched ApexDoc @param",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 228,
+          "startColumn": 20,
+          "endLine": 245,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc @return",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "EagerlyLoadedDescribeSObjectResult",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Performance",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 231,
+          "startColumn": 57,
+          "endLine": 231,
+          "endColumn": 105
+        }
+      ],
+      "message": "DescribeSObjectResult could be being loaded eagerly with all child relationships.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_performance.html#eagerlyloadeddescribesobjectresult"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_CaseDataManagerService.cls",
+          "startLine": 248,
+          "startColumn": 13,
+          "endLine": 257,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing or mismatched ApexDoc @param",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_ContactService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 203,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_ContactService.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_ContactService.cls",
+          "startLine": 47,
+          "startColumn": 9,
+          "endLine": 47,
+          "endColumn": 45
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_ContactService.cls",
+          "startLine": 47,
+          "startColumn": 9,
+          "endLine": 47,
+          "endColumn": 45
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_ContactService.cls",
+          "startLine": 107,
+          "startColumn": 13,
+          "endLine": 107,
+          "endColumn": 78
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 299,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 299,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_EducationService' has a total cognitive complexity of 51 (highest 9), current threshold is 50",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "CyclomaticComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 299,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_EducationService' has a total cyclomatic complexity of 49 (highest 8).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cyclomaticcomplexity"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 61,
+          "startColumn": 13,
+          "endLine": 61,
+          "endColumn": 50
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 61,
+          "startColumn": 13,
+          "endLine": 61,
+          "endColumn": 50
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 132,
+          "startColumn": 37,
+          "endLine": 136,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 164,
+          "startColumn": 47,
+          "endLine": 168,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 182,
+          "startColumn": 13,
+          "endLine": 182,
+          "endColumn": 78
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ExcessiveParameterList",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 194,
+          "startColumn": 13,
+          "endLine": 198,
+          "endColumn": 44
+        }
+      ],
+      "message": "Avoid long parameter lists (4 parameters - threshold is 4).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#excessiveparameterlist"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_LanguageService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 179,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_LanguageService.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_LanguageService.cls",
+          "startLine": 57,
+          "startColumn": 13,
+          "endLine": 57,
+          "endColumn": 50
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_LanguageService.cls",
+          "startLine": 57,
+          "startColumn": 13,
+          "endLine": 57,
+          "endColumn": 50
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 525,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 525,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_PractitionerBatch' has a total cognitive complexity of 255 (highest 32), current threshold is 50",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "CyclomaticComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 525,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_PractitionerBatch' has a total cyclomatic complexity of 57 (highest 5).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cyclomaticcomplexity"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 15,
+          "startColumn": 12,
+          "endLine": 18,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "FieldDeclarationsShouldBeAtStart",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 21,
+          "startColumn": 20,
+          "endLine": 21,
+          "endColumn": 24
+        }
+      ],
+      "message": "Field declaration for 'flow' should be before method declarations in its class",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#fielddeclarationsshouldbeatstart"
+      ]
+    },
+    {
+      "rule": "FieldDeclarationsShouldBeAtStart",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 22,
+          "startColumn": 21,
+          "endLine": 22,
+          "endColumn": 39
+        }
+      ],
+      "message": "Field declaration for 'anyFailure' should be before method declarations in its class",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#fielddeclarationsshouldbeatstart"
+      ]
+    },
+    {
+      "rule": "FieldDeclarationsShouldBeAtStart",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "CodeStyle",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 23,
+          "startColumn": 20,
+          "endLine": 23,
+          "endColumn": 30
+        }
+      ],
+      "message": "Field declaration for 'firstError' should be before method declarations in its class",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_codestyle.html#fielddeclarationsshouldbeatstart"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 29,
+          "startColumn": 12,
+          "endLine": 50,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 56,
+          "startColumn": 12,
+          "endLine": 156,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 56,
+          "startColumn": 12,
+          "endLine": 156,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'execute(Database.BatchableContext, List<Object>)' has a cognitive complexity of 32, current threshold is 15",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 162,
+          "startColumn": 12,
+          "endLine": 170,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ExcessiveParameterList",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 176,
+          "startColumn": 13,
+          "endLine": 183,
+          "endColumn": 40
+        }
+      ],
+      "message": "Avoid long parameter lists (7 parameters - threshold is 4).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#excessiveparameterlist"
+      ]
+    },
+    {
+      "rule": "ExcessiveParameterList",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 231,
+          "startColumn": 13,
+          "endLine": 235,
+          "endColumn": 21
+        }
+      ],
+      "message": "Avoid long parameter lists (4 parameters - threshold is 4).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#excessiveparameterlist"
+      ]
+    },
+    {
+      "rule": "ExcessiveParameterList",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerBatch.cls",
+          "startLine": 244,
+          "startColumn": 13,
+          "endLine": 248,
+          "endColumn": 21
+        }
+      ],
+      "message": "Avoid long parameter lists (4 parameters - threshold is 4).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#excessiveparameterlist"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 474,
+          "endColumn": 2
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 474,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_PractitionerService' has a total cognitive complexity of 79 (highest 15), current threshold is 50",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "CyclomaticComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 10,
+          "startColumn": 21,
+          "endLine": 474,
+          "endColumn": 2
+        }
+      ],
+      "message": "The class 'PRM_PractitionerService' has a total cyclomatic complexity of 79 (highest 12).",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cyclomaticcomplexity"
+      ]
+    },
+    {
+      "rule": "ApexDoc",
+      "engine": "pmd",
+      "severity": 4,
+      "tags": [
+        "Recommended",
+        "Documentation",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 11,
+          "startColumn": 12,
+          "endLine": 12,
+          "endColumn": 6
+        }
+      ],
+      "message": "Missing ApexDoc comment",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_documentation.html#apexdoc"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 112,
+          "startColumn": 13,
+          "endLine": 116,
+          "endColumn": 14
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 153,
+          "startColumn": 42,
+          "endLine": 157,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 303,
+          "startColumn": 9,
+          "endLine": 303,
+          "endColumn": 72
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 303,
+          "startColumn": 9,
+          "endLine": 303,
+          "endColumn": 72
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "CognitiveComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 306,
+          "startColumn": 13,
+          "endLine": 347,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'writeHealthcareProviderNpis(List<PractitionerUnitOfWork>)' has a cognitive complexity of 15, current threshold is 15",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cognitivecomplexity"
+      ]
+    },
+    {
+      "rule": "CyclomaticComplexity",
+      "engine": "pmd",
+      "severity": 3,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 306,
+          "startColumn": 13,
+          "endLine": 347,
+          "endColumn": 6
+        }
+      ],
+      "message": "The method 'writeHealthcareProviderNpis(List<PractitionerUnitOfWork>)' has a cyclomatic complexity of 12.",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_design.html#cyclomaticcomplexity"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 319,
+          "startColumn": 47,
+          "endLine": 323,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 335,
+          "startColumn": 9,
+          "endLine": 335,
+          "endColumn": 29
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 364,
+          "startColumn": 36,
+          "endLine": 368,
+          "endColumn": 10
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 379,
+          "startColumn": 9,
+          "endLine": 379,
+          "endColumn": 36
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 390,
+          "startColumn": 9,
+          "endLine": 390,
+          "endColumn": 71
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "ApexCRUDViolation",
+      "engine": "pmd",
+      "severity": 2,
+      "tags": [
+        "Recommended",
+        "Security",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_PractitionerService.cls",
+          "startLine": 390,
+          "startColumn": 9,
+          "endLine": 390,
+          "endColumn": 71
+        }
+      ],
+      "message": "Validate CRUD permission before SOQL/DML operation or enforce user mode",
+      "resources": [
+        "https://docs.pmd-code.org/pmd-doc-7.22.0/pmd_rules_apex_security.html#apexcrudviolation"
+      ]
+    },
+    {
+      "rule": "DetectCopyPasteForApex",
+      "engine": "cpd",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 101,
+          "startColumn": 115,
+          "endLine": 128,
+          "endColumn": 12
+        },
+        {
+          "file": "force-app/main/default/classes/PRM_ContactService.cls",
+          "startLine": 92,
+          "startColumn": 114,
+          "endLine": 119,
+          "endColumn": 12
+        }
+      ],
+      "message": "Duplicate code detected for language 'apex'. Found 2 code locations containing the same block of code consisting of 129 tokens across 28 lines.",
+      "resources": [
+        "https://docs.pmd-code.org/latest/pmd_userdocs_cpd.html#refactoring-duplicates"
+      ]
+    },
+    {
+      "rule": "DetectCopyPasteForApex",
+      "engine": "cpd",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 105,
+          "startColumn": 27,
+          "endLine": 128,
+          "endColumn": 12
+        },
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 171,
+          "startColumn": 35,
+          "endLine": 194,
+          "endColumn": 12
+        }
+      ],
+      "message": "Duplicate code detected for language 'apex'. Found 2 code locations containing the same block of code consisting of 115 tokens across 24 lines.",
+      "resources": [
+        "https://docs.pmd-code.org/latest/pmd_userdocs_cpd.html#refactoring-duplicates"
+      ]
+    },
+    {
+      "rule": "DetectCopyPasteForApex",
+      "engine": "cpd",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_ContactService.cls",
+          "startLine": 96,
+          "startColumn": 27,
+          "endLine": 119,
+          "endColumn": 12
+        },
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 171,
+          "startColumn": 35,
+          "endLine": 194,
+          "endColumn": 12
+        }
+      ],
+      "message": "Duplicate code detected for language 'apex'. Found 2 code locations containing the same block of code consisting of 115 tokens across 24 lines.",
+      "resources": [
+        "https://docs.pmd-code.org/latest/pmd_userdocs_cpd.html#refactoring-duplicates"
+      ]
+    },
+    {
+      "rule": "DetectCopyPasteForApex",
+      "engine": "cpd",
+      "severity": 5,
+      "tags": [
+        "Recommended",
+        "Design",
+        "Apex"
+      ],
+      "primaryLocationIndex": 0,
+      "locations": [
+        {
+          "file": "force-app/main/default/classes/PRM_BoardCertificationService.cls",
+          "startLine": 86,
+          "startColumn": 55,
+          "endLine": 100,
+          "endColumn": 22
+        },
+        {
+          "file": "force-app/main/default/classes/PRM_EducationService.cls",
+          "startLine": 88,
+          "startColumn": 59,
+          "endLine": 102,
+          "endColumn": 22
+        },
+        {
+          "file": "force-app/main/default/classes/PRM_LanguageService.cls",
+          "startLine": 84,
+          "startColumn": 45,
+          "endLine": 98,
+          "endColumn": 22
+        }
+      ],
+      "message": "Duplicate code detected for language 'apex'. Found 3 code locations containing the same block of code consisting of 105 tokens across 15 lines.",
+      "resources": [
+        "https://docs.pmd-code.org/latest/pmd_userdocs_cpd.html#refactoring-duplicates"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Concierge Info Codes &amp; Flags — Three-Level Breakdown</title>
+<style>
+  :root {
+    --bg: #f7f8fb;
+    --card: #ffffff;
+    --border: #d8dde6;
+    --border-strong: #9aa4b2;
+    --ink: #1a2233;
+    --muted: #5b6474;
+    --practitioner: #eaf3ff;
+    --practitioner-border: #4a90e2;
+    --practice-loc: #eaf7ee;
+    --practice-loc-border: #3aa055;
+    --ppl: #fdf2e6;
+    --ppl-border: #e08a2b;
+    --ica: #f4ecfb;
+    --ica-border: #7d4bbf;
+    --code: #0b1f3a;
+    --code-bg: #f2f4f8;
+    --pill-yes: #157e42;
+    --pill-no: #b1362f;
+    --pill-auto: #2a5aa6;
+    --pill-manual: #8a5a00;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                 "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    margin: 0;
+    padding: 28px 36px 64px 36px;
+    line-height: 1.45;
+  }
+  h1 { margin: 0 0 6px 0; font-size: 24px; letter-spacing: -0.01em; }
+  h2 { margin: 32px 0 12px 0; font-size: 18px; }
+  .sub { color: var(--muted); margin-bottom: 20px; font-size: 14px; }
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin: 10px 0 22px 0;
+  }
+  .swatch {
+    display: inline-flex; align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px; font-weight: 600;
+    border: 1px solid transparent;
+  }
+  .sw-prac  { background: var(--practitioner);  border-color: var(--practitioner-border);  color: #1e4b85; }
+  .sw-loc   { background: var(--practice-loc);  border-color: var(--practice-loc-border);  color: #1f6a37; }
+  .sw-ppl   { background: var(--ppl);           border-color: var(--ppl-border);           color: #8a5300; }
+  .sw-ica   { background: var(--ica);           border-color: var(--ica-border);           color: #522a86; }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    font-size: 13.5px;
+  }
+  th, td {
+    padding: 12px 14px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--border);
+  }
+  thead th {
+    background: #0b1f3a;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #0b1f3a;
+    position: sticky; top: 0;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:nth-child(odd)  { background: #fbfcfe; }
+  tbody tr:hover           { background: #eef4fb; }
+  td.label { font-weight: 600; width: 220px; color: #0b1f3a; }
+  td.col-prac  { background: color-mix(in srgb, var(--practitioner) 45%, white); }
+  td.col-loc   { background: color-mix(in srgb, var(--practice-loc) 45%, white); }
+  td.col-ppl   { background: color-mix(in srgb, var(--ppl) 45%, white); }
+
+  code, .api {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    color: var(--code);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid #e0e5ee;
+  }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    line-height: 1.6;
+    letter-spacing: 0.02em;
+    margin-right: 4px;
+  }
+  .pill-auto   { background: #e2ecf9; color: var(--pill-auto);   border: 1px solid #b7cdec; }
+  .pill-manual { background: #fff2d6; color: var(--pill-manual); border: 1px solid #eecf95; }
+  .pill-yes    { background: #dff3e6; color: var(--pill-yes);    border: 1px solid #a9d9be; }
+  .pill-no     { background: #fce1de; color: var(--pill-no);     border: 1px solid #edb5b0; }
+
+  ul { margin: 4px 0 0 0; padding-left: 18px; }
+  li { margin: 2px 0; }
+
+  .note {
+    background: #fffbe6;
+    border: 1px solid #f2d976;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 16px;
+  }
+  .source {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 24px;
+  }
+  .flow {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 14px;
+    font-size: 13px;
+  }
+  .flow strong { color: #0b1f3a; }
+  .arrow { color: var(--practitioner-border); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>Concierge Medicine — Info Codes &amp; Flags at Three Levels</h1>
+<div class="sub">
+  How <span class="api">PRM_InfoCodeAssignment__c</span> ("Concierge Provider" ICA) and the
+  <span class="api">PRM_IsConciergeProvider__c</span> boolean flag are created, maintained, and
+  rolled up across the Practitioner, Practice Location, and Practitioner-at-Practice-Location
+  levels.
+</div>
+
+<div class="legend">
+  <span class="swatch sw-prac">Practitioner  (Account)</span>
+  <span class="swatch sw-loc">Practice Location  (HealthcareFacility)</span>
+  <span class="swatch sw-ppl">Practitioner Practice Location  (HealthcarePractitionerFacility / HPF)</span>
+  <span class="swatch sw-ica">Info Code Assignment  (PRM_InfoCodeAssignment__c)</span>
+</div>
+
+<h2>Comparison Table</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th style="background:#1f4a8a;">Practitioner<br>(Account)</th>
+      <th style="background:#2f7a48;">Practice Location<br>(HealthcareFacility)</th>
+      <th style="background:#a06421;">Practitioner Practice Location<br>(HealthcarePractitionerFacility)</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <tr>
+      <td class="label">Business meaning</td>
+      <td class="col-prac">This practitioner practices concierge medicine <em>at all</em> of their practice locations (practitioner-wide).</td>
+      <td class="col-loc">Every active PCP/Dual practitioner at this location practices concierge (the "100% rule" location).</td>
+      <td class="col-ppl">This specific practitioner practices concierge at this specific location (granular; may be true at Loc&nbsp;A but not Loc&nbsp;B).</td>
+    </tr>
+
+    <tr>
+      <td class="label">Parent object of the ICA</td>
+      <td class="col-prac"><span class="api">PRM_InfoCodeAssignment__c.PRM_Account__c</span></td>
+      <td class="col-loc"><span class="api">PRM_InfoCodeAssignment__c.PRM_HealthcareFacility__c</span></td>
+      <td class="col-ppl"><span class="api">PRM_InfoCodeAssignment__c.PRM_HealthcarePractitionerFacility__c</span>
+        <br><span class="pill pill-yes">NEW (v4.0)</span></td>
+    </tr>
+
+    <tr>
+      <td class="label">Info Code(s) used</td>
+      <td class="col-prac">
+        <code>Concierge Provider</code> (external / Provider Directory)<br>
+        <code>Concierge PCP</code> (internal / DART, Inquire Only)
+      </td>
+      <td class="col-loc">
+        <code>Concierge Provider</code> only (rolled up from PPL level).<br>
+        <span style="color:var(--muted);font-size:12px;">Internal-only "Concierge PCP" is not rolled to the location.</span>
+      </td>
+      <td class="col-ppl">
+        <code>Concierge Provider</code> (created by PAR form and by PDA).<br>
+        <code>Concierge PCP</code> (created by PDA when needed).
+      </td>
+    </tr>
+
+    <tr>
+      <td class="label">Boolean flag field</td>
+      <td class="col-prac"><span class="api">Account.PRM_IsConciergeProvider__c</span></td>
+      <td class="col-loc"><span class="api">HealthcareFacility.PRM_IsConciergeProvider__c</span></td>
+      <td class="col-ppl"><span class="api">HealthcarePractitionerFacility.PRM_IsConciergeProvider__c</span></td>
+    </tr>
+
+    <tr>
+      <td class="label">How the ICA is <em>created</em></td>
+      <td class="col-prac">
+        <span class="pill pill-manual">Manual</span>
+        PDA creates from the Practitioner Account page (Story&nbsp;1.3).<br>
+        <span style="color:var(--muted);font-size:12px;">The PAR form does NOT create Practitioner-level ICAs.</span>
+      </td>
+      <td class="col-loc">
+        <span class="pill pill-auto">Auto (rolled up)</span>
+        Created by <span class="api">PRM_ConciergeRollupHelper.evaluateSync()</span>
+        when the 100% rule is satisfied — no Specialists AND every active PCP/Dual has
+        Account&nbsp;flag + Account&nbsp;ICA + PPL&nbsp;ICA all active.
+        <br>
+        <span class="pill pill-manual">Manual</span>
+        PDA may also create directly (Story&nbsp;1.4) subject to validation
+        <span class="api">ERR_LOC_NOT_CONCIERGE</span>.
+      </td>
+      <td class="col-ppl">
+        <span class="pill pill-auto">Auto</span>
+        PAR form loop: for each practice location the practitioner ticks,
+        Integration Procedure <span class="api">PRM_ConceirgeInfoCodeRecordsCreate</span>
+        inserts one HCPF-level ICA (Story&nbsp;2.5, v4.1).<br>
+        <span class="pill pill-manual">Manual</span>
+        PDA may also create from the HPF page (Story&nbsp;1.3).
+      </td>
+    </tr>
+
+    <tr>
+      <td class="label">How the ICA is <em>terminated</em></td>
+      <td class="col-prac">PDA sets <span class="api">PRM_EffectiveTo__c</span>, or Account flag flipped
+        <span class="pill pill-no">false</span> → cascades via
+        <span class="api">PRM_AccountTriggerHelper.handleConciergeRollup</span>
+        (terminate-only, never re-creates).</td>
+      <td class="col-loc">Auto-terminated by <span class="api">PRM_ConciergeRollupHelper</span> when the 100% rule breaks:
+        <ul>
+          <li>Any Specialist becomes active at the location, OR</li>
+          <li>Any PCP/Dual loses Account flag, Account ICA, or PPL ICA</li>
+        </ul>
+        <span style="color:var(--muted);font-size:12px;">Both the "full rollup" and "terminate-only" paths perform this.</span></td>
+      <td class="col-ppl">PDA sets <span class="api">PRM_EffectiveTo__c</span> on the HCPF ICA,
+        or (v4.3 recred) address screen "Yes → No" flip re-terminates.
+        Deletion also flows through the ICA trigger.</td>
+    </tr>
+
+    <tr>
+      <td class="label">How the boolean flag is set</td>
+      <td class="col-prac">
+        <span class="pill pill-auto">Auto</span>
+        <span class="api">PRM_ConciergeProviderRollupQueueable.rollupAccounts()</span> sets
+        <span class="api">= true</span> iff an active-today "Concierge Provider" ICA points to the Account
+        (<span class="api">PRM_EffectiveFrom__c &lt;= TODAY</span> AND
+         <span class="api">PRM_EffectiveTo__c = null OR &gt;= TODAY</span>).
+      </td>
+      <td class="col-loc">
+        <span class="pill pill-auto">Auto</span>
+        Set by <span class="api">PRM_ConciergeRollupHelper.evaluateSync()</span>
+        alongside the Location-ICA create/reactivate/terminate:
+        <span class="api">= true</span> when the created/synced ICA is active today,
+        <span class="api">= false</span> on termination or when the rule breaks.
+      </td>
+      <td class="col-ppl">
+        <span class="pill pill-auto">Auto</span>
+        <span class="api">PRM_ConciergeProviderRollupQueueable.rollupHPFs()</span> sets
+        <span class="api">= true</span> iff an active-today "Concierge Provider" ICA points to the HPF.
+      </td>
+    </tr>
+
+    <tr>
+      <td class="label">Trigger entry points</td>
+      <td class="col-prac">
+        <span class="api">PRM_AccountTriggerHandler</span> (after&nbsp;update) → <span class="api">handleConciergeRollup</span>
+        <br><span style="color:var(--muted);font-size:12px;">true → false only: terminate cascade. false → true: no auto-create.</span>
+      </td>
+      <td class="col-loc">
+        Rolled up transitively from <b>HPF trigger</b> and <b>ICA trigger</b> —
+        no direct trigger on HealthcareFacility.
+      </td>
+      <td class="col-ppl">
+        <span class="api">PRM_PracFacilityTriggerHandler</span> (after insert/update/delete) →
+        <span class="api">PRM_HCPFTriggerHelper.handleConciergeRollup</span><br>
+        <span class="api">PRM_InfoCodeAssTriggerHandler</span> (all events) → rollup queueable
+      </td>
+    </tr>
+
+    <tr>
+      <td class="label">Validation rules on the ICA</td>
+      <td class="col-prac">
+        <ul>
+          <li>Effective Date required</li>
+          <li>Effective Date &le; Termination Date</li>
+          <li>Practitioner role must be <b>PCP</b> or <b>Dual</b> (<span class="api">ERR_PRAC_ROLE</span>)</li>
+          <li>Dates must fall within practitioner's credentialing window</li>
+        </ul>
+      </td>
+      <td class="col-loc">
+        <ul>
+          <li>All active practitioners at the location must be PCP/Dual (<span class="api">ERR_LOC_ROLE</span>)</li>
+          <li>All must have Account flag <span class="api">= true</span> (<span class="api">ERR_LOC_NOT_CONCIERGE</span>)</li>
+          <li>An active PPL-level ICA must cover the proposed EffectiveFrom (<span class="api">ERR_LOC_NO_PPL_ICA</span>)</li>
+          <li>Dates within location's operational window and within the PPL ICA window</li>
+        </ul>
+      </td>
+      <td class="col-ppl">
+        <ul>
+          <li>HPF role must be PCP/Dual (<span class="api">ERR_PPL_PPL_ROLE</span> / <span class="api">ERR_PPL_PRAC_ROLE</span>)</li>
+          <li>Practitioner's Account flag must already be <span class="api">true</span> (<span class="api">ERR_PPL_NOT_CONCIERGE</span>) — <b>Practitioner ICA must exist first</b></li>
+          <li>Dates within HPF EffectiveFrom / EffectiveTo</li>
+          <li>Dates within the covering Practitioner-level ICA's window (<span class="api">ERR_PPL_BEFORE_PRAC_ICA</span> / <span class="api">ERR_PPL_AFTER_PRAC_ICA</span> / <span class="api">ERR_PPL_NO_PRAC_ICA</span>)</li>
+        </ul>
+      </td>
+    </tr>
+
+    <tr>
+      <td class="label">Data feeds</td>
+      <td class="col-prac">
+        <b>DART / Inquire Only</b> ← "Concierge PCP" ICAs<br>
+        <b>Provider Directory</b> ← "Concierge Provider" ICAs
+      </td>
+      <td class="col-loc">
+        Feeds inherit from Location-level ICAs (flag can drive quick UI filtering).
+      </td>
+      <td class="col-ppl">
+        <b>Provider Directory</b> uses HCPF-level ICAs to show concierge indicator per location.
+      </td>
+    </tr>
+
+    <tr>
+      <td class="label">Case Manager (IndividualApplication) capture</td>
+      <td colspan="3" style="background:#fbfcfe;">
+        Regardless of which level, the PAR&nbsp;form always writes the practitioner's raw answers to the Case Manager:
+        <span class="api">PRM_ConciergeMedicineIndicator__c</span>,
+        <span class="api">PRM_ConciergeFeeOptional__c</span>,
+        <span class="api">PRM_ConciergeFeeOptionalExisting__c</span>,
+        <span class="api">PRM_ConciergeOfferedPriorToDate__c</span>,
+        <span class="api">PRM_AcceptsNewPatientsNonConcierge__c</span>.
+        These are audit fields — they are <em>never</em> flipped by rollup logic.
+      </td>
+    </tr>
+
+  </tbody>
+</table>
+
+<h2>Rollup Precedence &amp; Chain</h2>
+<div class="flow">
+  <p style="margin-top:0;"><strong>PAR form / PDA action</strong> creates or terminates a
+  <span class="api">PRM_InfoCodeAssignment__c</span> record.
+  The ICA trigger then fires <b>one</b> queueable per transaction —
+  <span class="api">PRM_ConciergeProviderRollupQueueable</span> — which rolls up in this order:</p>
+
+  <ol>
+    <li>
+      <span class="swatch sw-prac">1. Account</span>
+      <span class="arrow">→</span>
+      <span class="api">rollupAccounts()</span> sets
+      <span class="api">Account.PRM_IsConciergeProvider__c</span>
+      <em>= (active Account-level "Concierge Provider" ICA exists today)</em>.
+    </li>
+    <li>
+      <span class="swatch sw-ppl">2. HPF (PPL)</span>
+      <span class="arrow">→</span>
+      <span class="api">rollupHPFs()</span> sets
+      <span class="api">HealthcarePractitionerFacility.PRM_IsConciergeProvider__c</span>
+      <em>= (active HCPF-level "Concierge Provider" ICA exists today)</em>.
+    </li>
+    <li>
+      <span class="swatch sw-loc">3. Practice Location</span>
+      <span class="arrow">→</span>
+      <span class="api">rollupHCFs()</span> delegates to
+      <span class="api">PRM_ConciergeRollupHelper.evaluateSync()</span>,
+      which applies the <b>100% rule</b> at the actual ICA transition date
+      (not <span class="api">System.today()</span>) and then either
+      creates / reactivates / date-syncs / terminates the Location-level ICA and
+      flips <span class="api">HealthcareFacility.PRM_IsConciergeProvider__c</span> accordingly.
+    </li>
+  </ol>
+
+  <p style="margin-bottom:0;">
+    <strong>Independent path — HPF trigger:</strong>
+    <span class="api">PRM_HCPFTriggerHelper.handleConciergeRollup</span> also fires whenever an HPF
+    is inserted, updated, or deleted (a practitioner joining or leaving a location can break the 100% rule)
+    and enqueues the Location-level evaluation for the affected facility. <br>
+    <strong>Independent path — Account trigger:</strong>
+    <span class="api">PRM_AccountTriggerHelper.handleConciergeRollup</span> fires only when
+    <span class="api">Account.PRM_IsConciergeProvider__c</span> flips
+    <span class="pill pill-yes">true</span>&nbsp;<span class="arrow">→</span>&nbsp;<span class="pill pill-no">false</span>;
+    it runs in <b>terminateOnly</b> mode — it will terminate a Location-level ICA if the rule breaks,
+    but it will never auto-create one.
+  </p>
+</div>
+
+<h2>Dependency Order (why the levels must be built bottom-up)</h2>
+<div class="flow" style="font-size:13.5px;">
+  <span class="swatch sw-prac">Practitioner ICA</span>
+  <span class="arrow">→</span> must exist &amp; be active <b>before</b>
+  <span class="swatch sw-ppl">HCPF (PPL) ICA</span>
+  <span class="arrow">→</span> must exist for <b>every</b> active PCP/Dual at the location <b>before</b>
+  <span class="swatch sw-loc">Location ICA</span> can auto-create.
+</div>
+
+<div class="note">
+  <b>Key takeaway.</b> The Practitioner flag is the <em>foundation</em>, the HCPF flag is the
+  <em>per-location fact</em>, and the Location flag is a <em>strict AND</em> of every active
+  practitioner at that location. Break any link at the lower levels — a Specialist joins, a PPL
+  ICA is terminated, or the Account flag flips off — and the Location-level ICA auto-terminates
+  the same day.
+</div>
+
+<div class="source">
+  <b>Sources:</b>
+  <span class="api">requirements/Concierge_Medicine_Complete_User_Stories.md</span> (Epic&nbsp;1 Stories 1.3–1.7, Epic&nbsp;2 Story 2.5, Epic&nbsp;6 Story 6.3) ·
+  <span class="api">force-app/main/default/classes/PRM_ConciergeRollupHelper.cls</span> ·
+  <span class="api">PRM_ConciergeProviderRollupQueueable.cls</span> ·
+  <span class="api">PRM_InfoCodeAssTriggerHelper.cls</span> ·
+  <span class="api">PRM_AccountTriggerHelper.cls</span> ·
+  <span class="api">PRM_HCPFTriggerHelper.cls</span> ·
+  <span class="api">PRM_PracFacilityTriggerHandler.cls</span>.
+</div>
+
+</body>
+</html>

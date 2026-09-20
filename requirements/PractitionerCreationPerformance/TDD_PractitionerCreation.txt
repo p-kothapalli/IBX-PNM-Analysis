@@ -1,0 +1,718 @@
+1. OVERVIEW
+================================================================================
+
+This document describes the technical approach for refactoring the Integration
+Procedure (IP) chain rooted at PRM_AddressLogicContainer to:
+
+  (a) Increase chainable governor limits on the parent container IP.
+  (b) Execute the 2nd child IP (PRM_ExistingPrimaryPracticeLocationLogicDelg)
+      as a Queueable from the container.
+  (c) Move the 3rd child IP (PRM_CreateDelegatedHFNRecords) out of the
+      container and invoke it as a Queueable from within the 2nd IP.
+  (d) Establish a robust exception-handling and rollback strategy that accounts
+      for the transaction-boundary changes introduced by Queueable execution.
+
+
+2. CURRENT ARCHITECTURE
+================================================================================
+
+2.1  Execution Chain (PRM_AddressLogicContainer_English_3)
+--------------------------------------------------------------------------
+The container IP invokes three child IPs in sequence:
+
+  Seq 1 - PractitionerAddressCreation
+           IP Key:  PRM_PractitionerAddressCreation
+           Mode:    Chainable  (chainOnStep = true)
+           Purpose: Creates/upserts practitioner address records,
+                    healthcare facilities, locations, taxonomy data,
+                    provider features, etc.
+
+  Seq 2 - ExistingPrimaryAddressLogic
+           IP Key:  PRM_ExistingPrimaryPracticeLocationLogicDelg
+           Mode:    Chainable  (chainOnStep = true)
+           Purpose: Processes existing primary practice location logic -
+                    facility records, provider features (ACC, AA),
+                    practice-to-practitioner affiliations, case data
+                    manager updates.
+
+  Seq 3 - AddTaxNetworkLogic
+           IP Key:  PRM_CreateDelegatedHFNRecords
+           Mode:    Queueable  (useQueueable = true, disableChainable = true)
+           Purpose: Creates delegated HFN records - taxonomy/network
+                    associations, payer networks, info-code records.
+
+2.2  Current Governor Limits
+--------------------------------------------------------------------------
+  IP Name                                        Queries  CPU(ms)  Heap(MB)
+  ---------------------------------------------------------------------------
+  PRM_AddressLogicContainer (Container)           50       2,000    default
+  PRM_PractitionerAddressCreation (IP1)          100      10,000    6
+     (queueable overrides: queries=200, cpu=60,000, heap=12)
+  PRM_ExistingPrimaryPracticeLocationLogicDelg   50       2,000    default
+  PRM_CreateDelegatedHFNRecords (IP3)            50       2,000    default
+     (queueable overrides: queries=120, cpu=40,000, heap=6)
+
+2.3  Current Transaction Boundaries
+--------------------------------------------------------------------------
+  Transaction 1 (Synchronous/Chainable):
+    Container -> IP1 -> IP2
+    rollbackOnError = true on all three IPs.
+    A failure in IP1 or IP2 rolls back all DML in the synchronous chain.
+
+  Transaction 2 (Queueable):
+    IP3 (PRM_CreateDelegatedHFNRecords)
+    Executes asynchronously. rollbackOnError = true within its own scope.
+    Failure here does NOT roll back Transaction 1.
+
+
+3. PROPOSED ARCHITECTURE
+================================================================================
+
+3.1  New Execution Chain
+--------------------------------------------------------------------------
+
+  PRM_AddressLogicContainer (Container)
+  |
+  |-- Seq 1: PractitionerAddressCreation       [CHAINABLE - unchanged]
+  |          IP Key: PRM_PractitionerAddressCreation
+  |          chainOnStep = false
+  |
+  |-- Seq 2: ExistingPrimaryAddressLogic       [QUEUEABLE - CHANGED]
+             IP Key: PRM_ExistingPrimaryPracticeLocationLogicDelg
+             useQueueable  = true
+             disableChainable = true
+             |
+             |-- (existing steps 1-17 within IP2)
+             |
+             |-- NEW Seq 18: AddTaxNetworkLogic    [QUEUEABLE from within IP2]
+                    IP Key: PRM_CreateDelegatedHFNRecords
+                    useQueueable  = true
+                    disableChainable = true
+
+  Seq 3 (AddTaxNetworkLogic) is REMOVED from the Container.
+
+3.2  New Transaction Boundaries
+--------------------------------------------------------------------------
+
+  Transaction 1 (Synchronous/Chainable):
+    Container + IP1 (PRM_PractitionerAddressCreation)
+    - All DML in the container's synchronous execution and IP1's chainable
+      execution share a single Apex transaction.
+    - rollbackOnError = true ensures full rollback on failure.
+
+  Transaction 2 (Queueable - first async hop):
+    IP2 (PRM_ExistingPrimaryPracticeLocationLogicDelg)
+    - Runs as Queueable, separate Apex transaction.
+    - rollbackOnError = true within IP2's own transaction scope.
+    - Gets elevated governor limits (Queueable context).
+
+  Transaction 3 (Queueable - second async hop):
+    IP3 (PRM_CreateDelegatedHFNRecords)
+    - Invoked as Queueable from within IP2.
+    - Runs in its own separate Apex transaction.
+    - rollbackOnError = true within IP3's own transaction scope.
+    - Gets elevated governor limits (Queueable context).
+
+
+4. DETAILED CHANGES
+================================================================================
+
+4.1  PRM_AddressLogicContainer_English_3  (New Version: 4)
+--------------------------------------------------------------------------
+
+  4.1.1  Increase Chainable Limits
+  ........................................................................
+  Update the IP-level propertySetConfig to raise governor ceilings.
+
+  BEFORE:
+    chainableQueriesLimit       = 50
+    chainableCpuLimit           = 2000
+    chainableHeapSizeLimit      = null
+    chainableDMLStatementsLimit = null
+    chainableDMLRowsLimit       = null
+    chainableQueryRowsLimit     = null
+
+  AFTER:
+    chainableQueriesLimit       = 120
+    chainableCpuLimit           = 10000
+    chainableHeapSizeLimit      = 6
+    chainableDMLStatementsLimit = 150
+    chainableDMLRowsLimit       = 10000
+    chainableQueryRowsLimit     = 50000
+
+  Rationale: IP1 (PractitionerAddressCreation) is data-intensive with many
+  DataRaptor Post/Extract actions. The current limit of 50 queries and 2000ms
+  CPU is insufficient when processing practitioners with many locations.
+
+  4.1.2  Change IP2 Invocation to Queueable
+  ........................................................................
+  Modify the "ExistingPrimaryAddressLogic" element (Seq 2):
+
+  BEFORE:
+    "disableChainable" : false,
+    "chainOnStep"      : true
+    (no remoteOptions / useQueueable)
+
+  AFTER:
+    "disableChainable" : true,
+    "chainOnStep"      : false,
+    "remoteOptions"    : { "useQueueable" : true }
+
+  4.1.3  Remove IP3 Invocation from Container
+  ........................................................................
+  Set the "AddTaxNetworkLogic" element (Seq 3) to isActive = false,
+  or remove it entirely from the container.
+
+  BEFORE:
+    Element "AddTaxNetworkLogic" calling PRM_CreateDelegatedHFNRecords
+    with useQueueable = true, disableChainable = true
+
+  AFTER:
+    Element deactivated/removed. IP3 will now be invoked from IP2.
+
+4.2  PRM_ExistingPrimaryPracticeLocationLogicDelg  (New Version: 2)
+--------------------------------------------------------------------------
+
+  4.2.1  Add Queueable Limit Overrides at IP Level
+  ........................................................................
+  Add queueable chainable overrides to the IP-level propertySetConfig:
+
+  ADDITIONS:
+    queueableChainableQueriesLimit  = 150
+    queueableChainableCpuLimit      = 60000
+    queueableChainableHeapSizeLimit = 12
+
+  Also increase base chainable limits since IP2 has 17 steps:
+    chainableQueriesLimit       = 100
+    chainableCpuLimit           = 10000
+    chainableHeapSizeLimit      = 6
+
+  4.2.2  Add New IP Action Element to Call IP3
+  ........................................................................
+  Add a new child element inside the "ExistingPrimaryPractice" conditional
+  block (or as a new top-level element after the ResponseForIp step):
+
+  New Element:
+    name:          "AddTaxNetworkLogicFromDelg"
+    type:          "Integration Procedure Action"
+    sequenceNumber: 18.0  (after UpdateCaseDataManager at seq 17)
+    level:         1.0  (inside ExistingPrimaryPractice block)
+    OR
+    level:         0.0  (top-level, after ResponseForIp, seq 6.0)
+
+  propertySetConfig:
+    {
+      "sendOnlyAdditionalInput" : true,
+      "remoteOptions" : { "useQueueable" : true },
+      "returnOnlyAdditionalOutput" : false,
+      "failOnStepError" : true,
+      "isActive" : true,
+      "disableChainable" : true,
+      "chainOnStep" : false,
+      "integrationProcedureKey" : "PRM_CreateDelegatedHFNRecords",
+      "additionalInput" : {
+        "PersonContactId"          : "=%PersonContactId%",
+        "IsActive"                 : "=%IsActive%",
+        "RecordsToUpdate"          : "=%RecordsToUpdate%",
+        "CaseManagerId"            : "=%CaseManagerId%",
+        "IsPending"                : "=%IsPending%",
+        "FacilityPractitionerTxNw" : "=%FacilityPractitionerTxNw%"
+      },
+      "useFormulas" : true
+    }
+
+  NOTE: The input parameters must match what IP3 expects. Currently the
+  Container passes PersonContactId, IsActive, RecordsToUpdate,
+  CaseManagerId, IsPending, and FacilityPractitionerTxNw. IP2 already
+  receives most of these inputs from the Container except RecordsToUpdate
+  and FacilityPractitionerTxNw. These must be added to the Container's
+  additionalInput for the IP2 invocation (see section 4.1.2).
+
+  4.2.3  Update Container IP2 Invocation to Pass Additional Inputs
+  ........................................................................
+  The Container's "ExistingPrimaryAddressLogic" additionalInput currently
+  does NOT pass RecordsToUpdate or FacilityPractitionerTxNw. These are
+  needed by IP3 and must be forwarded through IP2.
+
+  Add to Container's ExistingPrimaryAddressLogic additionalInput:
+    "RecordsToUpdate"          : "=%RecordsToUpdate%"
+    "FacilityPractitionerTxNw" : "=%FacilityPractitionerTxNw%"
+
+4.3  PRM_CreateDelegatedHFNRecords_Procedure_3  (No structural changes)
+--------------------------------------------------------------------------
+  No modifications required to IP3 itself. It already has:
+    - queueableChainableQueriesLimit  = 120
+    - queueableChainableCpuLimit      = 40000
+    - queueableChainableHeapSizeLimit = 6
+    - rollbackOnError = true
+
+  The IP will now be invoked from IP2 instead of the Container, but its
+  internal logic and expected inputs remain identical.
+
+
+5. EXCEPTION HANDLING & ROLLBACK STRATEGY
+================================================================================
+
+5.1  Fundamental Constraint: Queueable Transaction Isolation
+--------------------------------------------------------------------------
+When an IP step uses "useQueueable": true, the OmniStudio runtime enqueues
+the target IP as a Queueable Apex job. This means:
+
+  - The calling IP's transaction COMMITS before the Queueable starts.
+  - The Queueable IP runs in a NEW, independent Apex transaction.
+  - rollbackOnError ONLY applies within each individual transaction.
+  - Cross-transaction rollback is NOT automatic.
+
+Post-refactor, there are THREE independent transactions:
+
+  TX1: Container + IP1    (synchronous/chainable - single transaction)
+  TX2: IP2                (queueable - separate transaction)
+  TX3: IP3                (queueable from IP2 - separate transaction)
+
+5.2  Rollback Behavior Per Transaction
+--------------------------------------------------------------------------
+
+  +------+--------------------------------------------+-------------------+
+  | TX   | Scope                                      | rollbackOnError   |
+  +------+--------------------------------------------+-------------------+
+  | TX1  | Container + IP1                            | YES - full DML    |
+  |      | (PractitionerAddressCreation)              | rollback if any   |
+  |      |                                            | step fails        |
+  +------+--------------------------------------------+-------------------+
+  | TX2  | IP2                                        | YES - full DML    |
+  |      | (ExistingPrimaryPracticeLocationLogicDelg)  | rollback within   |
+  |      |                                            | IP2's scope only  |
+  +------+--------------------------------------------+-------------------+
+  | TX3  | IP3                                        | YES - full DML    |
+  |      | (CreateDelegatedHFNRecords)                | rollback within   |
+  |      |                                            | IP3's scope only  |
+  +------+--------------------------------------------+-------------------+
+
+5.3  Failure Scenarios & Handling
+--------------------------------------------------------------------------
+
+  SCENARIO A: TX1 Fails (Container + IP1)
+  .......................................................................
+  - All DML in the Container and IP1 is rolled back automatically.
+  - TX2 (IP2) is NEVER enqueued because the Container transaction aborted
+    before reaching the IP2 invocation step.
+  - TX3 (IP3) is also never enqueued.
+  - Net effect: CLEAN rollback. No orphan records.
+  - Action required: NONE (standard OmniStudio rollback behavior).
+
+  SCENARIO B: TX1 Succeeds, TX2 (IP2) Fails
+  .......................................................................
+  - TX1 has already committed. Records from IP1 (addresses, facilities,
+    locations, HC practitioners, identifiers, etc.) PERSIST in the database.
+  - TX2 rolls back its own DML (healthcare practitioner facilities,
+    provider features, practice-to-practitioner affiliations).
+  - TX3 (IP3) is NEVER enqueued because IP2 aborted before reaching
+    the IP3 invocation step.
+  - Net effect: PARTIAL STATE. IP1 records exist, IP2/IP3 records do not.
+  - This is the KEY risk scenario. See section 5.4 for mitigation.
+
+  SCENARIO C: TX1 Succeeds, TX2 (IP2) Succeeds, TX3 (IP3) Fails
+  .......................................................................
+  - TX1 and TX2 have already committed.
+  - TX3 rolls back its own DML (taxonomy/network, payer network, IFC).
+  - Net effect: PARTIAL STATE. IP1 and IP2 records exist, IP3 records
+    do not (network/IFC associations are missing).
+  - See section 5.4 for mitigation.
+
+  SCENARIO D: All Transactions Succeed
+  .......................................................................
+  - Happy path. All records created/updated across all three transactions.
+  - No action required.
+
+5.4  Exception Logging to PRM_ExceptionLog__c
+--------------------------------------------------------------------------
+
+  5.4.1  Overview & Rollback-Safe Logging Approach
+  ........................................................................
+  When rollbackOnError = true on an IP and the IP fails, ALL DML in that
+  transaction is rolled back - including any PRM_ExceptionLog__c records
+  inserted during the same transaction. Therefore, exception logging must
+  use the existing Platform Event (PRM_ExceptionLogEvent__e) which has
+  publishBehavior = "PublishImmediately". Platform Events survive
+  transaction rollbacks and are committed independently of the DML
+  transaction.
+
+  CRITICAL DESIGN DECISION:
+    Exception logs MUST be written via PRM_ExceptionLogEvent__e, NOT via
+    direct DML insert to PRM_ExceptionLog__c, because:
+    - rollbackOnError = true on IP2 and IP3 means the entire transaction
+      rolls back on failure.
+    - A direct insert to PRM_ExceptionLog__c would be rolled back along
+      with everything else.
+    - EventBus.publish() for Platform Events with PublishImmediately
+      commits independently of the Apex transaction.
+
+  5.4.2  Link Exception Logs to IndividualApplication (Case Manager)
+  ........................................................................
+
+  CURRENT STATE:
+    PRM_ExceptionLog__c has:
+      - PRM_RecordId__c        (Text 18)  - generic, currently unused
+      - PRM_RecordObjectName__c (Text 255) - generic, currently unused
+      - PRM_AsyncProcess__c    (Lookup to PRM_AsyncProcess__c)
+    PRM_ExceptionLogEvent__e has NO record-linking fields.
+    PRM_ExceptionLogger.cls does NOT populate RecordId or RecordObjectName.
+
+  PROPOSED CHANGES:
+
+  A. New Field on PRM_ExceptionLog__c:
+     ................................................................
+     Field Name:    PRM_IndividualApplication__c
+     Type:          Lookup(IndividualApplication)
+     Label:         Case Manager
+     Description:   The IndividualApplication (Case Manager) record
+                    associated with this exception log entry.
+     Required:      No
+     DeleteConstraint: SetNull
+
+     This provides a direct navigable relationship from the Exception Log
+     to the Case Manager record, enabling:
+       - Related list of Exception Logs on the Case Manager record.
+       - Reports/dashboards filtering exceptions by Case Manager.
+       - Quick identification of which practitioner submission failed.
+
+     NOTE: Also populate the existing PRM_RecordId__c with the
+     CaseManagerId (as fallback/compatibility) and PRM_RecordObjectName__c
+     with "IndividualApplication".
+
+  B. New Fields on PRM_ExceptionLogEvent__e:
+     ................................................................
+     Field Name:    PRM_RecordId__c
+     Type:          Text(18)
+     Label:         Record Id
+     Description:   Id of the related record (CaseManagerId).
+
+     Field Name:    PRM_RecordObjectName__c
+     Type:          Text(255)
+     Label:         Record Object Name
+     Description:   API name of the related object.
+
+     These fields carry the CaseManagerId through the Platform Event
+     so the subscriber can populate the lookup on PRM_ExceptionLog__c.
+
+  C. Platform Event Subscriber (New Trigger or Flow):
+     ................................................................
+     Since no trigger currently exists on PRM_ExceptionLogEvent__e, create
+     one to persist exception logs:
+
+     Trigger: PRM_ExceptionLogEventTrigger
+     Object:  PRM_ExceptionLogEvent__e (after insert)
+     Logic:
+       - For each event, create a PRM_ExceptionLog__c record with:
+           PRM_ProcessName__c       = event.PRM_ProcessName__c
+           PRM_IntegrationType__c   = event.PRM_IntegrationType__c
+           PRM_SeverityLevel__c     = event.PRM_SeverityLevel__c
+           PRM_StackTrace__c        = event.PRM_StackTrace__c
+           PRM_ErrorMessage__c      = event.PRM_ErrorMessage__c
+           PRM_ExceptionType__c     = event.PRM_ExceptionType__c
+           PRM_LineNumber__c        = event.PRM_LineNumber__c
+           PRM_CorrelationID__c     = event.PRM_CorrelationID__c
+           PRM_ErrorCode__c         = event.PRM_ErrorCode__c
+           PRM_SourceSystem__c      = event.PRM_SourceSystem__c
+           PRM_TargetSystem__c      = event.PRM_TargetSystem__c
+           PRM_RequestPayload__c    = event.PRM_RequestPayload__c
+           PRM_RecordId__c          = event.PRM_RecordId__c
+           PRM_RecordObjectName__c  = event.PRM_RecordObjectName__c
+           PRM_IndividualApplication__c = event.PRM_RecordId__c
+             (only when PRM_RecordObjectName__c == 'IndividualApplication')
+       - Bulk insert all PRM_ExceptionLog__c records.
+
+     ALTERNATIVE: Use a Record-Triggered Flow on PRM_ExceptionLogEvent__e
+     instead of an Apex trigger. A Flow is lower-code but less performant
+     for high-volume scenarios.
+
+  D. Update PRM_ExceptionLogger.cls:
+     ................................................................
+     Add overloaded methods that accept CaseManagerId:
+
+     // New overload with CaseManagerId
+     public static void logException(
+         String processName, String integrationType,
+         String severityLevel, String stackTrace,
+         String errorMessage, String exceptionType,
+         Integer lineNumber, String correlationId,
+         String errorCode, String sourceSystem,
+         String targetSystem, String payload,
+         String caseManagerId
+     ) {
+         PRM_ExceptionLog__c log = validateParams(
+             processName, integrationType, severityLevel,
+             stackTrace, errorMessage, exceptionType,
+             lineNumber, correlationId, errorCode,
+             sourceSystem, targetSystem, payload
+         );
+         log.PRM_RecordId__c = caseManagerId;
+         log.PRM_RecordObjectName__c = 'IndividualApplication';
+         if (String.isNotBlank(caseManagerId)
+                 && caseManagerId.startsWith('0iT')) {
+             log.PRM_IndividualApplication__c = caseManagerId;
+         }
+         insert log;
+     }
+
+     // New rollback-safe method using Platform Event
+     public static void logExceptionViaEvent(
+         String processName, String integrationType,
+         String severityLevel, String stackTrace,
+         String errorMessage, String exceptionType,
+         Integer lineNumber, String correlationId,
+         String errorCode, String sourceSystem,
+         String targetSystem, String payload,
+         String caseManagerId
+     ) {
+         PRM_ExceptionLogEvent__e evt = new PRM_ExceptionLogEvent__e(
+             PRM_ProcessName__c     = processName,
+             PRM_IntegrationType__c = integrationType,
+             PRM_SeverityLevel__c   = severityLevel,
+             PRM_StackTrace__c      = stackTrace,
+             PRM_ErrorMessage__c    = errorMessage,
+             PRM_ExceptionType__c   = exceptionType,
+             PRM_LineNumber__c      = lineNumber,
+             PRM_CorrelationID__c   = correlationId,
+             PRM_ErrorCode__c       = errorCode,
+             PRM_SourceSystem__c    = sourceSystem,
+             PRM_TargetSystem__c    = targetSystem,
+             PRM_RequestPayload__c  = payload,
+             PRM_RecordId__c        = caseManagerId,
+             PRM_RecordObjectName__c = 'IndividualApplication'
+         );
+         EventBus.publish(evt);
+     }
+
+     The logExceptionViaEvent method publishes a Platform Event that
+     survives transaction rollback. The trigger/flow subscriber then
+     creates the PRM_ExceptionLog__c record with the Case Manager lookup.
+
+  E. Update PRM_OmniUtils.cls - logException / logTryCatchException:
+     ................................................................
+     Modify the private logException() method to extract CaseManagerId
+     from the inputMap and pass it to PRM_ExceptionLogger:
+
+     BEFORE (line 326):
+       private String logException(Map<String, Object> inputMap,
+                                   Boolean returnId) {
+           ...
+           PRM_ExceptionLogger.logException(processName, ...);
+       }
+
+     AFTER:
+       private String logException(Map<String, Object> inputMap,
+                                   Boolean returnId) {
+           ...
+           String caseManagerId = (String) inputMap.get('caseManagerId');
+           if (returnId) {
+               return PRM_ExceptionLogger.logExceptionReturnId(
+                   processName, ..., caseManagerId);
+           } else {
+               PRM_ExceptionLogger.logException(
+                   processName, ..., caseManagerId);
+               return '';
+           }
+       }
+
+     Similarly update logTryCatchException() to extract CaseManagerId
+     from the inputs and pass it to PRM_ExceptionLogger.
+
+  F. Update PRM_ExceptionLogger IP (PRM_ExceptionLogger_Procedure_1):
+     ................................................................
+     Add "caseManagerId" to the additionalInput of both Remote Action
+     steps (CallLogException and CallLogExceptionReturnId):
+
+       "caseManagerId" : "%caseManagerId%"
+
+  5.4.3  Exception Logging Integration Points in IP2 and IP3
+  ........................................................................
+
+  IP2 (PRM_ExistingPrimaryPracticeLocationLogicDelg):
+  .................................................
+  IP2 runs as a Queueable with rollbackOnError = true. When it fails,
+  the entire IP2 transaction rolls back. To capture the error:
+
+  APPROACH: Use the OmniStudio Try/Catch Block pattern.
+    1. Wrap the "ExistingPrimaryPractice" conditional block (seq 4) in
+       a Try/Catch Block.
+    2. In the Catch block, add a Remote Action step that calls
+       PRM_OmniUtils.logExceptionViaEvent (new method - see 5.4.2.D).
+       This publishes a PRM_ExceptionLogEvent__e with:
+         - processName = "PRM_ExistingPrimaryPracticeLocationLogicDelg"
+         - integrationType = "ASYNC"
+         - severityLevel = "Error"
+         - errorMessage = (captured from the failed step)
+         - caseManagerId = %CaseManagerId%
+         - payload = (serialized input context)
+    3. Because the Platform Event uses PublishImmediately, it is committed
+       even when the IP2 transaction rolls back.
+    4. The PRM_ExceptionLogEventTrigger creates the PRM_ExceptionLog__c
+       record linked to the IndividualApplication via the lookup field.
+
+  IP3 (PRM_CreateDelegatedHFNRecords):
+  .................................................
+  Same approach as IP2:
+    1. Wrap the main logic blocks (CB_LogicExecuteTxNetwork,
+       CB_LogicExecuteLocNetwork, CB_ExecuteIFCLogic) in a Try/Catch.
+    2. Catch block publishes PRM_ExceptionLogEvent__e with:
+         - processName = "PRM_CreateDelegatedHFNRecords"
+         - integrationType = "ASYNC"
+         - caseManagerId = %CaseManagerId%
+
+  5.4.4  Exception Log Record Structure (Example)
+  ........................................................................
+  When IP2 fails, the resulting PRM_ExceptionLog__c record will contain:
+
+    Name                         : {auto-number, e.g., 000142}
+    PRM_ProcessName__c           : "PRM_ExistingPrimaryPracticeLocationLogicDelg"
+    PRM_IntegrationType__c       : "ASYNC"
+    PRM_SeverityLevel__c         : "Error"
+    PRM_ErrorMessage__c          : "FIELD_CUSTOM_VALIDATION_EXCEPTION:
+                                    HealthcarePractitionerFacility insert failed"
+    PRM_StackTrace__c            : "{full error JSON from OmniStudio}"
+    PRM_ExceptionType__c         : "DmlException"
+    PRM_SourceSystem__c          : "Salesforce"
+    PRM_TargetSystem__c          : "Salesforce"
+    PRM_RecordId__c              : "0iTOv000000DrsvMAC"
+    PRM_RecordObjectName__c      : "IndividualApplication"
+    PRM_IndividualApplication__c : 0iTOv000000DrsvMAC  (lookup)
+    PRM_RequestPayload__c        : "{serialized IP input JSON}"
+    PRM_CorrelationID__c         : (OmniStudio tracking ID if available)
+
+  This record appears in:
+    - The "Exception Logs" related list on the Case Manager record.
+    - Exception Log list views / reports filtered by Case Manager.
+
+5.5  Case Data Manager Status Tracking
+--------------------------------------------------------------------------
+  The Case Data Manager record (updated in step "UpdateCaseDataManager"
+  within IP2 at seq 17) serves as the progress checkpoint. It tracks flags:
+    - IsHCPractitionerFacilityUpsert
+    - ProviderFeature
+    - IsAddressUpsert / IsHCFacilityUpsert / IsLocationUpsert (from IP1)
+
+  APPROACH:
+  1. IP1 updates the Case Data Manager with address/facility/location flags
+     upon successful completion (already done in current implementation).
+  2. IP2 updates the Case Data Manager with HCPF/ProviderFeature flags
+     upon successful completion (already done at seq 17).
+  3. Add a NEW flag to Case Data Manager: "IsNetworkRecordsCreated"
+     (or use an existing status field) that IP3 sets upon successful completion.
+
+  If IP2 or IP3 fails, the Case Data Manager will reflect an incomplete
+  state. Combined with the PRM_ExceptionLog__c record linked to the same
+  IndividualApplication, support teams have full visibility into both
+  WHAT failed (exception log) and WHERE processing stopped (CDM flags).
+
+5.6  Compensating Transaction / Retry Mechanism
+--------------------------------------------------------------------------
+  Because automatic cross-transaction rollback is not possible with
+  Queueable execution, implement one of these strategies:
+
+  OPTION 1 - Manual Retry (Recommended for initial release)
+  ..........................................................
+  - When IP2 or IP3 fails, the PRM_ExceptionLog__c record linked to the
+    Case Manager provides the error details.
+  - Mark the Case Data Manager / Individual Application as
+    "Error - Incomplete Processing".
+  - Provide a UI action (Quick Action or OmniScript button) on the
+    Case Manager record that re-invokes only the failed IP(s).
+  - IP2 and IP3 are already designed to be idempotent (they use upserts
+    and conditional execution formulas to check existing records).
+
+  OPTION 2 - Automatic Retry with Queueable Error Handler
+  ..........................................................
+  - Wrap the IP3 invocation in IP2 with error-aware logic:
+    a. If IP2 completes successfully but cannot enqueue IP3 (unlikely
+       but possible under governor limit pressure), write an error record.
+    b. A scheduled Apex job polls for "incomplete" Case Data Manager
+       records and re-invokes IP3 for any that are missing network data.
+
+  OPTION 3 - Full Compensating Rollback (Complex, NOT recommended)
+  ..........................................................
+  - On IP2/IP3 failure, invoke a "rollback IP" that deletes records
+    created by TX1.
+  - This is fragile, introduces additional failure modes, and is NOT
+    recommended given the idempotent nature of the existing IP logic.
+
+  RECOMMENDATION: Option 1 for the initial release, with plans to evaluate
+  Option 2 if failure rates in production exceed acceptable thresholds.
+
+
+6. CONFIGURATION SUMMARY
+================================================================================
+
+6.1  PRM_AddressLogicContainer (Version 4)
+--------------------------------------------------------------------------
+  propertySetConfig changes:
+    chainableQueriesLimit        : 50  -> 120
+    chainableCpuLimit            : 2000 -> 10000
+    chainableHeapSizeLimit       : null -> 6
+    chainableDMLStatementsLimit  : null -> 150
+    chainableDMLRowsLimit        : null -> 10000
+    chainableQueryRowsLimit      : null -> 50000
+
+  ExistingPrimaryAddressLogic element changes:
+    chainOnStep       : true  -> false
+    disableChainable  : false -> true
+    ADD remoteOptions : { "useQueueable" : true }
+    ADD additionalInput keys: RecordsToUpdate, FacilityPractitionerTxNw
+
+  AddTaxNetworkLogic element:
+    isActive : true -> false  (DEACTIVATE)
+
+6.2  PRM_ExistingPrimaryPracticeLocationLogicDelg (Version 2)
+--------------------------------------------------------------------------
+  propertySetConfig changes:
+    chainableQueriesLimit              : 50   -> 100
+    chainableCpuLimit                  : 2000 -> 10000
+    chainableHeapSizeLimit             : null -> 6
+    ADD queueableChainableQueriesLimit : 150
+    ADD queueableChainableCpuLimit     : 60000
+    ADD queueableChainableHeapSizeLimit: 12
+
+  New element: "AddTaxNetworkLogicFromDelg" (IP Action)
+    integrationProcedureKey: PRM_CreateDelegatedHFNRecords
+    useQueueable: true, disableChainable: true
+    Placed after UpdateCaseDataManager (seq 18 in ExistingPrimaryPractice
+    block, or as a new top-level step after ResponseForIp).
+
+  Exception handling: Wrap ExistingPrimaryPractice block in Try/Catch.
+    Catch block: Remote Action -> PRM_OmniUtils.logExceptionViaEvent
+    with caseManagerId passed through.
+
+6.3  PRM_CreateDelegatedHFNRecords (Version 3 or new Version 4)
+--------------------------------------------------------------------------
+  Structural change: Wrap main logic blocks in Try/Catch.
+    Catch block: Remote Action -> PRM_OmniUtils.logExceptionViaEvent
+    with caseManagerId.
+  Existing queueable limits remain unchanged.
+
+6.4  Exception Logging Changes
+--------------------------------------------------------------------------
+  6.4.1  New Custom Field on PRM_ExceptionLog__c:
+    PRM_IndividualApplication__c  (Lookup to IndividualApplication)
+
+  6.4.2  New Custom Fields on PRM_ExceptionLogEvent__e:
+    PRM_RecordId__c               (Text 18)
+    PRM_RecordObjectName__c       (Text 255)
+
+  6.4.3  New Apex Trigger: PRM_ExceptionLogEventTrigger
+    Object: PRM_ExceptionLogEvent__e (after insert)
+    Creates PRM_ExceptionLog__c from event, populating the
+    PRM_IndividualApplication__c lookup when RecordObjectName
+    is "IndividualApplication".
+
+  6.4.4  PRM_ExceptionLogger.cls updates:
+    - New overloaded logException() accepting caseManagerId parameter.
+    - New logExceptionViaEvent() method using EventBus.publish().
+    - Existing methods remain backward-compatible (no signature changes).
+
+  6.4.5  PRM_OmniUtils.cls updates:
+    - logException() extracts caseManagerId from inputMap.
+    - New logExceptionViaEvent() remote method entry point.
+    - logTryCatchException() extracts caseManagerId from inputs.
+
+  6.4.6  PRM_ExceptionLogger IP (Version 2):
+    - Add "caseManagerId" to additionalInput on both Remote Action steps.

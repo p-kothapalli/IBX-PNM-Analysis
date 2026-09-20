@@ -1,0 +1,189 @@
+# Diagnostic Queries for Zip Filter Issue
+
+## Run these in Salesforce Developer Console → Query Editor
+
+### 1. Find the Account ID for HMHMG Specialty Care
+```sql
+SELECT Id, Name
+FROM Account
+WHERE Name LIKE '%HMHMG Specialty Care%'
+```
+Expected: Should return 1 account
+Copy the Account ID for use in queries below.
+
+
+### 2. Count Total Facilities for this Account
+Replace ACCOUNT_ID with the ID from query #1:
+```sql
+SELECT COUNT()
+FROM HealthcareFacility
+WHERE AccountId = 'ACCOUNT_ID'
+  AND PRM_IsErrorRecord__c = false
+```
+Expected: Should return 815
+
+
+### 3. Get Sample of Zip Codes for this Account
+Replace ACCOUNT_ID:
+```sql
+SELECT Name, LocationId,
+       (SELECT PRM_Zip__c, PRM_City__c, PRM_State__c
+        FROM Address__r
+        WHERE PRM_IsErrorRecord__c = false
+        LIMIT 1)
+FROM HealthcareFacility
+WHERE AccountId = 'ACCOUNT_ID'
+  AND PRM_IsErrorRecord__c = false
+  AND LocationId != null
+LIMIT 20
+```
+Expected: Shows sample facilities with their zip codes
+Look for zip codes like 07601, 08050, 08701, etc.
+
+
+### 4. Find All Location IDs for the Account
+Replace ACCOUNT_ID:
+```sql
+SELECT LocationId
+FROM HealthcareFacility
+WHERE AccountId = 'ACCOUNT_ID'
+  AND PRM_IsErrorRecord__c = false
+  AND LocationId != null
+```
+Expected: 815 results
+Copy 5-10 Location IDs for next query.
+
+
+### 5. Check Address Records for Sample Locations
+Replace with Location IDs from previous query:
+```sql
+SELECT Id, ParentId, PRM_Zip__c, PRM_City__c, PRM_State__c,
+       PRM_AddressLine1__c, PRM_IsErrorRecord__c
+FROM Address
+WHERE ParentId IN ('LOCATION_ID_1', 'LOCATION_ID_2', 'LOCATION_ID_3')
+  AND PRM_IsErrorRecord__c = false
+```
+Expected: Shows address details including zip codes
+Verify zip codes are correct.
+
+
+### 6. Test the Exact Filter Query (Manual Test)
+Replace ACCOUNT_ID and copy Location IDs from query #4 into a Set variable:
+```sql
+SELECT ParentId, PRM_Zip__c
+FROM Address
+WHERE ParentId IN ('LOCATION_ID_1', 'LOCATION_ID_2', ...)
+  AND PRM_IsErrorRecord__c = false
+  AND PRM_Zip__c LIKE '07601%'
+```
+Expected: Should ONLY return addresses with PRM_Zip__c = '07601'
+If you see '08050' or '08701', the data or LIKE operator is broken.
+
+
+### 7. Check for Null or Blank Zip Codes
+Replace ACCOUNT_ID:
+```sql
+SELECT LocationId, PRM_Zip__c
+FROM Address
+WHERE ParentId IN (
+    SELECT LocationId
+    FROM HealthcareFacility
+    WHERE AccountId = 'ACCOUNT_ID'
+)
+  AND PRM_IsErrorRecord__c = false
+  AND (PRM_Zip__c = null OR PRM_Zip__c = '')
+```
+Expected: Hopefully 0 results
+If many results, null/blank zips might be causing filter issues.
+
+
+### 8. Find Facilities with Specific Zip Codes (Verification)
+Replace ACCOUNT_ID:
+```sql
+SELECT hf.Id, hf.Name, addr.PRM_Zip__c, addr.PRM_City__c, addr.PRM_State__c
+FROM HealthcareFacility hf
+JOIN Address addr ON addr.ParentId = hf.LocationId
+WHERE hf.AccountId = 'ACCOUNT_ID'
+  AND addr.PRM_IsErrorRecord__c = false
+  AND addr.PRM_Zip__c IN ('07601', '08050', '08701', '07753')
+ORDER BY addr.PRM_Zip__c
+```
+Expected: Shows how many facilities have each zip code
+This confirms which zip codes actually exist in the account.
+
+
+## Analysis Steps
+
+### Step 1: Verify Data Integrity
+Run queries 1-5 to confirm:
+- ✅ Account exists and has facilities
+- ✅ Facilities have valid Location records
+- ✅ Addresses exist and have zip codes
+- ✅ Zip codes are stored correctly (not null/blank)
+
+### Step 2: Test Filter Query Manually
+Run query 6 with actual Location IDs:
+- If it returns only '07601' → Query is correct, issue is in JavaScript/parameter passing
+- If it returns '08050' and '08701' → Data corruption or SOQL bug (very unlikely)
+
+### Step 3: Compare Against UI Results
+Run query 8 to see actual zip distribution:
+- If '07601' exists: Filter should work
+- If '07601' doesn't exist but '08050' does: Wrong account or filter not applied
+- If multiple zips exist: Filter should narrow to only '07601'
+
+### Step 4: Check Debug Logs
+After running UI test with zip filter '07601', check:
+1. **Browser console:** Is zipFilter value '[07601]'?
+2. **Apex debug log:** What does the Address Query string look like?
+3. **Apex debug log:** What zip codes are in "Matched address zip:" lines?
+
+## Common Issues and Solutions
+
+### Issue 1: zipFilter is empty in Apex
+**Symptom:** Apex log shows `zipFilter: []` even though you entered '07601'
+**Cause:** JavaScript not capturing or passing the filter value
+**Solution:** Check handleFacilityFilterChange binding in HTML
+
+### Issue 2: Address query returns 0 results
+**Symptom:** `Address query returned: 0 results`
+**Cause:** No addresses match the filter for this account
+**Solution:** Run query 8 to verify zip codes actually exist
+
+### Issue 3: Query returns wrong zip codes
+**Symptom:** Matched address shows '08050' when filter is '07601'
+**Cause:** LIKE clause not working or data corruption
+**Solution:** Run query 6 manually to confirm query correctness
+
+### Issue 4: All locations shown regardless of filter
+**Symptom:** hasAddressFilters is false even with zip filter entered
+**Cause:** String.isNotBlank() returning false
+**Solution:** Check if zipFilter has leading/trailing spaces or is undefined
+
+## Expected Debug Log Output (Correct Behavior)
+
+```
+=== FILTER DEBUG START ===
+addressFilter: []
+cityFilter: []
+stateFilter: []
+zipFilter: [07601]
+accountLocationIds count: 815
+hasAddressFilters: true
+Zip WHERE clause: PRM_Zip__c LIKE '07601%'
+Address Query: SELECT ParentId, PRM_Zip__c FROM Address WHERE ParentId IN :accountLocationIds AND PRM_IsErrorRecord__c = false AND PRM_Zip__c LIKE '07601%'
+Address query returned: 3 results
+  Matched address zip: 07601 for LocationId: 131xxx
+  Matched address zip: 07601 for LocationId: 131yyy
+  Matched address zip: 07601 for LocationId: 131zzz
+Filtered locationIds count: 3
+=== FILTER DEBUG END ===
+```
+
+## Next Steps After Diagnosis
+
+1. **Run queries 1-8** to verify data
+2. **Perform UI test** with zip filter '07601'
+3. **Capture browser console logs**
+4. **Download Salesforce debug logs**
+5. **Share results** with exact error details

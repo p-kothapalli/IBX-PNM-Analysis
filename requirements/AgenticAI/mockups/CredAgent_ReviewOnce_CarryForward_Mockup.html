@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en" data-brand="ibx">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cred Agent — Review Once, Carry Forward (Business POC)</title>
+<style>
+  /* =====================================================================
+     Brand tokens lifted from prmAppReviewCaqhMatch.css (IBX + AmeriHealth)
+     ===================================================================== */
+  :root[data-brand="ibx"] {
+    --brand:#007db6; --brand-pure:#008ccc; --brand-dark:#024d76; --brand-light:#e6f4fb;
+    --brand-accent:#00aec7;
+    --success:#4d8b3f; --success-bg:#e3f1dd; --warning:#f16935; --warning-text:#9c3d18;
+    --warning-bg:#fde7dc; --error:#ea1d2c; --error-bg:#fde3e5; --qc-accent:#924799; --qc-bg:#f1e9f3;
+    --header-grad-from:var(--brand-dark); --header-grad-to:var(--brand-pure);
+  }
+  :root[data-brand="amerihealth"] {
+    --brand:#012169; --brand-pure:#012169; --brand-dark:#00164a; --brand-light:#e6ebf3;
+    --brand-accent:#008eaa;
+    --success:#2e7d52; --success-bg:#e0f0e8; --warning:#c2691a; --warning-text:#8a4a12;
+    --warning-bg:#fbe9d8; --error:#c1272d; --error-bg:#fbe3e4; --qc-accent:#af1685; --qc-bg:#f7e9f3;
+    --header-grad-from:var(--brand-dark); --header-grad-to:#0a3a8c;
+  }
+  :root {
+    --n-text:#181818; --n-text-muted:#747474; --n-border-light:#ecebea; --n-surface-alt:#fafaf9;
+    --font-heading:'Alright Sans',Arial,Helvetica,sans-serif; --font-text:Arial,Helvetica,sans-serif;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; font-family:var(--font-text); color:var(--n-text);
+    background:linear-gradient(160deg,#f3f7fa 0%,#eef2f6 100%); padding:1.5rem;
+  }
+  .wrap { max-width:1280px; margin:0 auto; }
+
+  /* ---------- App header ---------- */
+  .app-head {
+    display:flex; align-items:center; justify-content:space-between; gap:1rem;
+    background:linear-gradient(120deg,var(--header-grad-from),var(--header-grad-to));
+    color:#fff; border-radius:0.9rem; padding:1.1rem 1.3rem; margin-bottom:1.1rem;
+    box-shadow:0 8px 24px rgba(2,77,118,.18);
+  }
+  .app-head__l { display:flex; align-items:center; gap:.8rem; }
+  .spark {
+    width:2.5rem; height:2.5rem; border-radius:50%; background:rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center; font-size:1.2rem;
+    box-shadow:0 0 0 5px rgba(255,255,255,.08); animation:pulse 2.6s ease-in-out infinite;
+  }
+  .app-head h1 { font-family:var(--font-heading); font-size:1.25rem; margin:0; letter-spacing:.01em; }
+  .app-head p { margin:.15rem 0 0; font-size:.8rem; opacity:.9; }
+  .head-actions { display:flex; align-items:center; gap:.5rem; }
+  .btn {
+    border:1px solid rgba(255,255,255,.55); background:rgba(255,255,255,.16); color:#fff;
+    border-radius:1.5rem; padding:.5rem 1rem; font-weight:700; font-size:.82rem; cursor:pointer;
+    transition:background .15s ease,transform .1s ease; white-space:nowrap;
+  }
+  .btn:hover { background:rgba(255,255,255,.3); }
+  .btn:active { transform:translateY(1px); }
+  .btn-primary { background:#fff; color:var(--brand-dark); border-color:#fff; }
+  .seg { display:inline-flex; border:1px solid rgba(255,255,255,.5); border-radius:1.5rem; overflow:hidden; }
+  .seg button { border:none; background:transparent; color:#fff; padding:.45rem .8rem; font-size:.74rem; font-weight:700; cursor:pointer; }
+  .seg button.on { background:#fff; color:var(--brand-dark); }
+
+  /* ---------- Impact bar ---------- */
+  .impact {
+    display:grid; grid-template-columns:1.4fr 1fr; gap:1rem; margin-bottom:1.1rem;
+  }
+  .card {
+    background:#fff; border:1px solid var(--n-border-light); border-radius:.8rem;
+    box-shadow:0 1px 3px rgba(2,77,118,.08),0 8px 24px rgba(2,77,118,.05);
+  }
+  .impact__meter { padding:1.1rem 1.2rem; }
+  .impact__meter h2 { font-family:var(--font-heading); font-size:1rem; color:var(--brand-dark); margin:0 0 .2rem; }
+  .impact__meter .sub { font-size:.76rem; color:var(--n-text-muted); margin:0 0 .9rem; }
+  .bars { display:flex; flex-direction:column; gap:.7rem; }
+  .barrow { display:grid; grid-template-columns:7.5rem 1fr 4.5rem; align-items:center; gap:.6rem; }
+  .barrow__lbl { font-size:.78rem; font-weight:700; color:var(--n-text); }
+  .barrow__lbl small { display:block; font-weight:400; color:var(--n-text-muted); font-size:.66rem; }
+  .track { height:1.4rem; background:var(--n-surface-alt); border-radius:1rem; overflow:hidden; border:1px solid var(--n-border-light); }
+  .fill { height:100%; border-radius:1rem; width:0; transition:width 1s cubic-bezier(.2,.7,.2,1); display:flex; align-items:center; justify-content:flex-end; padding-right:.5rem; color:#fff; font-size:.7rem; font-weight:700; }
+  .fill-before { background:linear-gradient(90deg,#c2691a,var(--error)); }
+  .fill-after { background:linear-gradient(90deg,var(--brand-accent),var(--success)); }
+  .barrow__val { font-family:var(--font-heading); font-weight:700; text-align:right; font-size:.95rem; }
+
+  .impact__savings { padding:1.1rem 1.2rem; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:var(--brand-light); }
+  .savings__big { font-family:var(--font-heading); font-size:3.4rem; font-weight:800; color:var(--brand-dark); line-height:1; }
+  .savings__cap { font-size:.82rem; color:var(--n-text-muted); margin-top:.2rem; }
+  .savings__pills { display:flex; gap:.4rem; margin-top:.8rem; flex-wrap:wrap; justify-content:center; }
+  .mini { background:#fff; border:1px solid var(--n-border-light); border-radius:1rem; padding:.25rem .6rem; font-size:.7rem; font-weight:700; color:var(--brand-dark); }
+  .mini b { color:var(--success); }
+
+  /* ---------- Lanes ---------- */
+  .lanes { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; align-items:start; }
+  .lane { position:relative; }
+  .lane__head { display:flex; align-items:center; gap:.55rem; padding:.7rem .9rem; border-radius:.8rem .8rem 0 0; color:#fff; }
+  .lane--app .lane__head { background:linear-gradient(120deg,var(--brand-dark),var(--brand-pure)); }
+  .lane--psv .lane__head { background:linear-gradient(120deg,#0a5b6b,var(--brand-accent)); }
+  .lane--qc  .lane__head { background:linear-gradient(120deg,#5d2b63,var(--qc-accent)); }
+  .lane__num { width:1.6rem; height:1.6rem; border-radius:50%; background:rgba(255,255,255,.22); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.85rem; flex:0 0 auto; }
+  .lane__title { font-family:var(--font-heading); font-weight:700; font-size:.95rem; }
+  .lane__title small { display:block; font-weight:400; font-size:.68rem; opacity:.9; }
+  .lane__timer { margin-left:auto; font-family:var(--font-heading); font-weight:800; font-size:1.05rem; background:rgba(255,255,255,.16); border-radius:1rem; padding:.1rem .55rem; }
+  .lane__body { border:1px solid var(--n-border-light); border-top:none; border-radius:0 0 .8rem .8rem; background:#fff; padding:.85rem; min-height:18rem; }
+
+  /* arrows between lanes */
+  .flowarrow { position:absolute; top:1.4rem; right:-0.95rem; z-index:3; width:1.8rem; height:1.8rem; border-radius:50%; background:#fff; border:2px solid var(--brand-accent); color:var(--brand); display:flex; align-items:center; justify-content:center; font-weight:800; box-shadow:0 2px 6px rgba(0,0,0,.12); opacity:.25; transition:opacity .4s ease, transform .4s ease; }
+  .flowarrow.on { opacity:1; transform:scale(1.12); }
+
+  /* provider summary */
+  .psum { display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.7rem; border:1px solid var(--n-border-light); border-radius:.6rem; background:var(--brand-light); margin-bottom:.7rem; }
+  .psum__id { display:flex; align-items:center; gap:.55rem; min-width:0; }
+  .avatar { width:2.3rem; height:2.3rem; border-radius:50%; background:linear-gradient(135deg,var(--brand-pure),var(--brand-dark)); color:#fff; font-weight:700; font-size:.8rem; display:flex; align-items:center; justify-content:center; flex:0 0 auto; }
+  .psum__name { display:flex; flex-direction:column; min-width:0; }
+  .psum__prov { font-family:var(--font-heading); font-weight:700; color:var(--brand-dark); font-size:.9rem; }
+  .psum__npi { font-size:.68rem; color:var(--n-text-muted); }
+  .ring { width:3.2rem; height:3.2rem; border-radius:50%; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; flex:0 0 auto; box-shadow:inset 0 0 0 3px rgba(255,255,255,.35); }
+  .ring b { font-family:var(--font-heading); font-size:.95rem; line-height:1; }
+  .ring span { font-size:.55rem; text-transform:uppercase; letter-spacing:.05em; opacity:.9; }
+  .ring--review { background:var(--warning); }
+
+  .chips { display:grid; grid-template-columns:repeat(3,1fr); gap:.4rem; margin-bottom:.7rem; }
+  .chip { border:1px solid var(--n-border-light); border-radius:.5rem; padding:.4rem .2rem; text-align:center; }
+  .chip b { font-family:var(--font-heading); font-size:1.15rem; display:block; line-height:1; }
+  .chip span { font-size:.6rem; text-transform:uppercase; letter-spacing:.03em; color:var(--n-text-muted); }
+  .chip--review b { color:var(--warning-text); } .chip--missing b { color:var(--error); } .chip--match b { color:var(--success); }
+
+  .runbtn { width:100%; border:none; border-radius:1.4rem; padding:.6rem; font-weight:700; font-size:.85rem; color:#fff; cursor:pointer; background:linear-gradient(120deg,var(--brand),var(--brand-accent)); transition:transform .1s ease, opacity .15s; }
+  .runbtn:hover { opacity:.92; } .runbtn:active { transform:translateY(1px); }
+  .runbtn:disabled { opacity:.5; cursor:not-allowed; }
+
+  .waiting { text-align:center; color:var(--n-text-muted); padding:2.5rem 1rem; font-size:.85rem; }
+  .waiting .lock { font-size:1.6rem; opacity:.5; display:block; margin-bottom:.4rem; }
+
+  .steps { list-style:none; margin:.2rem 0 .6rem; padding:0; }
+  .step { display:flex; align-items:center; gap:.55rem; padding:.32rem .1rem; font-size:.8rem; border-bottom:1px dashed var(--n-border-light); }
+  .step:last-child { border-bottom:none; }
+  .step .dot { width:1.05rem; height:1.05rem; border-radius:50%; border:2px solid var(--n-border-light); border-top-color:var(--brand); animation:spin .7s linear infinite; flex:0 0 auto; }
+  .step.done .dot { border:none; background:var(--success); position:relative; animation:none; }
+  .step.done .dot::after { content:"✓"; color:#fff; font-size:.66rem; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; }
+  .step .det { margin-left:auto; font-size:.66rem; color:var(--n-text-muted); background:var(--n-surface-alt); border-radius:.7rem; padding:.05rem .45rem; }
+
+  .carry { display:flex; align-items:center; gap:.5rem; background:var(--success-bg); color:var(--success); border:1px solid var(--success); border-radius:.55rem; padding:.55rem .7rem; font-size:.8rem; font-weight:700; margin-bottom:.7rem; }
+  .carry .big { font-size:1.05rem; }
+
+  .reviewbox { background:var(--qc-bg); border:1px solid var(--qc-accent); border-radius:.6rem; padding:.6rem; }
+  .reviewbox__h { display:flex; align-items:center; gap:.4rem; font-family:var(--font-heading); font-weight:700; color:var(--qc-accent); font-size:.85rem; margin-bottom:.5rem; }
+  .reviewbox__h .cnt { margin-left:auto; background:var(--qc-accent); color:#fff; border-radius:1rem; font-size:.68rem; padding:.05rem .5rem; }
+
+  .finding { border-left:3px solid var(--warning); border:1px solid var(--n-border-light); border-left:3px solid var(--warning); border-radius:.5rem; background:#fff; margin-bottom:.5rem; padding:.5rem .6rem; }
+  .finding.hard { border-left-color:var(--error); }
+  .finding__top { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; }
+  .finding__field { font-weight:700; font-size:.8rem; color:var(--brand-dark); }
+  .sbadge { padding:.03rem .4rem; border-radius:.7rem; font-size:.64rem; font-weight:700; }
+  .sbadge.partial { background:var(--warning-bg); color:var(--warning-text); }
+  .sbadge.mismatch { background:var(--error-bg); color:var(--error); }
+  .hardtag { background:var(--error); color:#fff; font-size:.58rem; font-weight:700; text-transform:uppercase; border-radius:.7rem; padding:.03rem .4rem; }
+  .diff { display:flex; align-items:center; gap:.45rem; margin:.4rem 0 .15rem; }
+  .side { flex:1 1 0; background:var(--n-surface-alt); border-radius:.4rem; padding:.25rem .4rem; min-width:0; }
+  .side .cap { font-size:.58rem; text-transform:uppercase; color:var(--n-text-muted); display:block; }
+  .side .val { font-size:.78rem; word-break:break-word; }
+  .vs { color:var(--n-text-muted); }
+  .reason { font-size:.7rem; color:var(--n-text-muted); font-style:italic; margin:.25rem 0 0; }
+  .confirm { display:inline-flex; align-items:center; gap:.3rem; margin-top:.45rem; padding:.3rem .65rem; border:1px solid var(--success); border-radius:1.2rem; background:#fff; color:var(--success); font-size:.72rem; font-weight:700; cursor:pointer; }
+  .confirm:hover { background:var(--success-bg); }
+
+  .verified { margin-top:.6rem; border-top:1px solid var(--n-border-light); padding-top:.5rem; }
+  .verified summary { cursor:pointer; font-size:.76rem; font-weight:700; color:var(--n-text-muted); }
+  .vrow { display:flex; align-items:center; gap:.5rem; padding:.3rem .2rem; font-size:.78rem; border-bottom:1px dashed var(--n-border-light); }
+  .vrow .ok { color:var(--success); font-weight:700; }
+  .vrow .meta { margin-left:auto; font-size:.68rem; color:var(--n-text-muted); }
+  .audit { font-size:.66rem; color:var(--n-text-muted); margin-top:.5rem; }
+
+  /* ROI strip */
+  .roi { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-top:1.1rem; }
+  .roi__tile { padding:1rem; text-align:center; }
+  .roi__tile b { font-family:var(--font-heading); font-size:1.8rem; color:var(--brand-dark); display:block; line-height:1; }
+  .roi__tile .lbl { font-size:.72rem; color:var(--n-text-muted); margin-top:.35rem; }
+  .roi__tile .up { color:var(--success); font-weight:700; } .roi__tile .down { color:var(--success); font-weight:700; }
+
+  .foot { font-size:.68rem; color:var(--n-text-muted); margin-top:1rem; line-height:1.5; }
+  .badge-demo { display:inline-block; background:var(--warning-bg); color:var(--warning-text); border-radius:1rem; padding:.1rem .55rem; font-size:.64rem; font-weight:700; text-transform:uppercase; letter-spacing:.03em; }
+
+  @keyframes spin { to { transform:rotate(360deg); } }
+  @keyframes pulse { 0%,100%{ box-shadow:0 0 0 5px rgba(255,255,255,.08);} 50%{ box-shadow:0 0 0 9px rgba(255,255,255,.02);} }
+  @keyframes slide { from{ opacity:0; transform:translateY(6px);} to{ opacity:1; transform:translateY(0);} }
+  .anim { animation:slide .35s ease both; }
+  @media (max-width:1000px){ .lanes,.roi{ grid-template-columns:1fr; } .impact{ grid-template-columns:1fr; } .flowarrow{ display:none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ============ HEADER ============ -->
+  <header class="app-head">
+    <div class="app-head__l">
+      <span class="spark">✦</span>
+      <div>
+        <h1>Cred Agent — Review Once, Carry Forward</h1>
+        <p>Initial Credentialing &amp; Re-credentialing · CAQH ↔ application review · <span class="badge-demo">Illustrative POC</span></p>
+      </div>
+    </div>
+    <div class="head-actions">
+      <div class="seg" title="Brand">
+        <button id="brandIbx" class="on" onclick="setBrand('ibx')">IBX</button>
+        <button id="brandAh" onclick="setBrand('amerihealth')">AmeriHealth</button>
+      </div>
+      <button class="btn btn-primary" id="playBtn" onclick="playDemo()">▶ Play demo</button>
+      <button class="btn" onclick="resetDemo()">↺ Reset</button>
+    </div>
+  </header>
+
+  <!-- ============ IMPACT METER ============ -->
+  <section class="impact">
+    <div class="card impact__meter">
+      <h2>CAQH / cross-document review time per file</h2>
+      <p class="sub">Today the same CAQH-vs-application comparison is done by eye <b>three times</b> — App Review, then PSV, then QC. The Cred Agent does it once; PSV &amp; QC confirm only the exceptions.</p>
+      <div class="bars">
+        <div class="barrow">
+          <div class="barrow__lbl">Today<small>3× full manual review</small></div>
+          <div class="track"><div class="fill fill-before" id="fillBefore">0 min</div></div>
+          <div class="barrow__val" id="valBefore">0</div>
+        </div>
+        <div class="barrow">
+          <div class="barrow__lbl">With Cred Agent<small>1 review + 2× confirm</small></div>
+          <div class="track"><div class="fill fill-after" id="fillAfter">0 min</div></div>
+          <div class="barrow__val" id="valAfter">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="card impact__savings">
+      <div class="savings__big" id="savingsPct">0%</div>
+      <div class="savings__cap">fewer CAQH-review minutes per file</div>
+      <div class="savings__pills">
+        <span class="mini">Reviewer minutes saved/file: <b id="minSaved">0</b></span>
+        <span class="mini">Missed time-windows: <b>0</b></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LANES ============ -->
+  <section class="lanes">
+
+    <!-- ---- App Review ---- -->
+    <div class="lane lane--app">
+      <div class="flowarrow" id="arrow1">→</div>
+      <div class="lane__head">
+        <span class="lane__num">1</span>
+        <div class="lane__title">Application Review<small>Credentialing Intake Specialist</small></div>
+        <span class="lane__timer" id="timerApp">—</span>
+      </div>
+      <div class="lane__body" id="bodyApp">
+        <div class="psum">
+          <div class="psum__id">
+            <span class="avatar">MG</span>
+            <div class="psum__name">
+              <span class="psum__prov">Dr. Maria Gonzalez</span>
+              <span class="psum__npi">NPI 1234567890 · Cardiology</span>
+            </div>
+          </div>
+          <div class="ring ring--review"><b id="appScore">—</b><span>match</span></div>
+        </div>
+        <div id="appPre">
+          <p class="waiting" style="padding:1.2rem .5rem">
+            8 sections to compare against CAQH:<br/>
+            <small>Specialty · Education · License · Work History · DEA · CDS · Malpractice · Board Cert</small>
+          </p>
+          <button class="runbtn" id="runApp" onclick="runApp()">✦ Run Cred Agent</button>
+        </div>
+        <div id="appResult" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- ---- PSV ---- -->
+    <div class="lane lane--psv">
+      <div class="flowarrow" id="arrow2">→</div>
+      <div class="lane__head">
+        <span class="lane__num">2</span>
+        <div class="lane__title">PSV<small>Primary Source Verification</small></div>
+        <span class="lane__timer" id="timerPsv">—</span>
+      </div>
+      <div class="lane__body" id="bodyPsv">
+        <div class="waiting"><span class="lock">🔒</span>Waiting for Application Review.<br/><small>PSV picks up the carried-forward scorecard.</small></div>
+      </div>
+    </div>
+
+    <!-- ---- QC ---- -->
+    <div class="lane lane--qc">
+      <div class="lane__head">
+        <span class="lane__num">3</span>
+        <div class="lane__title">QC<small>Quality Control</small></div>
+        <span class="lane__timer" id="timerQc">—</span>
+      </div>
+      <div class="lane__body" id="bodyQc">
+        <div class="waiting"><span class="lock">🔒</span>Waiting for PSV.<br/><small>QC confirms exceptions, then routes routine / non-routine.</small></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============ ROI ============ -->
+  <section class="roi">
+    <div class="card roi__tile"><b id="roiCycle">—</b><div class="lbl">CAQH-review time / file<br/><span class="down">↓ illustrative</span></div></div>
+    <div class="card roi__tile"><b id="roiThru">—</b><div class="lbl">Files / analyst / day<br/><span class="up">↑ more throughput</span></div></div>
+    <div class="card roi__tile"><b>100%</b><div class="lbl">Verifications with a replayable<br/>NCQA audit trail</div></div>
+    <div class="card roi__tile"><b>0</b><div class="lbl">Missed attestation / 120-day<br/>windows (auto-checked)</div></div>
+  </section>
+
+  <p class="foot">
+    <b>How to read this:</b> the Cred Agent runs the deterministic CAQH match engine (<code>PRM_CAQHMatchScoreService</code>) once at Application Review, scores every field/section, and persists a replayable scorecard to <code>PRM_AgentDecision__c</code>. PSV and QC load that scorecard and <b>confirm only the exceptions</b> (PARTIAL / MISMATCH / hard-fail) instead of re-comparing all 8 sections by eye. The analyst still attests every section — the agent assists, it does not decide.<br/>
+    <b>Numbers are illustrative</b> for the business conversation (to be calibrated in shadow mode). Per-file reviewer-time reduction is expected in the ~30–50% range overall; the CAQH-review portion shown here is larger because it is the most-repeated task. Hard-fail example (expired license) always forces human review regardless of score — preserving NCQA CR 3 controls.
+  </p>
+</div>
+
+<script>
+/* ---------------- demo data ---------------- */
+var BEFORE_TOTAL = 50;          // min/file spent on CAQH/cross-doc review today (App+PSV+QC)
+var AFTER = { app:12, psv:5, qc:4 };
+var AFTER_TOTAL = AFTER.app + AFTER.psv + AFTER.qc; // 21
+var LANE_BEFORE = { app:18, psv:18, qc:14 };
+
+var STEPS = [
+  { label:"Fetch CAQH record (reused IP)", det:"0.4s" },
+  { label:"Align 8 sections to application", det:"DataRaptor" },
+  { label:"Score fields → sections → overall", det:"deterministic" },
+  { label:"Apply hard-fail rules", det:"license/DEA/COI" },
+  { label:"Draft discrepancy notes", det:"grounded" },
+  { label:"Persist audit scorecard", det:"AgentDecision" }
+];
+
+/* exceptions carried forward to PSV & QC */
+var EXCEPTIONS = [
+  { field:"License Expiration (SBRD)", status:"mismatch", hard:true,
+    app:"Exp 2024-11-30", caqh:"Exp 2024-11-30",
+    reason:"CAQH shows the license expired 2024-11-30 — hard fail; must be resolved before approval." },
+  { field:"DEA Number", status:"mismatch", hard:false,
+    app:"BG1234563", caqh:"BG1234569",
+    reason:"Application DEA differs from CAQH in the last digit — confirm the correct registration." },
+  { field:"Education — Institution", status:"partial", hard:false,
+    app:"U. of Penn", caqh:"University of Pennsylvania",
+    reason:"Same institution, different formatting — likely a match; analyst confirms." }
+];
+var VERIFIED = [
+  { label:"Specialty / Taxonomy", meta:"NUCC code match" },
+  { label:"Work History", meta:"no gap > 6 mo" },
+  { label:"CDS", meta:"match" },
+  { label:"Malpractice", meta:"$2M / in window" },
+  { label:"Board Certification", meta:"certified, current" }
+];
+
+/* ---------------- helpers ---------------- */
+function setBrand(b){
+  document.documentElement.setAttribute('data-brand', b);
+  document.getElementById('brandIbx').classList.toggle('on', b==='ibx');
+  document.getElementById('brandAh').classList.toggle('on', b==='amerihealth');
+}
+function animateNumber(el, to, suffix, ms){
+  var start=0, t0=performance.now();
+  function tick(now){ var p=Math.min(1,(now-t0)/ms); el.textContent=Math.round(start+(to-start)*p)+(suffix||''); if(p<1) requestAnimationFrame(tick); }
+  requestAnimationFrame(tick);
+}
+function exceptionHtml(list, accentConfirm){
+  var h='';
+  list.forEach(function(e,i){
+    h+='<div class="finding '+(e.hard?'hard':'')+' anim" style="animation-delay:'+(i*0.06)+'s">'
+      +'<div class="finding__top"><span class="finding__field">'+e.field+'</span>'
+      +'<span class="sbadge '+e.status+'">'+(e.status==='mismatch'?'Mismatch':'Partial')+'</span>'
+      +(e.hard?'<span class="hardtag">Hard fail</span>':'')+'</div>'
+      +'<div class="diff"><span class="side"><span class="cap">Application</span><span class="val">'+e.app+'</span></span>'
+      +'<span class="vs">⇄</span><span class="side"><span class="cap">CAQH</span><span class="val">'+e.caqh+'</span></span></div>'
+      +'<p class="reason">'+e.reason+'</p>'
+      +'<button class="confirm">✓ '+(accentConfirm||'Mark reviewed')+'</button></div>';
+  });
+  return h;
+}
+function verifiedHtml(carryLabel){
+  var h='<div class="carry anim"><span class="big">✓</span><span>'+carryLabel+'</span></div>';
+  h+='<details class="verified" open><summary>5 sections verified at Application Review</summary>';
+  VERIFIED.forEach(function(v){ h+='<div class="vrow"><span class="ok">✓</span>'+v.label+'<span class="meta">'+v.meta+' · carried forward</span></div>'; });
+  h+='</details>';
+  return h;
+}
+
+/* ---------------- lane 1: App Review ---------------- */
+var appDone=false;
+function runApp(){
+  if(appDone) return;
+  document.getElementById('runApp').disabled=true;
+  document.getElementById('appPre').style.display='none';
+  var res=document.getElementById('appResult'); res.style.display='block';
+  // loading steps
+  var h='<ul class="steps" id="appSteps">';
+  STEPS.forEach(function(s,i){ h+='<li class="step" data-i="'+i+'"><span class="dot"></span><span>'+s.label+'</span><span class="det">'+s.det+'</span></li>'; });
+  h+='</ul>';
+  res.innerHTML=h;
+  var i=0;
+  var iv=setInterval(function(){
+    var li=res.querySelector('[data-i="'+i+'"]'); if(li) li.classList.add('done');
+    i++;
+    if(i>=STEPS.length){ clearInterval(iv); showAppResult(); }
+  }, 360);
+}
+function showAppResult(){
+  appDone=true;
+  document.getElementById('appScore').textContent='72%';
+  var res=document.getElementById('appResult');
+  var h='';
+  h+='<div class="chips anim">'
+    +'<div class="chip chip--review"><b>3</b><span>Needs review</span></div>'
+    +'<div class="chip chip--missing"><b>1</b><span>Hard fail</span></div>'
+    +'<div class="chip chip--match"><b>5</b><span>Matched</span></div></div>';
+  h+='<div class="reviewbox"><div class="reviewbox__h">✦ These items need your review <span class="cnt">3</span></div>'
+    + exceptionHtml(EXCEPTIONS,'Mark reviewed') + '</div>';
+  h+='<details class="verified" open><summary>5 sections matched CAQH</summary>';
+  VERIFIED.forEach(function(v){ h+='<div class="vrow"><span class="ok">✓</span>'+v.label+'<span class="meta">'+v.meta+'</span></div>'; });
+  h+='</details>';
+  h+='<p class="audit">Audit record: AD-000142 · scorecard saved for PSV &amp; QC</p>';
+  res.innerHTML=h;
+  document.getElementById('timerApp').textContent=AFTER.app+'m';
+  enableLane('psv');
+  document.getElementById('arrow1').classList.add('on');
+}
+
+/* ---------------- lane 2 & 3: carry-forward confirm ---------------- */
+function buildConfirmLane(bodyId, timerId, mins, headLabel, carryLabel){
+  var body=document.getElementById(bodyId);
+  var h='';
+  h+=verifiedHtml(carryLabel);
+  h+='<div class="reviewbox anim"><div class="reviewbox__h">'+headLabel+' <span class="cnt">3</span></div>'
+    + exceptionHtml(EXCEPTIONS,'Confirm') + '</div>';
+  h+='<p class="audit">Loaded scorecard AD-000142 — only exceptions shown.</p>';
+  body.innerHTML=h;
+  document.getElementById(timerId).textContent=mins+'m';
+}
+var psvReady=false, qcReady=false;
+function enableLane(which){
+  if(which==='psv') psvReady=true;
+  if(which==='qc') qcReady=true;
+}
+function runPsv(){
+  if(!psvReady) return;
+  buildConfirmLane('bodyPsv','timerPsv',AFTER.psv,'Confirm carried-forward exceptions','5 sections verified upstream — carried forward to PSV');
+  enableLane('qc'); document.getElementById('arrow2').classList.add('on');
+}
+function runQc(){
+  if(!qcReady) return;
+  buildConfirmLane('bodyQc','timerQc',AFTER.qc,'Confirm, then route routine / non-routine','5 sections verified upstream — carried forward to QC');
+  tallyImpact();
+}
+
+/* ---------------- impact meter ---------------- */
+function tallyImpact(){
+  var beforeW=100, afterW=Math.round(AFTER_TOTAL/BEFORE_TOTAL*100);
+  document.getElementById('fillBefore').style.width=beforeW+'%';
+  document.getElementById('fillAfter').style.width=afterW+'%';
+  document.getElementById('fillBefore').textContent=BEFORE_TOTAL+' min';
+  document.getElementById('fillAfter').textContent=AFTER_TOTAL+' min';
+  animateNumber(document.getElementById('valBefore'),BEFORE_TOTAL,'',700);
+  animateNumber(document.getElementById('valAfter'),AFTER_TOTAL,'',900);
+  var pct=Math.round((BEFORE_TOTAL-AFTER_TOTAL)/BEFORE_TOTAL*100);
+  animateNumber(document.getElementById('savingsPct'),pct,'%',1000);
+  document.getElementById('minSaved').textContent=(BEFORE_TOTAL-AFTER_TOTAL);
+  document.getElementById('roiCycle').textContent=BEFORE_TOTAL+'→'+AFTER_TOTAL+'m';
+  document.getElementById('roiThru').textContent='+'+Math.round((BEFORE_TOTAL/AFTER_TOTAL-1)*100)+'%';
+}
+
+/* ---------------- orchestrated play ---------------- */
+function playDemo(){
+  resetDemo();
+  document.getElementById('playBtn').disabled=true;
+  runApp();
+  // wait for app steps (~6*360 + buffer) then PSV, then QC
+  var appMs=STEPS.length*360+500;
+  setTimeout(runPsv, appMs+900);
+  setTimeout(function(){ runQc(); document.getElementById('playBtn').disabled=false; }, appMs+2400);
+}
+function resetDemo(){
+  appDone=false; psvReady=false; qcReady=false;
+  document.getElementById('runApp').disabled=false;
+  document.getElementById('appPre').style.display='block';
+  document.getElementById('appResult').style.display='none';
+  document.getElementById('appResult').innerHTML='';
+  document.getElementById('appScore').textContent='—';
+  document.getElementById('timerApp').textContent='—';
+  document.getElementById('timerPsv').textContent='—';
+  document.getElementById('timerQc').textContent='—';
+  document.getElementById('bodyPsv').innerHTML='<div class="waiting"><span class="lock">🔒</span>Waiting for Application Review.<br/><small>PSV picks up the carried-forward scorecard.</small></div>';
+  document.getElementById('bodyQc').innerHTML='<div class="waiting"><span class="lock">🔒</span>Waiting for PSV.<br/><small>QC confirms exceptions, then routes routine / non-routine.</small></div>';
+  ['arrow1','arrow2'].forEach(function(id){ document.getElementById(id).classList.remove('on'); });
+  ['fillBefore','fillAfter'].forEach(function(id){ document.getElementById(id).style.width='0'; document.getElementById(id).textContent=''; });
+  document.getElementById('valBefore').textContent='0'; document.getElementById('valAfter').textContent='0';
+  document.getElementById('savingsPct').textContent='0%'; document.getElementById('minSaved').textContent='0';
+  document.getElementById('roiCycle').textContent='—'; document.getElementById('roiThru').textContent='—';
+}
+</script>
+</body>
+</html>

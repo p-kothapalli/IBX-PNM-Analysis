@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Practitioner Creation — Design Overview</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --ink:#0f172a; --muted:#475569; --line:#e2e8f0; --bg:#f6f8fb; --card:#ffffff;
+    --brand:#1e3a8a; --brand2:#4f46e5; --accent:#0284c7;
+    --ui:#0284c7; --svc:#4f46e5; --data:#047857; --orch:#b45309; --batch:#3730a3; --cfg:#7c3aed;
+    --shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(15,23,42,.06);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;
+    line-height:1.55; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px; margin:0 auto; padding:0 24px 72px}
+
+  /* Header */
+  header.hero{
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);
+    color:#fff; padding:44px 0 40px; box-shadow:var(--shadow);
+  }
+  header.hero .wrap{padding-bottom:0}
+  .eyebrow{font-size:12px; letter-spacing:.18em; text-transform:uppercase; opacity:.85; font-weight:600}
+  header.hero h1{margin:8px 0 6px; font-size:30px; font-weight:700; letter-spacing:-.01em}
+  header.hero p{margin:0; max-width:760px; opacity:.92; font-size:15px}
+  .hero-meta{display:flex; gap:28px; margin-top:22px; flex-wrap:wrap}
+  .hero-meta .kpi{background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.18);
+    border-radius:10px; padding:10px 16px; backdrop-filter:blur(2px)}
+  .hero-meta .kpi b{display:block; font-size:20px; line-height:1.1}
+  .hero-meta .kpi span{font-size:12px; opacity:.85}
+
+  /* Nav */
+  nav.toc{position:sticky; top:0; z-index:20; background:rgba(255,255,255,.9);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--line)}
+  nav.toc .wrap{display:flex; gap:8px; padding:10px 24px; flex-wrap:wrap; align-items:center}
+  nav.toc a{color:var(--muted); text-decoration:none; font-size:13.5px; font-weight:600;
+    padding:6px 12px; border-radius:999px}
+  nav.toc a:hover{color:var(--brand2); background:#eef2ff}
+  nav.toc .spacer{flex:1}
+  .btn-print{border:1px solid var(--line); background:#fff; color:var(--muted);
+    border-radius:999px; padding:6px 14px; font-size:13px; font-weight:600; cursor:pointer}
+  .btn-print:hover{border-color:var(--brand2); color:var(--brand2)}
+
+  /* Sections */
+  section{margin-top:40px}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:6px}
+  .sec-num{font-size:13px; font-weight:700; color:#fff; background:var(--brand2);
+    border-radius:8px; padding:3px 10px; white-space:nowrap}
+  .sec-head h2{margin:0; font-size:22px; font-weight:700; letter-spacing:-.01em}
+  .sec-head .stage-chip{margin-left:auto; display:inline-flex; align-items:center; gap:8px;
+    font-size:13px; font-weight:700; color:#3730a3; background:#eef2ff;
+    border:1px solid #c7d2fe; border-radius:999px; padding:6px 14px; white-space:nowrap}
+  .sec-head .stage-chip b{font-size:16px; line-height:1}
+  .sec-sub{color:var(--muted); font-size:14.5px; margin:2px 0 18px}
+
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px;
+    box-shadow:var(--shadow); padding:26px}
+
+  /* Layered stack */
+  .stack{display:flex; flex-direction:column; gap:12px}
+  .layer{display:grid; grid-template-columns:150px 1fr 150px; align-items:center; gap:18px;
+    border:1px solid var(--line); border-left:6px solid var(--brand2);
+    border-radius:12px; padding:14px 18px; background:#fff; transition:transform .12s ease, box-shadow .12s ease}
+  .layer:hover{transform:translateY(-1px); box-shadow:var(--shadow)}
+  .layer .lname{font-weight:700; color:var(--ink)}
+  .layer .lname small{display:block; font-weight:500; color:var(--muted); font-size:12px; margin-top:2px}
+  .layer .ldesc{color:var(--muted); font-size:14px}
+  .layer .ldesc code{background:#f1f5f9; border-radius:5px; padding:1px 6px; font-size:12.5px; color:#0f172a}
+  .pill{justify-self:end; font-size:11.5px; font-weight:700; padding:4px 12px; border-radius:999px;
+    white-space:nowrap; text-align:center}
+  .pill.form{background:#fef3c7; color:#92400e}
+  .pill.shared{background:#dcfce7; color:#166534}
+  .layer.l-async{border-left-color:var(--orch); background:linear-gradient(90deg,#fff,#fff8ef)}
+  .layer.l-transport{border-left-color:var(--ui)}
+  .layer.l-batch{border-left-color:var(--batch)}
+  .layer.l-svc{border-left-color:var(--svc)}
+  .layer.l-sel{border-left-color:var(--data)}
+  .layer.l-util{border-left-color:var(--cfg)}
+
+  /* Mermaid host */
+  .diagram{width:100%; overflow-x:auto; text-align:center; padding:6px 0}
+  .mermaid{font-size:15px}
+
+  /* Legend */
+  .legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:16px}
+  .legend .item{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--muted)}
+  .legend .dot{width:14px; height:14px; border-radius:4px; display:inline-block}
+
+  .callout{margin-top:16px; border-left:4px solid var(--accent); background:#f0f9ff;
+    padding:12px 16px; border-radius:0 10px 10px 0; color:#0c4a6e; font-size:13.5px}
+
+  footer{margin-top:56px; padding-top:20px; border-top:1px solid var(--line);
+    color:var(--muted); font-size:12.5px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
+
+  @media (max-width:720px){
+    .layer{grid-template-columns:1fr; gap:8px}
+    .pill{justify-self:start}
+    .hero-meta{gap:12px}
+  }
+  @media print{
+    nav.toc,.btn-print{display:none}
+    body{background:#fff}
+    .card,.layer{box-shadow:none}
+    header.hero{background:var(--brand)!important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+    section{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">IBC High-Volume Onboarding · Solution Design</div>
+    <h1>Practitioner Creation — Architecture Overview</h1>
+    <p>A reusable, metadata-driven asynchronous engine that onboards large practitioner rosters reliably — bulk-first, idempotent, and resumable — while the existing intake experience continues to run.</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#hld">Layered Design</a>
+    <a href="#arch">High-Level Architecture</a>
+    <a href="#flow">Process Flow</a>
+    <span class="spacer"></span>
+    <button class="btn-print" onclick="window.print()">Print / Save as PDF</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- 2.1 LAYERED DESIGN -->
+  <section id="hld">
+    <div class="sec-head">
+      <span class="sec-num">2.1</span>
+      <h2>Layered Design (HLD)</h2>
+    </div>
+    <p class="sec-sub">Clear separation of concerns. Only the top two layers are built per intake form; everything below is shared platform that new forms reuse as-is.</p>
+
+    <div class="card">
+      <div class="stack">
+
+        <div class="layer l-transport">
+          <div class="lname">L0 · Transport<small>Entry &amp; validation</small></div>
+          <div class="ldesc"><b>LWC (JSON/CSV upload) → Apex controller</b> — validate synchronously → <code>PRM_CaseService</code> creates Case Managers → insert <code>PRM_AsyncJob__c</code> → call <code>start(jobId)</code> → return. <em>Legacy OmniScript/IP coexists.</em></div>
+          <span class="pill form">Per form</span>
+        </div>
+
+        <div class="layer l-batch">
+          <div class="lname">L1 · Batch classes<small>Orchestration</small></div>
+          <div class="ldesc">Four concrete <code>Database.Batchable</code> classes; each wraps its domain service(s) and runs as one stage of the chain.</div>
+          <span class="pill form">Per form</span>
+        </div>
+
+        <div class="layer l-svc">
+          <div class="lname">L2 · Domain services<small>PRM_*Service</small></div>
+          <div class="ldesc">Build records + <b>one bulk DML per object type</b>; SOQL-free; carry state via the <code>params</code> / response map.</div>
+          <span class="pill shared">Shared</span>
+        </div>
+
+        <div class="layer l-sel">
+          <div class="lname">L3 · Selectors<small>PRM_*Selector</small></div>
+          <div class="ldesc">All SOQL — bulk-safe, typed, zero DML.</div>
+          <span class="pill shared">Shared</span>
+        </div>
+
+        <div class="layer l-util">
+          <div class="lname">L4 · Utilities<small>Cross-cutting helpers</small></div>
+          <div class="ldesc"><code>PRM_FormSubUtility</code> (<code>NameNormalize</code>, <code>recordTypeId</code>, <code>computeHcfExternalId</code>, <code>cmaFieldSets</code>) + abstract <code>PRM_ServiceBase</code>.</div>
+          <span class="pill shared">Shared</span>
+        </div>
+
+        <div class="layer l-async">
+          <div class="lname">Async engine<small>Generic control plane</small></div>
+          <div class="ldesc"><code>PRM_AsyncJob__c</code> → <code>PRM_AsyncOrchestrator.start(jobId)</code> → <code>PRM_AsyncJobRecords__c</code> (per practitioner) + <code>PRM_AsyncJobDetails__c</code> (per stage) → invokes the named batch classes (sequenced, halt-on-failure); dead-letter queue, notifications &amp; cleanup.</div>
+          <span class="pill shared">Shared</span>
+        </div>
+
+      </div>
+      <div class="callout"><b>Why it matters:</b> a new onboarding form contributes only a payload/validator and its batch classes — the services, selectors, utilities and async engine are reused, keeping delivery fast and behavior consistent.</div>
+    </div>
+  </section>
+
+  <!-- 2.2 HIGH-LEVEL ARCHITECTURE -->
+  <section id="arch">
+    <div class="sec-head">
+      <span class="sec-num">2.2</span>
+      <h2>High-Level Architecture</h2>
+    </div>
+    <p class="sec-sub">How a submission moves from the browser to durable records — synchronous intake, then an asynchronous, metadata-driven pipeline built on reusable layers.</p>
+
+    <div class="card">
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart TB
+    LWC["LWC — JSON/CSV upload"]:::ui --> CTRL["Apex Controller<br/>validate · PRM_CaseService (sync) · insert job"]:::svc
+    CTRL --> CM[("IndividualApplication<br/>= Case Manager · per practitioner")]:::data
+    CTRL --> JOB[("PRM_AsyncJob__c + JSON file")]:::data
+    JOB --> REC[("PRM_AsyncJobRecords__c<br/>per practitioner")]:::data
+    CTRL -->|"start(jobId) · post-commit"| AORC["PRM_AsyncOrchestrator"]:::orch
+    CFG[/"PRM_AsyncJobConfig__mdt"/]:::cfg -.->|defines stages| AORC
+    AORC --> DET[("PRM_AsyncJobDetails__c<br/>per batch step")]:::data
+    AORC --> BATCH["Named batch classes<br/>PractitionerBatch … Level4Batch"]:::batch
+    subgraph Reusable["Reusable layers — shared across forms"]
+      BATCH --> SVC["Domain Services · PRM_*Service"]:::svc
+      SVC --> SEL["Selectors · PRM_*Selector"]:::svc
+      SVC --> CTX["params / response Map"]:::data
+    end
+    AORC --> DLQ[("PRM_FailedRecordStaging__c")]:::data
+    SVC --> DATA[("Target objects · e.g. HealthcareFacilityNetwork")]:::data
+    classDef ui fill:#0284c7,color:#fff,stroke:#0369a1;
+    classDef svc fill:#4f46e5,color:#fff,stroke:#3730a3;
+    classDef orch fill:#b45309,color:#fff,stroke:#92400e;
+    classDef data fill:#047857,color:#fff,stroke:#065f46;
+    classDef cfg fill:#7c3aed,color:#fff,stroke:#5b21b6;
+    classDef batch fill:#3730a3,color:#fff,stroke:#312e81;
+        </pre>
+      </div>
+      <div class="legend">
+        <div class="item"><span class="dot" style="background:var(--ui)"></span> User interface</div>
+        <div class="item"><span class="dot" style="background:var(--svc)"></span> Service / controller</div>
+        <div class="item"><span class="dot" style="background:var(--orch)"></span> Orchestrator</div>
+        <div class="item"><span class="dot" style="background:var(--batch)"></span> Batch classes</div>
+        <div class="item"><span class="dot" style="background:var(--data)"></span> Data / objects</div>
+        <div class="item"><span class="dot" style="background:var(--cfg)"></span> Configuration (metadata)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS FLOW -->
+  <section id="flow">
+    <div class="sec-head">
+      <span class="sec-num">Flow</span>
+      <h2>Practitioner Creation Process Flow (high-level)</h2>
+      <span class="stage-chip"><b>4</b> asynchronous batch stages</span>
+    </div>
+    <p class="sec-sub">End-to-end at a glance — synchronous intake on the left, then the metadata-driven asynchronous pipeline, with the key services executed inside each batch stage.</p>
+
+    <div class="card">
+      <div class="diagram">
+        <pre class="mermaid">
+flowchart LR
+    subgraph INTAKE["① INTAKE — synchronous"]
+      direction TB
+      UPCSV["LWC upload<br/><b>CSV</b>"]:::ui
+      X(["CSV → JSON<br/>transformation"]):::svc
+      CANON[("Canonical JSON<br/>payload")]:::data
+      CS["<b>PRM_CaseService</b> · E1<br/>Account · Case · Case Manager"]:::svc
+      UPCSV ==> X ==> CANON ==> CS
+    end
+
+    ORCH{{"<b>PRM_AsyncOrchestrator</b><br/>start(jobId) · sequences stages<br/>halt-on-failure"}}:::orch
+
+    subgraph PIPE["② ASYNCHRONOUS PIPELINE — 4 batch stages"]
+      direction TB
+      B1["<b>Stage 1 · Practitioner</b><br/>E2 Practitioner · E5 License · E6 Education<br/>E7 Board Cert · E8 Info Code · E11 Language<br/><i>E19 CMA · E16 CDM</i>"]:::batch
+      B2["<b>Stage 2 · Location &amp; Group</b><br/>E3 Group · E13 Facility (E12 NPI)<br/>E8 Info Code · <i>E19 · E16</i>"]:::batch
+      B3["<b>Stage 3 · Affiliations &amp; Features</b><br/>E14 Practitioner–Facility<br/>E15 Provider Feature · <i>E19 · E16</i>"]:::batch
+      B4["<b>Stage 4 · Level-4 Network</b><br/>E18 Network &amp; Taxonomy"]:::batch
+      B1 ==> B2 ==> B3 ==> B4
+    end
+
+    DONE(["✓ Completed<br/>notify"]):::done
+
+    CS ==> ORCH ==> B1
+    B4 ==> DONE
+
+    classDef ui fill:#0284c7,color:#fff,stroke:#0369a1,stroke-width:1px;
+    classDef data fill:#047857,color:#fff,stroke:#065f46,stroke-width:1px;
+    classDef svc fill:#4f46e5,color:#fff,stroke:#3730a3,stroke-width:1px;
+    classDef orch fill:#b45309,color:#fff,stroke:#92400e,stroke-width:1px;
+    classDef batch fill:#3730a3,color:#fff,stroke:#312e81,stroke-width:1px;
+    classDef done fill:#166534,color:#fff,stroke:#14532d,stroke-width:1px;
+    style INTAKE fill:#f0f9ff,stroke:#bae6fd,color:#0c4a6e,rx:14,ry:14;
+    style PIPE fill:#eef2ff,stroke:#c7d2fe,color:#3730a3,rx:14,ry:14;
+        </pre>
+      </div>
+      <div class="callout"><b>Reliability by design:</b> stages run in a fixed, metadata-defined sequence and halt on the first failure — failed work is captured for retry so a submission is never left partially processed without a trace.</div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Practitioner Creation — Architecture Overview · IBC High-Volume Onboarding</span>
+    <span>Prepared for design review</span>
+  </footer>
+
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    securityLevel: 'loose',
+    theme: 'base',
+    flowchart: { htmlLabels: true, curve: 'basis', nodeSpacing: 45, rankSpacing: 55 },
+    themeVariables: {
+      fontFamily: '"Segoe UI",-apple-system,Roboto,Helvetica,Arial,sans-serif',
+      fontSize: '15px',
+      lineColor: '#94a3b8'
+    }
+  });
+</script>
+</body>
+</html>

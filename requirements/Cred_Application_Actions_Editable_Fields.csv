@@ -1,0 +1,104 @@
+﻿Salesforce Object,Field Label (UI),Field API Name,Cred Application Action,Screen / Tab,Create,Update,Notes
+IndividualApplication,Form Type,PRM_FormType__c,Update Practitioner & Provider Information,Practitioner Information,No,Yes,IBC / AmeriHealth - CAQH / AmeriHealth - Universal
+IndividualApplication,FHNatic Case Number,PRM_FHNaticCaseNumber__c,Update Practitioner & Provider Information,Practitioner Information,No,Yes,
+IndividualApplication,Corporate Receipt Date,PRM_CorporateReceiptDate__c,Update Practitioner & Provider Information,Practitioner Information,No,Yes,
+IndividualApplication,Form Completed By,PRM_FormCompletedBy__c,Update / Edit Contact Information,Primary Contact,No,Yes,Captured on the primary contact section
+IndividualApplication,Primary Contact,PRM_PrimaryContact__c,Update / Edit Contact Information,Primary Contact,Yes,Yes,Lookup to the primary Credentialing Contact Account
+IndividualApplication,Secondary Contact,PRM_SecondaryContact__c,Update / Edit Contact Information,Secondary Contact,Yes,Yes,Set when secondary = Yes; cleared when secondary = No
+Account (Practitioner),First Name,FirstName,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Person Account
+Account (Practitioner),Middle Name,MiddleName,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Person Account
+Account (Practitioner),Last Name,LastName,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Person Account
+Account (Practitioner),Suffix,Suffix,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Person Account
+Account (Practitioner),Email,PersonEmail,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Person Account
+Account (Practitioner),Date of Birth,PersonBirthdate,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Person Account
+Account (Practitioner),Gender,PersonGenderIdentity,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Male / Female / Unknown / Prefer not to share
+Account (Practitioner),Practitioner Role,PRM_ProviderRole__c,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Specialist / PCP / Dual
+Account (Credentialing Contact),First Name,FirstName,Update / Edit Contact Information,Primary / Secondary Contact,Yes,Yes,Record type PRM_CredentialingContact; can pick existing or create new
+Account (Credentialing Contact),Last Name,LastName,Update / Edit Contact Information,Primary / Secondary Contact,Yes,Yes,
+Account (Credentialing Contact),Contact Person Role,PRM_ContactPersonRole__c,Update / Edit Contact Information,Primary / Secondary Contact,Yes,Yes,Physician / Office Manager / Office Staff / Administrator / Credentialing Coordinator / Other
+Account (Credentialing Contact),Contact Phone #,Phone,Update / Edit Contact Information,Primary / Secondary Contact,Yes,Yes,Formatted as (XXX) XXX-XXXX
+Account (Credentialing Contact),Contact Email,PersonEmail,Update / Edit Contact Information,Primary / Secondary Contact,Yes,Yes,
+Account (Credentialing Contact),Company Website Link,Website,Update / Edit Contact Information,Primary / Secondary Contact,Yes,Yes,
+Account (Group),Group Name,Name,Update / Edit Address Details,Add New Location — Group,Yes,No,"New group only; existing groups are selected, not renamed here"
+Account (Hospital / Vendor),Hospital,Id (lookup),Manage Taxonomy & Roles,Manage Admitting Privileges,Yes,Yes,Lookup to a Vendor (hospital) Account; stored as HealthcarePractitionerFacility.AccountId
+HealthcareProviderNPI,Individual NPI,Npi,Update Practitioner & Provider Information,Practitioner Information,No,Yes,Also written to Name; validated via NPI-1 IP
+HealthcareProviderNPI,Group NPI,Npi,Update / Edit Address Details,Add New Location — Group,Yes,No,Looked up / created for the group Account
+HealthcareProviderNPI,Primary Office NPI / Additional Address NPI,Npi,Update / Edit Address Details,Add New Location — Office,Yes,No,Per-location NPI
+Identifier,CAQH ID,IdValue,Update Practitioner & Provider Information,Practitioner Information,Yes,Yes,Blanking the field deletes the Identifier row (cannot store null IdValue)
+Identifier,Group Tax ID,IdValue,Update / Edit Address Details,Add New Location — Group,Yes,No,TIN identifier on the group Account
+ContactProfile,Hispanic/Latino identity,PRM_HispanicLatino__c,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Hispanic/Latino / Non-Hispanic/Non-Latino / Unknown; Prefer not to share clears it
+ContactProfile,Share Hispanic/Latino in directory,PRM_HispanicLatinoIsDirectoryPrint__c,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Yes / No
+ContactProfile,Hispanic origin,PRM_HispanicOrigin__c,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Multi-select; max 5; Unknown is mutually exclusive; only when Hispanic/Latino
+ContactProfile,Share Hispanic origin in directory,PRM_HispanicOriginIsDirectoryPrint__c,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Yes / No
+ContactProfile,Racial identity,Race,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Multi-select; max 5; Unknown is mutually exclusive
+ContactProfile,Share race in directory,PRM_RaceIsDirectoryPrint__c,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Yes / No
+ContactProfile,Cultural identity,PRM_Ethnicity__c,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Multi-select; max 5; Unknown is mutually exclusive
+ContactProfile,Share ethnicity in directory,PRM_EthnicityIsDirectoryPrint__c,Update Practitioner & Provider Information,Provider Information,Yes,Yes,Yes / No
+ContactProfile,Personal Pronouns,PRM_PersonalPronoun__c,Update Practitioner & Provider Information,Personal Pronouns,Yes,Yes,Multi-select; max 3
+ContactProfile,Pronoun not listed (free text),PRM_PersonalPronounNotListed__c,Update Practitioner & Provider Information,Personal Pronouns,Yes,Yes,Required when 'My pronoun is not listed' is selected; max 255 chars
+ContactProfile,Share pronouns in directory,PRM_PersonalPronounDirectoryPrint__c,Update Practitioner & Provider Information,Personal Pronouns,Yes,Yes,Yes / No
+PersonLanguage,Language,Language,Update Practitioner & Provider Information,Languages Spoken Fluently,Yes,Yes,Multi-select; Prefer not to share errors out existing rows
+PersonLanguage,Share in public Provider Directory,PRM_ShareInPublicDirectory__c,Update Practitioner & Provider Information,Languages Spoken Fluently,Yes,Yes,Yes / No; required when any language is selected
+PRM_ProviderFeature__c,Affirming Care Categories,PRM_AffirmingCareCategory__c,Update Practitioner & Provider Information,Affirming Care Categories,Yes,Yes,Multi-select; Prefer not to share errors out the row
+PRM_ProviderFeature__c,Share affirming care in directory,PRM_IsDirectoryPrint__c,Update Practitioner & Provider Information,Affirming Care Categories,Yes,Yes,Yes / No
+PRM_ProviderFeature__c,Accessibility / Assistive Aids,PRM_AssistiveAids__c,Update / Edit Address Details,Add New Location — Office,Yes,No,Record type PRM_AssistiveAid; displayed in the provider directory
+Address,Address Line 1,PRM_AddressLine1__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,Primary / Mailing / Billing / Additional offices
+Address,Address Line 2,PRM_AddressLine2__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,
+Address,City,PRM_City__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,
+Address,State,PRM_State__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,Abbreviation (e.g. PA)
+Address,State (full name),PRM_StateCounty__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,Full state name used with county picklist
+Address,County,PRM_County__c,Update / Edit Address Details,Brand New Locations; Add New Location,Yes,Yes,Stored with County suffix
+Address,County (UI),PRM_CountyForUserInterface__c,Update / Edit Address Details,Brand New Locations; Add New Location,Yes,Yes,Value shown in the county combobox
+Address,Zip,PRM_Zip__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,Also written to postalCode
+Address,Zip+4,PRM_Zip4__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,
+Address,Phone,PRM_Phone__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,
+Address,Phone Extension,PRM_PhoneExtension__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,
+Address,Fax,PRM_Fax__c,Update / Edit Address Details,Brand New Locations; Billing & Mailing; Add New Location,Yes,Yes,
+Address,Address Type,PRM_AddressType__c,Update / Edit Address Details,Add New Location; Billing & Mailing,Yes,No,Primary / Mailing / Billing; also AddressType
+HealthcareFacility,Practice Name,PRM_PracticeName__c,Update / Edit Address Details,Brand New Locations; Add New Location,Yes,Yes,Group or practice name on the location
+HealthcareFacility,Primary Practice Location,PRM_Primary__c,Update / Edit Address Details,Brand New Locations; Add New Location,Yes,Yes,Is this the practitioner's primary practice location?
+HealthcarePractitionerFacility,Hospital (Admitting Privilege),AccountId,Manage Taxonomy & Roles,Manage Admitting Privileges,Yes,Yes,Vendor/hospital Account; record type Admitting Privileges
+HealthcarePractitionerFacility,Role (Admitting Privilege),PRM_PractitionerRole__c,Manage Taxonomy & Roles,Manage Admitting Privileges,Yes,Yes,
+HealthcareProviderTaxonomy,Taxonomy,TaxonomyId,Manage Taxonomy & Roles,Manage Taxonomies,Yes,Yes,Lookup to CareTaxonomy; also used when adding a location's specialties
+HealthcareProviderTaxonomy,Provider Type,PRM_ProviderType__c,Manage Taxonomy & Roles,Manage Taxonomies,Yes,Yes,
+HealthcareProviderTaxonomy,Is Primary Taxonomy,IsPrimaryTaxonomy,Manage Taxonomy & Roles,Manage Taxonomies,Yes,Yes,Only one primary per practitioner
+HealthcareProviderTaxonomy,Is Active,IsActive,Manage Taxonomy & Roles,Manage Taxonomies,Yes,Yes,Remove sets IsActive = false and PRM_IsErrorRecord__c = true
+HealthcareProviderTaxonomy,Primary / Additional Specialties (Add Location),TaxonomyId,Update / Edit Address Details,Add New Location — Office,Yes,No,Same object; specialties selected on the new office
+HealthcareFacilityNetwork,Practice Location,HealthcareFacilityId,Manage Taxonomy & Roles,Manage Roles,Yes,No,Editable on create only; read-only on edit
+HealthcareFacilityNetwork,Taxonomy,PRM_Taxonomy__c,Manage Taxonomy & Roles,Manage Roles,Yes,Yes,Lookup to CareTaxonomy
+HealthcareFacilityNetwork,Practitioner Role,PRM_PractitionerRole__c,Manage Taxonomy & Roles,Manage Roles,Yes,Yes,
+HealthcareFacilityNetwork,Status,PanelStatus,Manage Taxonomy & Roles,Manage Roles,Yes,Yes,
+HealthcareFacilityNetwork,Primary Taxonomy,PRM_Primary__c,Manage Taxonomy & Roles,Manage Roles,Yes,Yes,
+HealthcareFacilityNetwork,Role Effective From,PRM_RoleEffectiveFrom__c,Manage Taxonomy & Roles,Manage Roles,Yes,Yes,
+HealthcareFacilityNetwork,Role Effective To,PRM_RoleEffectiveTo__c,Manage Taxonomy & Roles,Manage Roles,Yes,Yes,
+BusinessLicense,License State,PRM_LicenseState__c,Credentials Management,Business License,Yes,Yes,Required; duplicate key = State + Number + Class
+BusinessLicense,License Number,LicenseNumber,Credentials Management,Business License,Yes,Yes,Also written to Name
+BusinessLicense,Effective Date,PRM_ProviderLicenseEffectiveDate__c,Credentials Management,Business License,Yes,Yes,Must be prior to Expiration Date
+BusinessLicense,Expiration Date,PRM_ProviderLicenseExpirationDate__c,Credentials Management,Business License,Yes,Yes,
+BusinessLicense,License Class,LicenseClass,Credentials Management,Business License,Yes,Yes,Required
+BusinessLicense,Status,Status,Credentials Management,Business License,Yes,Yes,Required
+BusinessLicense,Verified On,VerifiedDate,Credentials Management,Business License,Yes,Yes,Required
+PersonEducation,Degree,PRM_Degree__c,Credentials Management,Person Education,Yes,Yes,Lookup; degree name also written to Name
+PersonEducation,Institution,PRM_Institution__c,Credentials Management,Person Education,Yes,Yes,Lookup to PRM_Institution__c; can create a new institution inline
+PersonEducation,Education Level,EducationLevel,Credentials Management,Person Education,Yes,Yes,
+PersonEducation,Start Date,PRM_StartDate__c,Credentials Management,Person Education,Yes,Yes,
+PersonEducation,End Date,PRM_EndDate__c,Credentials Management,Person Education,Yes,Yes,
+PersonEducation,Graduation Date,PRM_GraduationDate__c,Credentials Management,Person Education,Yes,Yes,
+PersonEducation,Completed,PRM_Completed__c,Credentials Management,Person Education,Yes,Yes,
+PersonEducation,Status,PRM_Status__c,Credentials Management,Person Education,Yes,Yes,
+PersonEducation,Verified Date,VerifiedDate,Credentials Management,Person Education,Yes,Yes,
+PersonEducation,Primary,PRM_Primary__c,Credentials Management,Person Education,Yes,Yes,Only one primary; setting this clears others
+PRM_Institution__c,Institution Name,Name,Credentials Management,Person Education — New Institution,Yes,No,Created inline when the institution is not found
+PRM_Institution__c,School Code,PRM_SchoolCode__c,Credentials Management,Person Education — New Institution,Yes,No,
+PRM_Institution__c,City,PRM_City__c,Credentials Management,Person Education — New Institution,Yes,No,
+PRM_Institution__c,State,PRM_State__c,Credentials Management,Person Education — New Institution,Yes,No,
+PRM_Institution__c,Country,PRM_Country__c,Credentials Management,Person Education — New Institution,Yes,No,
+BoardCertification,Certification Name,Name,Credentials Management,Board Certification,Yes,Yes,
+BoardCertification,Board Name,BoardName,Credentials Management,Board Certification,Yes,Yes,
+BoardCertification,Certification Type,CertificationType,Credentials Management,Board Certification,Yes,Yes,
+BoardCertification,Certification Date,CurrentCertificationDate,Credentials Management,Board Certification,Yes,Yes,
+BoardCertification,Effective From,PRM_EffectiveFrom__c,Credentials Management,Board Certification,Yes,Yes,
+BoardCertification,Expiration Date,ExpirationDate,Credentials Management,Board Certification,Yes,Yes,
+BoardCertification,Board Original,PRM_BoardOriginal__c,Credentials Management,Board Certification,Yes,Yes,
+BoardCertification,Board Re-Cert,PRM_BoardReCert__c,Credentials Management,Board Certification,Yes,Yes,
+ContentNote,Reason for this change,Title / Content,All five actions,Every save after first edit,Yes,No,Required note attached to the IndividualApplication (Case Manager); not a domain-object field

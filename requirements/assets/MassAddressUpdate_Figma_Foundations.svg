@@ -1,0 +1,301 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1700" viewBox="0 0 1440 1700" font-family="Arial, Helvetica, sans-serif">
+  <style>
+    .h1{font-size:26px;font-weight:700;fill:#181818}
+    .h2{font-size:16px;font-weight:700;fill:#024D76}
+    .lbl{font-size:12px;fill:#747474}
+    .lbl-b{font-size:12px;font-weight:700;fill:#181818}
+    .mono{font-size:11px;fill:#444}
+    .cap{font-size:11px;fill:#747474}
+    .tok{font-size:11px;font-weight:700;fill:#024D76}
+    .white{fill:#fff}
+    .sub{font-size:13px;fill:#444}
+  </style>
+
+  <rect width="1440" height="1700" fill="#f3f3f3"/>
+
+  <!-- ===== Title band (IBX gradient) ===== -->
+  <defs>
+    <linearGradient id="ibx" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#024D76"/><stop offset="1" stop-color="#008CCC"/>
+    </linearGradient>
+    <linearGradient id="prog" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#007DB6"/><stop offset="1" stop-color="#00AEC7"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1440" height="64" fill="url(#ibx)"/>
+  <text x="32" y="32" class="white" font-size="18" font-weight="700">Mass Address Update — Figma Foundations</text>
+  <text x="32" y="50" fill="#d4e7fb" font-size="12">SLDS spacing tokens · 4px grid · Compact + Comfortable density · Responsive breakpoints · IBX / AmeriHealth color modes</text>
+
+  <!-- ============================================================= -->
+  <!-- 1. SPACING SCALE on the 4px grid -->
+  <!-- ============================================================= -->
+  <text x="32" y="104" class="h1">1 · SLDS Spacing Scale  (4px grid)</text>
+  <text x="32" y="124" class="sub">Bind each as a Figma Number Variable in collection spacing/*. Bars drawn to scale; every value is a 4-multiple (2px hairline is the only ½).</text>
+
+  <!-- column headers -->
+  <text x="40" y="150" class="lbl-b">token</text>
+  <text x="220" y="150" class="lbl-b">px</text>
+  <text x="270" y="150" class="lbl-b">scaled bar</text>
+
+  <!-- rows -->
+  <g>
+    <!-- 3x-small 2 -->
+    <text x="40" y="172" class="tok">spacing-3x-small</text><text x="222" y="172" class="mono">2</text>
+    <rect x="270" y="163" width="2" height="12" fill="#024D76"/>
+    <!-- 2x-small 4 -->
+    <text x="40" y="194" class="tok">spacing-2x-small</text><text x="222" y="194" class="mono">4</text>
+    <rect x="270" y="185" width="4" height="12" fill="#0a6aa0"/>
+    <!-- x-small 8 -->
+    <text x="40" y="216" class="tok">spacing-x-small</text><text x="222" y="216" class="mono">8</text>
+    <rect x="270" y="207" width="8" height="12" fill="#0a6aa0"/>
+    <!-- small 12 -->
+    <text x="40" y="238" class="tok">spacing-small</text><text x="222" y="238" class="mono">12</text>
+    <rect x="270" y="229" width="12" height="12" fill="#0a6aa0"/>
+    <!-- medium 16 -->
+    <text x="40" y="260" class="tok">spacing-medium</text><text x="222" y="260" class="mono">16</text>
+    <rect x="270" y="251" width="16" height="12" fill="#007DB6"/>
+    <!-- large 24 -->
+    <text x="40" y="282" class="tok">spacing-large</text><text x="222" y="282" class="mono">24</text>
+    <rect x="270" y="273" width="24" height="12" fill="#007DB6"/>
+    <!-- x-large 32 -->
+    <text x="40" y="304" class="tok">spacing-x-large</text><text x="222" y="304" class="mono">32</text>
+    <rect x="270" y="295" width="32" height="12" fill="#00AEC7"/>
+    <!-- 2x-large 48 -->
+    <text x="40" y="326" class="tok">spacing-2x-large</text><text x="222" y="326" class="mono">48</text>
+    <rect x="270" y="317" width="48" height="12" fill="#00AEC7"/>
+    <!-- 3x-large 64 -->
+    <text x="40" y="348" class="tok">spacing-3x-large</text><text x="222" y="348" class="mono">64</text>
+    <rect x="270" y="339" width="64" height="12" fill="#00AEC7"/>
+  </g>
+
+  <!-- 4px grid swatch -->
+  <text x="470" y="150" class="lbl-b">4px base grid</text>
+  <g transform="translate(470,158)">
+    <rect x="0" y="0" width="160" height="160" fill="#fff" stroke="#ecebea"/>
+    <g stroke="#e6f0f7" stroke-width="1">
+      <line x1="0" y1="40" x2="160" y2="40"/><line x1="0" y1="80" x2="160" y2="80"/><line x1="0" y1="120" x2="160" y2="120"/>
+      <line x1="40" y1="0" x2="40" y2="160"/><line x1="80" y1="0" x2="80" y2="160"/><line x1="120" y1="0" x2="120" y2="160"/>
+    </g>
+    <g stroke="#c3e1fb" stroke-width="1">
+      <line x1="0" y1="16" x2="160" y2="16"/><line x1="0" y1="32" x2="160" y2="32"/>
+      <line x1="16" y1="0" x2="16" y2="160"/><line x1="32" y1="0" x2="32" y2="160"/>
+    </g>
+    <rect x="16" y="16" width="48" height="32" fill="#e6f4fb" stroke="#007DB6"/>
+    <text x="20" y="36" class="mono" fill="#024D76">16×</text>
+  </g>
+  <text x="470" y="338" class="cap">light = 16px gutter · faint = 4px baseline</text>
+
+  <!-- ============================================================= -->
+  <!-- 2. TYPE SCALE -->
+  <!-- ============================================================= -->
+  <text x="700" y="104" class="h1">2 · Type Scale</text>
+  <text x="700" y="124" class="sub">Heading: Alright Sans → Arial. Body: Arial. Line-heights are 4px multiples.</text>
+  <g transform="translate(700,140)">
+    <text x="0" y="20" font-size="30" font-weight="700" fill="#024D76">1,284</text><text x="300" y="20" class="cap">display 30/36 · stat banner</text>
+    <text x="0" y="52" font-size="18" font-weight="700" fill="#181818">Mass Update Billing Address</text><text x="300" y="52" class="cap">font-6 18/28 · h1</text>
+    <text x="0" y="80" font-size="16" font-weight="700" fill="#181818">Identify the Group</text><text x="300" y="80" class="cap">font-5 16/24 · card h2</text>
+    <text x="0" y="106" font-size="14" fill="#181818">500 Corporate Plaza, Suite 1200</text><text x="300" y="106" class="cap">font-4 14/20 · body / input</text>
+    <text x="0" y="130" font-size="13" fill="#444">ALEX WARREN LLC – Bristol</text><text x="300" y="130" class="cap">font-3 13/20 · table cell</text>
+    <text x="0" y="152" font-size="12" font-weight="700" fill="#444">Tax ID (EIN)</text><text x="300" y="152" class="cap">font-2 12/16 · label / badge</text>
+    <text x="0" y="172" font-size="10" fill="#747474">UPDATED &amp; ACTIVE</text><text x="300" y="172" class="cap">font-1 10/16 · micro / stat label</text>
+  </g>
+
+  <!-- ============================================================= -->
+  <!-- 3. COLOR MODES -->
+  <!-- ============================================================= -->
+  <text x="32" y="404" class="h1">3 · Semantic Color Variables  (two modes)</text>
+  <text x="32" y="424" class="sub">Components reference semantic names only. Mode swap re-skins the whole library.</text>
+
+  <text x="40" y="450" class="lbl-b">IBX (default)</text>
+  <g transform="translate(40,458)">
+    <rect x="0"   y="0" width="90" height="44" fill="#007DB6"/><text x="6" y="60" class="cap">brand</text>
+    <rect x="98"  y="0" width="90" height="44" fill="#024D76"/><text x="104" y="60" class="cap">brand-dark</text>
+    <rect x="196" y="0" width="90" height="44" fill="#E6F4FB" stroke="#ecebea"/><text x="202" y="60" class="cap">brand-light</text>
+    <rect x="294" y="0" width="90" height="44" fill="#00AEC7"/><text x="300" y="60" class="cap">accent</text>
+    <rect x="392" y="0" width="90" height="44" fill="#4D8B3F"/><text x="398" y="60" class="cap">success</text>
+    <rect x="490" y="0" width="90" height="44" fill="#F16935"/><text x="496" y="60" class="cap">warning</text>
+    <rect x="588" y="0" width="90" height="44" fill="#EA1D2C"/><text x="594" y="60" class="cap">error</text>
+    <rect x="686" y="0" width="90" height="44" fill="#924799"/><text x="692" y="60" class="cap">qc-accent</text>
+  </g>
+
+  <text x="40" y="552" class="lbl-b">AmeriHealth</text>
+  <g transform="translate(40,560)">
+    <rect x="0"   y="0" width="90" height="44" fill="#012169"/><text x="6" y="60" class="cap">brand</text>
+    <rect x="98"  y="0" width="90" height="44" fill="#00164A"/><text x="104" y="60" class="cap">brand-dark</text>
+    <rect x="196" y="0" width="90" height="44" fill="#E6EBF3" stroke="#ecebea"/><text x="202" y="60" class="cap">brand-light</text>
+    <rect x="294" y="0" width="90" height="44" fill="#008EAA"/><text x="300" y="60" class="cap">accent</text>
+    <rect x="392" y="0" width="90" height="44" fill="#2E7D52"/><text x="398" y="60" class="cap">success</text>
+    <rect x="490" y="0" width="90" height="44" fill="#C2691A"/><text x="496" y="60" class="cap">warning</text>
+    <rect x="588" y="0" width="90" height="44" fill="#C1272D"/><text x="594" y="60" class="cap">error</text>
+    <rect x="686" y="0" width="90" height="44" fill="#AF1685"/><text x="692" y="60" class="cap">qc-accent</text>
+  </g>
+
+  <!-- ============================================================= -->
+  <!-- 4. DENSITY COMPARISON (Field + Table row) -->
+  <!-- ============================================================= -->
+  <text x="32" y="664" class="h1">4 · Density Modes  (Comfortable vs Compact)</text>
+  <text x="32" y="684" class="sub">Compact = drop every spacing token one step + control heights −4px. Table rows use the fixed 44 / 32 pair.</text>
+
+  <!-- Comfortable field -->
+  <text x="40" y="712" class="lbl-b">Field — Comfortable</text>
+  <g transform="translate(40,720)">
+    <text x="0" y="12" class="lbl">Tax ID (EIN)</text>
+    <rect x="0" y="20" width="280" height="32" rx="4" fill="#fff" stroke="#c9c9c9"/>
+    <text x="10" y="40" class="sub">23-2266054</text>
+    <!-- height annotation -->
+    <line x1="292" y1="20" x2="292" y2="52" stroke="#007DB6"/><text x="298" y="40" class="tok">32</text>
+    <text x="0" y="70" class="cap">label↔control gap 4 · inner pad 8/4</text>
+  </g>
+
+  <!-- Compact field -->
+  <text x="360" y="712" class="lbl-b">Field — Compact</text>
+  <g transform="translate(360,720)">
+    <text x="0" y="12" class="lbl">Tax ID (EIN)</text>
+    <rect x="0" y="20" width="280" height="28" rx="4" fill="#fff" stroke="#c9c9c9"/>
+    <text x="10" y="38" class="sub">23-2266054</text>
+    <line x1="292" y1="20" x2="292" y2="48" stroke="#F16935"/><text x="298" y="38" class="tok" fill="#9c3d18">28</text>
+    <text x="0" y="66" class="cap">inner pad 8/2 · row gap small(12)</text>
+  </g>
+
+  <!-- Comfortable table row -->
+  <text x="700" y="712" class="lbl-b">Table row — Comfortable (44)</text>
+  <g transform="translate(700,720)">
+    <rect x="0" y="0" width="660" height="32" fill="#fafaf9" stroke="#c9c9c9"/>
+    <text x="44" y="20" class="lbl-b">Practice Location</text><text x="300" y="20" class="lbl-b">Current → New</text><text x="600" y="20" class="lbl-b">Status</text>
+    <rect x="0" y="32" width="660" height="44" fill="#e6f4fb" stroke="#ecebea"/>
+    <rect x="0" y="32" width="3" height="44" fill="#007DB6"/>
+    <rect x="14" y="48" width="14" height="14" rx="2" fill="#fff" stroke="#007DB6"/>
+    <text x="44" y="58" class="sub">ALEX WARREN LLC</text>
+    <text x="300" y="58" font-size="12" fill="#747474" text-decoration="line-through">88 Mill St</text>
+    <text x="370" y="58" font-size="12" fill="#4D8B3F" font-weight="700">500 Corporate Plaza</text>
+    <rect x="590" y="46" width="58" height="18" rx="9" fill="#E3F1DD"/><text x="598" y="59" font-size="11" fill="#4D8B3F">Active</text>
+    <line x1="672" y1="32" x2="672" y2="76" stroke="#007DB6"/><text x="676" y="58" class="tok">44</text>
+  </g>
+
+  <!-- Compact table row -->
+  <text x="700" y="810" class="lbl-b">Table row — Compact (32)</text>
+  <g transform="translate(700,818)">
+    <rect x="0" y="0" width="660" height="32" fill="#fafaf9" stroke="#c9c9c9"/>
+    <text x="36" y="20" class="lbl-b">Practice Location</text><text x="300" y="20" class="lbl-b">Current → New</text><text x="600" y="20" class="lbl-b">Status</text>
+    <rect x="0" y="32" width="660" height="32" fill="#fff" stroke="#ecebea"/>
+    <rect x="0" y="32" width="3" height="32" fill="#F16935"/>
+    <rect x="12" y="41" width="14" height="14" rx="2" fill="#fff" stroke="#007DB6"/>
+    <text x="36" y="52" font-size="12" fill="#444">ALEX WARREN LLC – Bristol</text>
+    <text x="300" y="52" font-size="11" fill="#747474" text-decoration="line-through">88 Mill St</text>
+    <text x="365" y="52" font-size="11" fill="#4D8B3F" font-weight="700">500 Corporate Plaza</text>
+    <rect x="590" y="42" width="62" height="16" rx="8" fill="#FDE7DC"/><text x="596" y="54" font-size="10" fill="#9c3d18">⚠ Bundle</text>
+    <line x1="672" y1="32" x2="672" y2="64" stroke="#F16935"/><text x="676" y="52" class="tok" fill="#9c3d18">32</text>
+  </g>
+
+  <!-- ============================================================= -->
+  <!-- 5. RESPONSIVE BREAKPOINT FRAMES -->
+  <!-- ============================================================= -->
+  <text x="32" y="924" class="h1">5 · Responsive Breakpoints</text>
+  <text x="32" y="944" class="sub">Lightning/SLDS breakpoints. Draw one frame per width; key behaviors annotated.</text>
+
+  <!-- x-large desktop -->
+  <g transform="translate(40,964)">
+    <rect x="0" y="0" width="560" height="300" fill="#fff" stroke="#c9c9c9"/>
+    <rect x="0" y="0" width="560" height="22" fill="url(#ibx)"/><text x="8" y="15" class="white" font-size="10">x-large 1280+ · 12 col · Comfortable</text>
+    <!-- path -->
+    <rect x="12" y="32" width="536" height="16" fill="#e6f4fb"/><text x="16" y="44" class="cap">path: full labeled · 1·2·3·4·QC</text>
+    <!-- 2-col form -->
+    <rect x="12" y="58" width="258" height="40" fill="#fafaf9" stroke="#ecebea"/><rect x="290" y="58" width="258" height="40" fill="#fafaf9" stroke="#ecebea"/>
+    <text x="16" y="82" class="cap">formgrid 2–3 col</text>
+    <!-- grid + side editor -->
+    <rect x="12" y="108" width="360" height="150" fill="#fafaf9" stroke="#ecebea"/><text x="16" y="124" class="cap">DataTable 7 col (fill)</text>
+    <rect x="380" y="108" width="168" height="150" fill="#eaf4fe" stroke="#c3e1fb"/><text x="386" y="124" class="cap">editor 480 (side)</text>
+    <rect x="12" y="268" width="536" height="22" fill="#fff" stroke="#ecebea"/><text x="16" y="283" class="cap">footer: recap left · buttons right</text>
+  </g>
+
+  <!-- medium tablet -->
+  <g transform="translate(640,964)">
+    <rect x="0" y="0" width="320" height="300" fill="#fff" stroke="#c9c9c9"/>
+    <rect x="0" y="0" width="320" height="22" fill="url(#ibx)"/><text x="8" y="15" class="white" font-size="10">medium 768 · 8 col · Compact</text>
+    <rect x="12" y="32" width="296" height="16" fill="#e6f4fb"/><text x="16" y="44" class="cap">path: full, compact nodes</text>
+    <rect x="12" y="58" width="142" height="36" fill="#fafaf9" stroke="#ecebea"/><rect x="166" y="58" width="142" height="36" fill="#fafaf9" stroke="#ecebea"/>
+    <text x="16" y="80" class="cap">formgrid 2-col</text>
+    <rect x="12" y="104" width="296" height="120" fill="#fafaf9" stroke="#ecebea"/><text x="16" y="120" class="cap">table: hide low-priority cols</text>
+    <rect x="240" y="104" width="68" height="120" fill="#eaf4fe" stroke="#c3e1fb" opacity="0.6"/><text x="244" y="120" class="cap" font-size="9">editor →</text><text x="244" y="132" class="cap" font-size="9">slide-over</text>
+    <rect x="12" y="234" width="296" height="22" fill="#fff" stroke="#ecebea"/><text x="16" y="249" class="cap">footer: buttons right</text>
+  </g>
+
+  <!-- small / x-small phone -->
+  <g transform="translate(1000,964)">
+    <rect x="0" y="0" width="180" height="380" fill="#fff" stroke="#c9c9c9"/>
+    <rect x="0" y="0" width="180" height="22" fill="url(#ibx)"/><text x="6" y="15" class="white" font-size="9">x-small 360 · Compact</text>
+    <rect x="10" y="30" width="160" height="16" fill="#e6f4fb"/><text x="14" y="42" class="cap" font-size="9">Stepper: "2 of 5 · Review"</text>
+    <rect x="10" y="52" width="160" height="30" fill="#fafaf9" stroke="#ecebea"/><text x="14" y="71" class="cap" font-size="9">form 1-col stack</text>
+    <!-- row cards -->
+    <rect x="10" y="90" width="160" height="50" fill="#fff" stroke="#ecebea"/><rect x="10" y="90" width="3" height="50" fill="#F16935"/>
+    <text x="18" y="104" class="cap" font-size="9">☐ ALEX WARREN – Bristol</text>
+    <text x="18" y="116" class="cap" font-size="8" fill="#747474">88 Mill St →</text>
+    <text x="18" y="126" class="cap" font-size="8" fill="#4D8B3F">500 Corporate Plaza</text>
+    <rect x="130" y="96" width="34" height="12" rx="6" fill="#FDE7DC"/><text x="134" y="105" font-size="7" fill="#9c3d18">Bundle</text>
+    <rect x="10" y="146" width="160" height="50" fill="#fff" stroke="#ecebea"/><rect x="10" y="146" width="3" height="50" fill="#4D8B3F"/>
+    <text x="18" y="160" class="cap" font-size="9">☑ ALEX WARREN LLC</text>
+    <text x="18" y="172" class="cap" font-size="8" fill="#747474">10209 Shiloh →</text>
+    <text x="18" y="182" class="cap" font-size="8" fill="#4D8B3F">500 Corporate Plaza</text>
+    <text x="14" y="216" class="cap" font-size="9">DataTable → RowCard list</text>
+    <!-- stacked footer -->
+    <rect x="10" y="300" width="160" height="26" rx="4" fill="#007DB6"/><text x="40" y="317" class="white" font-size="10">Continue →</text>
+    <rect x="10" y="332" width="160" height="24" rx="4" fill="#fff" stroke="#c9c9c9"/><text x="66" y="348" class="cap" font-size="10">Back</text>
+    <text x="10" y="372" class="cap" font-size="9">footer: full-width stack</text>
+  </g>
+
+  <!-- breakpoint legend -->
+  <g transform="translate(40,1300)">
+    <text x="0" y="0" class="lbl-b">Breakpoint tokens</text>
+    <text x="0" y="20" class="mono">x-small 0–479 (360) · small 480–767 · medium 768–1023 · large 1024–1279 (1280) · x-large 1280+ (1440, content max 1340)</text>
+    <text x="0" y="40" class="mono">cols: 4 → 6 → 8 → 12 → 12     density: Compact forced ≤ medium · Comfortable + toggle ≥ large     touch target ≥ 44px ≤ small</text>
+  </g>
+
+  <!-- ============================================================= -->
+  <!-- 6. KEY COMPONENTS strip -->
+  <!-- ============================================================= -->
+  <text x="32" y="1380" class="h1">6 · Key Components  (auto-layout, token-bound)</text>
+
+  <!-- buttons -->
+  <g transform="translate(40,1400)">
+    <text x="0" y="0" class="lbl-b">Buttons</text>
+    <rect x="0" y="12" width="120" height="32" rx="4" fill="#007DB6"/><text x="22" y="33" class="white" font-size="13" font-weight="700">Primary</text>
+    <rect x="132" y="12" width="100" height="32" rx="4" fill="#fff" stroke="#007DB6"/><text x="150" y="33" font-size="13" font-weight="700" fill="#007DB6">Outline</text>
+    <rect x="244" y="12" width="90" height="32" rx="4" fill="#fff" stroke="#c9c9c9"/><text x="262" y="33" font-size="13" fill="#181818">Neutral</text>
+    <text x="0" y="62" class="cap">pad 16/8 · height 32 (comfortable) / 28 (compact) · r4</text>
+  </g>
+
+  <!-- badges -->
+  <g transform="translate(40,1480)">
+    <text x="0" y="0" class="lbl-b">Status badges</text>
+    <rect x="0"   y="10" width="62" height="20" rx="10" fill="#E3F1DD"/><text x="8" y="24" font-size="11" fill="#4D8B3F">Active</text>
+    <rect x="72"  y="10" width="86" height="20" rx="10" fill="#FDE7DC"/><text x="80" y="24" font-size="11" fill="#9c3d18">⚠ Bundle</text>
+    <rect x="168" y="10" width="100" height="20" rx="10" fill="#ECEBEA"/><text x="176" y="24" font-size="11" fill="#747474">Already matches</text>
+    <rect x="278" y="10" width="80" height="20" rx="10" fill="#E6F4FB"/><text x="286" y="24" font-size="11" fill="#024D76">New billing</text>
+    <rect x="368" y="10" width="74" height="20" rx="10" fill="#F1E9F3"/><text x="376" y="24" font-size="11" fill="#924799">QC verdict</text>
+  </g>
+
+  <!-- alert -->
+  <g transform="translate(40,1540)">
+    <text x="0" y="0" class="lbl-b">Inline alert (warning)</text>
+    <rect x="0" y="10" width="640" height="44" rx="4" fill="#FDE7DC" stroke="#F16935" stroke-opacity="0.4"/>
+    <text x="12" y="30" font-size="13" fill="#9c3d18">⚠  37 locations belong to an active capitated bundle — flagged, not auto-included.</text>
+    <text x="12" y="48" font-size="11" fill="#9c3d18">pad 12/8 · gap 8 · 1px border @40% · icon top-aligned</text>
+  </g>
+
+  <!-- progress -->
+  <g transform="translate(720,1480)">
+    <text x="0" y="0" class="lbl-b">Job progress + stat tiles</text>
+    <rect x="0" y="12" width="400" height="12" rx="6" fill="#ecebea"/>
+    <rect x="0" y="12" width="256" height="12" rx="6" fill="url(#prog)"/>
+    <text x="410" y="22" class="tok">64%</text>
+    <g transform="translate(0,36)">
+      <rect x="0"   y="0" width="92" height="50" rx="4" fill="#fff" stroke="#ecebea"/><text x="30" y="26" font-size="20" font-weight="700" fill="#4D8B3F">802</text><text x="14" y="42" font-size="9" fill="#747474">UPDATED</text>
+      <rect x="100" y="0" width="92" height="50" rx="4" fill="#fff" stroke="#ecebea"/><text x="128" y="26" font-size="20" font-weight="700" fill="#F16935">37</text><text x="108" y="42" font-size="9" fill="#747474">BUNDLE→QC</text>
+      <rect x="200" y="0" width="92" height="50" rx="4" fill="#fff" stroke="#ecebea"/><text x="232" y="26" font-size="20" font-weight="700" fill="#EA1D2C">3</text><text x="216" y="42" font-size="9" fill="#747474">ERRORS</text>
+      <rect x="300" y="0" width="92" height="50" rx="4" fill="#fff" stroke="#ecebea"/><text x="322" y="26" font-size="20" font-weight="700" fill="#747474">458</text><text x="312" y="42" font-size="9" fill="#747474">PENDING</text>
+    </g>
+    <text x="0" y="104" class="cap">tiles 4-up → 2-up (medium) → 1-up (small) · gap small(12)</text>
+  </g>
+
+  <text x="32" y="1660" class="cap">Drag this SVG into Figma → Foundations page. Rebuild spacing as Number Variables, colors as a 2-mode collection (IBX/AmeriHealth), then build Components (§3 of the spec) with a density Variant.</text>
+</svg>

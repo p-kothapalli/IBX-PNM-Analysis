@@ -1,0 +1,166 @@
+<!-- Existing Practitioner Practice Locations - IMPROVED VERSION -->
+<template if:true={showExistingLocations}>
+    <div class="slds-m-bottom_large">
+        <div class="slds-text-heading_small slds-m-bottom_small">
+            <lightning-icon icon-name="standard:location" size="x-small" class="slds-m-right_xx-small"></lightning-icon>
+            Existing Practice Locations
+        </div>
+
+        <!-- Search Bar -->
+        <div class="slds-m-bottom_small">
+            <lightning-input
+                type="search"
+                label="Search Locations"
+                placeholder="Search by facility name, address, or city..."
+                value={locationSearchTerm}
+                onchange={handleLocationSearch}
+            ></lightning-input>
+        </div>
+
+        <!-- Tabs for Active vs Pending -->
+        <lightning-tabset>
+            <!-- Active Locations Tab (Read-Only) -->
+            <lightning-tab label="Active Locations" title="Active Locations">
+                <template if:true={hasActiveLocations}>
+                    <div class="slds-text-body_small slds-m-around_small slds-text-color_weak">
+                        <lightning-icon icon-name="utility:lock" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                        Active locations are read-only and cannot be edited.
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto; padding: 0.5rem;">
+                        <template for:each={filteredActiveLocations} for:item="location">
+                            <div key={location.id} class="location-card slds-box slds-m-bottom_small">
+                                <!-- Location Header -->
+                                <div class="slds-grid slds-grid_align-spread slds-p-around_small" style="background: #f3f3f3;">
+                                    <div class="slds-col">
+                                        <strong>{location.facilityName}</strong>
+                                        <template if:true={location.isPrimary}>
+                                            <lightning-badge label="Primary" variant="success" class="slds-m-left_xx-small"></lightning-badge>
+                                        </template>
+                                        <div class="slds-text-body_small slds-text-color_weak slds-m-top_xx-small">
+                                            {location.addressLine1}, {location.city}, {location.state} {location.zip}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Read-only Details -->
+                                <div class="slds-p-around_small slds-text-body_small">
+                                    <div class="slds-grid slds-wrap slds-gutters_small">
+                                        <div class="slds-col slds-size_1-of-2"><strong>Phone:</strong> {location.phone}</div>
+                                        <div class="slds-col slds-size_1-of-2"><strong>Fax:</strong> {location.fax}</div>
+                                        <template if:true={location.caseManagerName}>
+                                            <div class="slds-col slds-size_1-of-1"><strong>Case Manager:</strong> {location.caseManagerName}</div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <template if:false={hasActiveLocations}>
+                    <div class="slds-text-align_center slds-p-around_large slds-text-color_weak">
+                        No active locations found
+                    </div>
+                </template>
+            </lightning-tab>
+
+            <!-- Pending Locations Tab (Editable) -->
+            <lightning-tab label="Pending Locations" title="Pending Locations">
+                <template if:true={hasPendingLocations}>
+                    <div class="slds-text-body_small slds-m-around_small slds-text-color_weak">
+                        <lightning-icon icon-name="utility:edit" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                        Pending locations can be edited or removed.
+                    </div>
+                    <div style="max-height: 400px; overflow-y: auto; padding: 0.5rem;">
+                        <template for:each={filteredPendingLocations} for:item="location">
+                            <div key={location.id} class="location-card slds-box slds-m-bottom_small">
+                                <!-- Editable Form -->
+                                <div class="slds-p-around_small">
+                                    <div class="slds-grid slds-gutters slds-wrap">
+                                        <!-- Facility Name Header -->
+                                        <div class="slds-col slds-size_1-of-1 slds-m-bottom_small" style="background: #f3f3f3; padding: 0.5rem; border-radius: 0.25rem;">
+                                            <strong>{location.facilityName}</strong>
+                                            <template if:true={location.isPrimary}>
+                                                <lightning-badge label="Primary" variant="success" class="slds-m-left_xx-small"></lightning-badge>
+                                            </template>
+                                        </div>
+
+                                        <!-- Address Fields -->
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                            <lightning-input label="Address Line 1" value={location.addressLine1} data-id={location.id} data-field="addressLine1" onchange={handleLocationFieldChange} required></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                            <lightning-input label="Address Line 2" value={location.addressLine2} data-id={location.id} data-field="addressLine2" onchange={handleLocationFieldChange}></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                            <lightning-input label="City" value={location.city} data-id={location.id} data-field="city" onchange={handleLocationFieldChange} required></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                            <lightning-input label="State" value={location.state} data-id={location.id} data-field="state" onchange={handleLocationFieldChange} required max-length="2"></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                            <lightning-input label="Zip Code" value={location.zip} data-id={location.id} data-field="zip" onchange={handleLocationFieldChange} required max-length="5" pattern="[0-9]{5}"></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4">
+                                            <lightning-input label="Zip + 4" value={location.zip4} data-id={location.id} data-field="zip4" onchange={handleLocationFieldChange} max-length="4" pattern="[0-9]{4}"></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                            <lightning-input label="Phone" type="tel" value={location.phone} data-id={location.id} data-field="phone" onchange={handleLocationFieldChange} required></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                            <lightning-input label="Phone Extension" value={location.phoneExtension} data-id={location.id} data-field="phoneExtension" onchange={handleLocationFieldChange}></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                                            <lightning-input label="Fax" type="tel" value={location.fax} data-id={location.id} data-field="fax" onchange={handleLocationFieldChange}></lightning-input>
+                                        </div>
+
+                                        <!-- Checkboxes -->
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                            <lightning-input type="checkbox" label="Primary Location" checked={location.isPrimary} data-id={location.id} data-field="isPrimary" onchange={handleLocationFieldChange}></lightning-input>
+                                        </div>
+                                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                                            <lightning-input type="checkbox" label="Active" checked={location.isActive} data-id={location.id} data-field="isActive" onchange={handleLocationFieldChange}></lightning-input>
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div class="slds-col slds-size_1-of-1 slds-m-top_small">
+                                            <div class="slds-grid slds-grid_align-end slds-gutters_x-small">
+                                                <div class="slds-col slds-no-flex">
+                                                    <lightning-button label="Save" variant="brand" data-id={location.id} onclick={handleSaveLocation}></lightning-button>
+                                                </div>
+                                                <div class="slds-col slds-no-flex">
+                                                    <lightning-button label="Remove" variant="destructive" data-id={location.facilityId} onclick={handleRemoveLocation}></lightning-button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Case Manager Info -->
+                                        <template if:true={location.caseManagerName}>
+                                            <div class="slds-col slds-size_1-of-1 slds-m-top_xx-small">
+                                                <p class="slds-text-body_small slds-text-color_weak">
+                                                    <lightning-icon icon-name="utility:user" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+                                                    Case Manager: {location.caseManagerName}
+                                                </p>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </template>
+                <template if:false={hasPendingLocations}>
+                    <div class="slds-text-align_center slds-p-around_large slds-text-color_weak">
+                        No pending locations found
+                    </div>
+                </template>
+            </lightning-tab>
+        </lightning-tabset>
+
+        <div class="slds-m-top_small slds-text-body_small slds-text-color_weak">
+            <lightning-icon icon-name="utility:info" size="xx-small" class="slds-m-right_xx-small"></lightning-icon>
+            Edit pending locations above, or search below to add new locations.
+        </div>
+    </div>
+
+    <hr class="slds-m-vertical_medium">
+</template>

@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBC Credentialing & Provider Data Management</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  :root {
+    --sf-blue: #0176D3;
+    --sf-blue-dark: #014486;
+    --sf-navy: #032D60;
+    --sf-sky: #1B96FF;
+    --sf-sea: #04E1CB;
+    --sf-white: #FFFFFF;
+    --sf-surface: #F4F6F9;
+    --sf-neutral-10: #181818;
+    --sf-neutral-60: #747474;
+    --sf-health-blue: #00A1DF;
+    --sf-orange: #FF5D2D;
+    --sf-purple: #7F56D9;
+    --sf-teal: #00D1B2;
+    --sf-green: #2E844A;
+    --sf-red: #C23934;
+    --font-stack: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: #000;
+    font-family: var(--font-stack);
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+  }
+
+  .presentation { position: relative; width: 100vw; height: 100vh; }
+
+  .slide {
+    position: absolute; top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #FFFFFF;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+  }
+  .slide.active { display: flex; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Cover */
+  .slide--cover .cover-band {
+    background: var(--sf-navy); height: 45%; display: flex; align-items: center;
+    padding: 0 5vw; position: relative;
+  }
+  .slide--cover .cover-band::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: var(--sf-sky);
+  }
+  .slide--cover .cover-title { color: #fff; font-size: clamp(30px, 3.8vw, 58px); font-weight: 700; line-height: 1.2; }
+  .slide--cover .cover-body { flex: 1; padding: 5vh 5vw; display: flex; flex-direction: column; justify-content: center; }
+  .slide--cover .cover-subtitle { font-size: clamp(16px, 1.8vw, 26px); color: var(--sf-neutral-60); line-height: 1.6; margin-bottom: 24px; }
+  .slide--cover .cover-meta { font-size: clamp(12px, 1.2vw, 18px); color: var(--sf-neutral-60); }
+
+  /* Section Header */
+  .slide--section {
+    background: var(--sf-navy); justify-content: center; align-items: center; text-align: center; padding: 5vw;
+  }
+  .slide--section .section-title { color: #fff; font-size: clamp(32px, 4vw, 60px); font-weight: 700; margin-bottom: 16px; }
+  .slide--section .section-subtitle { color: var(--sf-sky); font-size: clamp(16px, 2vw, 28px); max-width: 70vw; }
+
+  /* Content Slide */
+  .slide--content .content-header { padding: 5vh 5vw 0 5vw; }
+  .slide--content .content-title {
+    font-size: clamp(22px, 2.5vw, 40px); font-weight: 700; color: var(--sf-navy);
+    padding-bottom: 16px; border-bottom: 2px solid var(--sf-sky); display: inline-block;
+  }
+  .slide--content .content-body { flex: 1; padding: 3vh 5vw 5vh 5vw; overflow: hidden; display: flex; align-items: center; }
+  .slide--content .content-body ul { list-style: none; padding: 0; width: 100%; }
+  .slide--content .content-body ul li {
+    position: relative; padding-left: 28px; margin-bottom: clamp(12px, 2vh, 24px);
+    font-size: clamp(14px, 1.4vw, 22px); line-height: 1.5; color: var(--sf-neutral-10);
+  }
+  .slide--content .content-body ul li::before {
+    content: ''; position: absolute; left: 0; top: 0.6em;
+    width: 10px; height: 10px; border-radius: 50%; background: var(--sf-blue);
+  }
+  .slide--content .content-body ul li strong { color: var(--sf-navy); font-weight: 600; }
+
+  /* ====== JOURNEY MAP ====== */
+  .slide--journey { padding: 0; position: relative; background: #FFFFFF; }
+
+  .journey-header {
+    padding: 3vh 4vw 1vh 4vw; display: flex; align-items: center; gap: 16px;
+    height: 10vh; flex-shrink: 0;
+  }
+  .journey-header .journey-title { font-size: clamp(20px, 2.2vw, 36px); font-weight: 700; color: var(--sf-navy); }
+  .journey-header .journey-badge {
+    font-size: clamp(9px, 0.9vw, 14px); font-weight: 600; padding: 4px 12px;
+    border-radius: 12px; color: white; text-transform: uppercase; letter-spacing: 0.5px;
+  }
+
+  .journey-map { position: relative; height: 90vh; width: 100%; overflow: hidden; }
+
+  .journey-path { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+  .journey-path path { fill: none; stroke: #E5E7EB; stroke-width: 42; stroke-linecap: round; stroke-linejoin: round; }
+  .journey-path .path-accent { stroke-width: 4; stroke-dasharray: 8 6; opacity: 0.5; }
+
+  .journey-waypoints { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; }
+
+  .waypoint {
+    position: absolute; display: flex; flex-direction: column; align-items: center;
+    text-align: center; width: clamp(110px, 11vw, 180px); transform: translateX(-50%);
+  }
+  .waypoint-icon {
+    width: clamp(44px, 4vw, 68px); height: clamp(44px, 4vw, 68px); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: clamp(18px, 1.8vw, 28px); color: white; margin-bottom: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2); flex-shrink: 0;
+  }
+  .waypoint-name {
+    font-size: clamp(11px, 1.1vw, 17px); font-weight: 700; color: var(--sf-navy);
+    margin-bottom: 3px; line-height: 1.3; background: rgba(255,255,255,0.9);
+    padding: 2px 6px; border-radius: 3px;
+  }
+  .waypoint-desc {
+    font-size: clamp(9px, 0.85vw, 14px); color: #444; line-height: 1.4;
+    max-width: 160px; background: rgba(255,255,255,0.85); padding: 2px 5px; border-radius: 3px;
+  }
+
+  /* Integration callout badges */
+  .integration-badge {
+    position: absolute; transform: translateX(-50%);
+    background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 4px;
+    padding: 2px 8px; font-size: clamp(8px, 0.7vw, 11px); font-weight: 600;
+    color: #92400E; white-space: nowrap; z-index: 4;
+  }
+  .integration-badge::before {
+    content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+    width: 0; height: 0; border-left: 4px solid transparent;
+    border-right: 4px solid transparent; border-bottom: 4px solid #F59E0B;
+  }
+  .integration-badge.below::before {
+    top: auto; bottom: -4px;
+    border-bottom: none; border-top: 4px solid #F59E0B;
+  }
+
+  /* Persona badge */
+  .persona-badge {
+    position: absolute; bottom: 4vh; left: 4vw; display: flex; align-items: center;
+    gap: 12px; background: var(--sf-surface); padding: 12px 20px; border-radius: 8px; z-index: 3;
+  }
+  .persona-avatar {
+    width: clamp(36px, 3.5vw, 56px); height: clamp(36px, 3.5vw, 56px); border-radius: 50%;
+    background: var(--sf-navy); display: flex; align-items: center; justify-content: center;
+    color: white; font-size: clamp(14px, 1.4vw, 22px); font-weight: 700;
+  }
+  .persona-info .persona-name { font-size: clamp(11px, 1vw, 16px); font-weight: 700; color: var(--sf-navy); }
+  .persona-info .persona-role { font-size: clamp(9px, 0.8vw, 13px); color: var(--sf-neutral-60); }
+
+  /* Key info box */
+  .journey-info {
+    position: absolute; bottom: 4vh; right: 4vw; background: var(--sf-surface);
+    border-left: 3px solid var(--sf-sky); padding: 12px 18px; border-radius: 0 6px 6px 0;
+    max-width: 22vw; z-index: 3;
+  }
+  .journey-info p { font-size: clamp(9px, 0.85vw, 14px); color: var(--sf-neutral-10); line-height: 1.4; }
+  .journey-info strong { color: var(--sf-navy); }
+
+  /* ====== TILES SLIDE ====== */
+  .slide--tiles { padding: 0; position: relative; background: #FFFFFF; }
+  .tiles-header {
+    padding: 4vh 5vw 2vh 5vw; flex-shrink: 0;
+  }
+  .tiles-header .tiles-title {
+    font-size: clamp(22px, 2.5vw, 40px); font-weight: 700; color: var(--sf-navy);
+    padding-bottom: 12px; border-bottom: 2px solid var(--sf-sky); display: inline-block;
+  }
+  .tiles-header .tiles-subtitle {
+    font-size: clamp(12px, 1.1vw, 18px); color: var(--sf-neutral-60); margin-top: 10px;
+  }
+  .tiles-grid {
+    flex: 1; padding: 2vh 5vw 5vh 5vw; display: grid;
+    gap: clamp(12px, 1.5vw, 24px); align-content: start;
+  }
+  .tiles-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .tiles-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .tile {
+    background: var(--sf-surface); border-radius: 12px; padding: clamp(16px, 2vw, 32px);
+    border: 1px solid #E5E7EB; transition: transform 0.2s, box-shadow 0.2s;
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+  }
+  .tile:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+  .tile-icon {
+    width: clamp(48px, 4.5vw, 72px); height: clamp(48px, 4.5vw, 72px);
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: clamp(20px, 2vw, 32px); color: white; margin-bottom: 12px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+  .tile-name { font-size: clamp(12px, 1.2vw, 18px); font-weight: 700; color: var(--sf-navy); margin-bottom: 6px; }
+  .tile-desc { font-size: clamp(9px, 0.8vw, 13px); color: var(--sf-neutral-60); line-height: 1.4; }
+
+  /* Entity Columns Layout */
+  .entity-columns {
+    flex: 1; padding: 2vh 5vw 5vh 5vw; display: grid;
+    grid-template-columns: repeat(3, 1fr); gap: clamp(16px, 2vw, 32px);
+    align-content: start;
+  }
+  .entity-column {
+    display: flex; flex-direction: column; border-radius: 12px;
+    border: 1px solid #E5E7EB; overflow: hidden; background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  .entity-header {
+    padding: clamp(12px, 1.5vh, 20px) clamp(16px, 1.5vw, 24px);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .entity-icon { font-size: clamp(20px, 2vw, 32px); }
+  .entity-name { color: #fff; font-size: clamp(14px, 1.4vw, 22px); font-weight: 700; }
+  .entity-tiles {
+    padding: clamp(10px, 1.2vh, 16px) clamp(12px, 1.2vw, 20px);
+    display: flex; flex-wrap: wrap; gap: clamp(6px, 0.6vw, 10px);
+    flex: 1;
+  }
+  .entity-tile {
+    background: var(--sf-surface); border: 1px solid #E5E7EB; border-radius: 6px;
+    padding: clamp(6px, 0.7vh, 10px) clamp(10px, 1vw, 16px);
+    font-size: clamp(10px, 0.95vw, 15px); font-weight: 500; color: var(--sf-neutral-10);
+    white-space: nowrap;
+  }
+
+  /* Demo Transition */
+  .slide--demo {
+    background: linear-gradient(135deg, var(--sf-navy) 0%, #0a4a8a 100%);
+    justify-content: center; align-items: center; text-align: center; padding: 5vw;
+  }
+  .slide--demo .demo-badge { display: inline-block; border: 2px solid var(--sf-sky); border-radius: 40px; padding: 12px 36px; margin-bottom: 32px; }
+  .slide--demo .demo-badge span { color: var(--sf-sky); font-size: clamp(12px, 1.2vw, 18px); font-weight: 600; letter-spacing: 3px; text-transform: uppercase; }
+  .slide--demo .demo-title { color: #fff; font-size: clamp(36px, 4.5vw, 68px); font-weight: 700; margin-bottom: 24px; }
+  .slide--demo .demo-subtitle { color: rgba(255,255,255,0.7); font-size: clamp(14px, 1.6vw, 24px); max-width: 60vw; line-height: 1.6; }
+
+  /* Footer */
+  .slide-footer {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5vw; font-size: clamp(10px, 0.9vw, 14px); color: var(--sf-neutral-60);
+  }
+  .slide--section .slide-footer, .slide--demo .slide-footer { color: rgba(255,255,255,0.4); }
+
+  /* Nav */
+  .progress-bar { position: fixed; bottom: 0; left: 0; height: 3px; background: var(--sf-sky); transition: width 0.3s; z-index: 100; }
+  .nav-controls { position: fixed; bottom: 24px; right: 24px; display: flex; gap: 8px; z-index: 100; }
+  .nav-btn { width: 44px; height: 44px; border-radius: 50%; border: none; background: rgba(3,45,96,0.7); color: rgba(255,255,255,0.9); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .nav-btn:hover { background: rgba(3,45,96,0.9); color: white; }
+  .slide-counter { position: fixed; bottom: 30px; left: 24px; color: rgba(3,45,96,0.7); font-size: 13px; font-weight: 600; z-index: 100; }
+  .notes-panel { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(3,45,96,0.95); color: rgba(255,255,255,0.9); padding: 20px 40px; font-size: 14px; line-height: 1.6; transform: translateY(100%); transition: transform 0.3s; z-index: 200; max-height: 200px; overflow-y: auto; }
+  .notes-panel.visible { transform: translateY(0); }
+  .notes-toggle { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: rgba(3,45,96,0.7); border: 1px solid rgba(3,45,96,0.3); color: rgba(255,255,255,0.9); padding: 6px 16px; border-radius: 20px; font-size: 11px; cursor: pointer; z-index: 100; font-family: var(--font-stack); letter-spacing: 0.5px; text-transform: uppercase; backdrop-filter: blur(4px); }
+  .notes-toggle:hover { background: rgba(3,45,96,0.9); color: white; }
+</style>
+</head>
+<body>
+
+<div class="presentation" id="presentation">
+
+  <!-- SLIDE 1: COVER -->
+  <div class="slide slide--cover active" data-notes="Thank you all for your time today. I'm going to walk you through how we've built guided flows for our two most critical operations — Credentialing and Provider Data Management. We have 7 distinct credentialing journeys and comprehensive PDM flows.">
+    <div class="cover-band">
+      <div class="cover-title">IBC Credentialing &amp;<br>Provider Data Management</div>
+    </div>
+    <div class="cover-body">
+      <div class="cover-subtitle">The Provider Credentialing &amp; PDM Journey</div>
+      <div class="cover-meta">IBX Provider Network Management &nbsp;&bull;&nbsp; May 2026</div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>Confidential</span></div>
+  </div>
+
+  <!-- SLIDE 2: SECTION — CREDENTIALING -->
+  <div class="slide slide--section" data-notes="Credentialing isn't one process — it's 7 distinct journeys. Let me walk you through each one as a visual path.">
+    <div class="section-title">The Credentialing Journeys</div>
+    <div class="section-subtitle">7 guided flows covering the full credentialing lifecycle</div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>2</span></div>
+  </div>
+
+  <!-- SLIDE 3: JOURNEY 1 — INITIAL CREDENTIALING (with integrations) -->
+  <div class="slide slide--journey" data-notes="Primary journey. PAR Form starts it, CAQH pre-fills data. PSV verifies with NPDB, state boards, education. Precisely validates addresses at PDA. Letters generated at activation. QC validates before HACAC decides.">
+    <div class="journey-header">
+      <div class="journey-title">The Initial Credentialing Journey</div>
+      <div class="journey-badge" style="background: var(--sf-blue);">Primary Path</div>
+    </div>
+    <div class="journey-map">
+      <svg class="journey-path" viewBox="0 0 1180 540" preserveAspectRatio="xMidYMid meet">
+        <path d="M 80,120 C 200,120 250,120 350,180 C 450,240 400,320 500,320 C 600,320 600,200 700,200 C 800,200 800,340 900,340 C 1000,340 1020,220 1100,220" />
+        <path class="path-accent" d="M 80,120 C 200,120 250,120 350,180 C 450,240 400,320 500,320 C 600,320 600,200 700,200 C 800,200 800,340 900,340 C 1000,340 1020,220 1100,220" style="stroke: var(--sf-sky);" />
+      </svg>
+      <div class="journey-waypoints">
+        <div class="waypoint" style="left: 7%; top: 14%;">
+          <div class="waypoint-icon" style="background: var(--sf-blue);">&#128221;</div>
+          <div class="waypoint-name">PAR Form</div>
+          <div class="waypoint-desc">Provider Action Request — single intake entry point</div>
+        </div>
+        <div class="integration-badge" style="left: 7%; top: 48%;">&#128279; CAQH Pre-fill</div>
+
+        <div class="waypoint" style="left: 22%; top: 26%;">
+          <div class="waypoint-icon" style="background: var(--sf-blue);">&#128269;</div>
+          <div class="waypoint-name">App Review</div>
+          <div class="waypoint-desc">Case manager triages for completeness &amp; eligibility</div>
+        </div>
+
+        <div class="waypoint" style="left: 37%; top: 46%;">
+          <div class="waypoint-icon" style="background: var(--sf-blue);">&#9989;</div>
+          <div class="waypoint-name">PSV</div>
+          <div class="waypoint-desc">Primary Source Verification — licenses, education, DEA</div>
+        </div>
+        <div class="integration-badge" style="left: 37%; top: 76%;">&#128279; NPDB Query</div>
+
+        <div class="waypoint" style="left: 52%; top: 32%;">
+          <div class="waypoint-icon" style="background: var(--sf-blue);">&#128203;</div>
+          <div class="waypoint-name">QC Review</div>
+          <div class="waypoint-desc">Quality control validates all PSV data before committee</div>
+        </div>
+
+        <div class="waypoint" style="left: 65%; top: 20%;">
+          <div class="waypoint-icon" style="background: var(--sf-navy);">&#9878;</div>
+          <div class="waypoint-name">Committee</div>
+          <div class="waypoint-desc">HACAC — Approve, Deny, Defer, or Conditions</div>
+        </div>
+
+        <div class="waypoint" style="left: 78%; top: 44%;">
+          <div class="waypoint-icon" style="background: var(--sf-blue);">&#128202;</div>
+          <div class="waypoint-name">PDA Review</div>
+          <div class="waypoint-desc">Provider Data Accuracy — aligns records with decision</div>
+        </div>
+        <div class="integration-badge" style="left: 78%; top: 74%;">&#128279; Precisely Address</div>
+
+        <div class="waypoint" style="left: 91%; top: 28%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#127942;</div>
+          <div class="waypoint-name">Activation</div>
+          <div class="waypoint-desc">BCBSA sync, network &amp; taxonomy record creation</div>
+        </div>
+        <div class="integration-badge" style="left: 91%; top: 58%;">&#128232; Welcome Letter</div>
+      </div>
+      <div class="persona-badge">
+        <div class="persona-avatar">P</div>
+        <div class="persona-info">
+          <div class="persona-name">New Provider</div>
+          <div class="persona-role">Initial Credentialing Application</div>
+        </div>
+      </div>
+      <div class="journey-info">
+        <p><strong>Hard Gate:</strong> No case advances past PSV without complete documentation. Compliance enforced by design — the system blocks progression.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>3</span></div>
+  </div>
+
+  <!-- SLIDE 4: JOURNEY 2 — RE-CREDENTIALING (with integrations) -->
+  <div class="slide slide--journey" data-notes="Re-Credentialing is our highest-volume motion — cyclical every 2-3 years. Driven by 4 batch jobs. CAQH is a hard gate. NPDB queried at PSV. Letters generated for termination via RCAT.">
+    <div class="journey-header">
+      <div class="journey-title">The Re-Credentialing Journey</div>
+      <div class="journey-badge" style="background: var(--sf-purple);">Highest Volume</div>
+    </div>
+    <div class="journey-map">
+      <svg class="journey-path" viewBox="0 0 1180 540" preserveAspectRatio="xMidYMid meet">
+        <path d="M 80,100 C 180,100 220,160 320,200 C 420,240 460,300 560,280 C 660,260 680,160 780,160 C 880,160 900,280 1000,260 C 1060,250 1090,200 1120,180" />
+        <path class="path-accent" d="M 80,100 C 180,100 220,160 320,200 C 420,240 460,300 560,280 C 660,260 680,160 780,160 C 880,160 900,280 1000,260 C 1060,250 1090,200 1120,180" style="stroke: var(--sf-purple);" />
+        <!-- Failure path branch -->
+        <path d="M 560,280 C 580,360 620,400 720,420 C 820,440 900,440 1000,420" style="stroke: #FEE2E2; stroke-width: 24;" />
+        <path d="M 560,280 C 580,360 620,400 720,420 C 820,440 900,440 1000,420" class="path-accent" style="stroke: var(--sf-red);" />
+      </svg>
+      <div class="journey-waypoints">
+        <div class="waypoint" style="left: 7%; top: 10%;">
+          <div class="waypoint-icon" style="background: var(--sf-purple);">&#9200;</div>
+          <div class="waypoint-name">Batch Trigger</div>
+          <div class="waypoint-desc">4 scheduled jobs: due-date, CAQH access, email, letter</div>
+        </div>
+
+        <div class="waypoint" style="left: 22%; top: 26%;">
+          <div class="waypoint-icon" style="background: var(--sf-purple);">&#128274;</div>
+          <div class="waypoint-name">CAQH Gate</div>
+          <div class="waypoint-desc">Hard gate — cannot advance without valid attestation</div>
+        </div>
+        <div class="integration-badge" style="left: 22%; top: 50%;">&#128279; CAQH Validation</div>
+
+        <div class="waypoint" style="left: 38%; top: 40%;">
+          <div class="waypoint-icon" style="background: var(--sf-purple);">&#9989;</div>
+          <div class="waypoint-name">PSV</div>
+          <div class="waypoint-desc">Re-verification of all credentials with sources</div>
+        </div>
+        <div class="integration-badge" style="left: 38%; top: 66%;">&#128279; NPDB Query</div>
+
+        <div class="waypoint" style="left: 54%; top: 32%;">
+          <div class="waypoint-icon" style="background: var(--sf-purple);">&#128203;</div>
+          <div class="waypoint-name">QC Review</div>
+          <div class="waypoint-desc">14+ verification steps with editable notes</div>
+        </div>
+
+        <div class="waypoint" style="left: 69%; top: 16%;">
+          <div class="waypoint-icon" style="background: var(--sf-navy);">&#9878;</div>
+          <div class="waypoint-name">Committee</div>
+          <div class="waypoint-desc">Decision on renewal — approve or escalate</div>
+        </div>
+
+        <div class="waypoint" style="left: 84%; top: 32%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#128260;</div>
+          <div class="waypoint-name">Renewed</div>
+          <div class="waypoint-desc">Recred updates applied, provider status renewed</div>
+        </div>
+
+        <!-- Failure path waypoints -->
+        <div class="waypoint" style="left: 56%; top: 64%;">
+          <div class="waypoint-icon" style="background: var(--sf-red);">&#9888;</div>
+          <div class="waypoint-name">RCAT</div>
+          <div class="waypoint-desc">Fails criteria — routes to auto-termination</div>
+        </div>
+        <div class="waypoint" style="left: 74%; top: 70%;">
+          <div class="waypoint-icon" style="background: var(--sf-red);">&#128232;</div>
+          <div class="waypoint-name">Letter Gen</div>
+          <div class="waypoint-desc">Termination letter generated and sent</div>
+        </div>
+        <div class="integration-badge" style="left: 74%; top: 88%;">&#128232; Term Letter</div>
+
+        <div class="waypoint" style="left: 88%; top: 66%;">
+          <div class="waypoint-icon" style="background: var(--sf-red);">&#10060;</div>
+          <div class="waypoint-name">Terminated</div>
+          <div class="waypoint-desc">Network removal, record closure</div>
+        </div>
+      </div>
+      <div class="persona-badge">
+        <div class="persona-avatar">R</div>
+        <div class="persona-info">
+          <div class="persona-name">Active Provider</div>
+          <div class="persona-role">Cyclical Re-Credentialing (every 2-3 years)</div>
+        </div>
+      </div>
+      <div class="journey-info">
+        <p><strong>RCAT Buckets:</strong> LMS (Last Man Standing), PNC/Delegated, Neither — determines termination processing path.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>4</span></div>
+  </div>
+
+  <!-- SLIDE 5: JOURNEY 3 — OFF-CYCLE (with request types at entry) -->
+  <div class="slide slide--journey" data-notes="Off-Cycle is event-driven — provider circumstances change between regular cycles. Request types include: New Specialty, Privilege Change, Affiliation Update, Additional Certification, Hospital Privilege Change.">
+    <div class="journey-header">
+      <div class="journey-title">The Off-Cycle Credentialing Journey</div>
+      <div class="journey-badge" style="background: var(--sf-teal); color: #181818;">Exception Lane</div>
+    </div>
+    <div class="journey-map">
+      <svg class="journey-path" viewBox="0 0 1180 540" preserveAspectRatio="xMidYMid meet">
+        <path d="M 100,250 C 220,250 300,150 420,180 C 540,210 580,320 700,290 C 820,260 860,180 980,200 C 1040,210 1080,240 1100,250" />
+        <path class="path-accent" d="M 100,250 C 220,250 300,150 420,180 C 540,210 580,320 700,290 C 820,260 860,180 980,200 C 1040,210 1080,240 1100,250" style="stroke: var(--sf-teal);" />
+      </svg>
+      <div class="journey-waypoints">
+        <div class="waypoint" style="left: 9%; top: 30%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#9889;</div>
+          <div class="waypoint-name">Off-Cycle Request</div>
+          <div class="waypoint-desc">New Specialty | Privilege Change | Affiliation Update | Add'l Certification | Hospital Privilege</div>
+        </div>
+
+        <div class="waypoint" style="left: 28%; top: 16%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#128221;</div>
+          <div class="waypoint-name">Change Entry</div>
+          <div class="waypoint-desc">Capture specific credential changes</div>
+        </div>
+
+        <div class="waypoint" style="left: 47%; top: 36%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#9989;</div>
+          <div class="waypoint-name">PSV</div>
+          <div class="waypoint-desc">Verifies only changed credentials — fast track</div>
+        </div>
+        <div class="integration-badge" style="left: 47%; top: 62%;">&#128279; NPDB Query</div>
+
+        <div class="waypoint" style="left: 67%; top: 28%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#128203;</div>
+          <div class="waypoint-name">QC Review</div>
+          <div class="waypoint-desc">Review of specific changes only</div>
+        </div>
+
+        <div class="waypoint" style="left: 86%; top: 22%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#10004;</div>
+          <div class="waypoint-name">Complete</div>
+          <div class="waypoint-desc">PDA updated, changes published</div>
+        </div>
+        <div class="integration-badge" style="left: 86%; top: 48%;">&#128279; Precisely Address</div>
+      </div>
+      <div class="persona-badge">
+        <div class="persona-avatar">E</div>
+        <div class="persona-info">
+          <div class="persona-name">Existing Provider</div>
+          <div class="persona-role">Event-driven credential change between cycles</div>
+        </div>
+      </div>
+      <div class="journey-info">
+        <p><strong>Restriction:</strong> Delegated-only practitioners are blocked from this flow — must use full PAR form.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>5</span></div>
+  </div>
+
+  <!-- SLIDE 6: JOURNEY 4 — ANCILLARY -->
+  <div class="slide slide--journey" data-notes="Ancillary covers non-physician providers: Skilled Nursing, Staffing, Hospitals, DME, Home Health. Different intake with services selection.">
+    <div class="journey-header">
+      <div class="journey-title">The Ancillary Provider Journey</div>
+      <div class="journey-badge" style="background: var(--sf-orange);">Non-Physician</div>
+    </div>
+    <div class="journey-map">
+      <svg class="journey-path" viewBox="0 0 1180 540" preserveAspectRatio="xMidYMid meet">
+        <path d="M 60,140 C 140,140 180,200 260,240 C 340,280 380,180 460,160 C 540,140 580,240 660,260 C 740,280 780,180 860,160 C 940,140 980,220 1060,240 C 1100,250 1120,250 1140,240" />
+        <path class="path-accent" d="M 60,140 C 140,140 180,200 260,240 C 340,280 380,180 460,160 C 540,140 580,240 660,260 C 740,280 780,180 860,160 C 940,140 980,220 1060,240 C 1100,250 1120,250 1140,240" style="stroke: var(--sf-orange);" />
+      </svg>
+      <div class="journey-waypoints">
+        <div class="waypoint" style="left: 5%; top: 14%;">
+          <div class="waypoint-icon" style="background: var(--sf-orange);">&#127963;</div>
+          <div class="waypoint-name">Ancillary PAR</div>
+          <div class="waypoint-desc">Facility type &amp; services selection</div>
+        </div>
+        <div class="waypoint" style="left: 18%; top: 30%;">
+          <div class="waypoint-icon" style="background: var(--sf-orange);">&#128196;</div>
+          <div class="waypoint-name">Services &amp; License</div>
+          <div class="waypoint-desc">Business license + practice location</div>
+        </div>
+        <div class="waypoint" style="left: 33%; top: 18%;">
+          <div class="waypoint-icon" style="background: var(--sf-orange);">&#128269;</div>
+          <div class="waypoint-name">App Review</div>
+          <div class="waypoint-desc">Completeness check for ancillary type</div>
+        </div>
+        <div class="waypoint" style="left: 48%; top: 30%;">
+          <div class="waypoint-icon" style="background: var(--sf-orange);">&#9989;</div>
+          <div class="waypoint-name">PSV</div>
+          <div class="waypoint-desc">Verification per facility classification</div>
+        </div>
+        <div class="integration-badge" style="left: 48%; top: 56%;">&#128279; NPDB Query</div>
+
+        <div class="waypoint" style="left: 63%; top: 20%;">
+          <div class="waypoint-icon" style="background: var(--sf-orange);">&#128203;</div>
+          <div class="waypoint-name">QC Review</div>
+          <div class="waypoint-desc">Quality control validation</div>
+        </div>
+        <div class="waypoint" style="left: 76%; top: 14%;">
+          <div class="waypoint-icon" style="background: var(--sf-navy);">&#9878;</div>
+          <div class="waypoint-name">Committee</div>
+          <div class="waypoint-desc">Credentialing decision</div>
+        </div>
+        <div class="waypoint" style="left: 91%; top: 28%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#10004;</div>
+          <div class="waypoint-name">Active</div>
+          <div class="waypoint-desc">PDA updated, provider activated</div>
+        </div>
+        <div class="integration-badge" style="left: 91%; top: 54%;">&#128279; Precisely Address</div>
+      </div>
+      <div class="persona-badge">
+        <div class="persona-avatar">A</div>
+        <div class="persona-info">
+          <div class="persona-name">Ancillary Provider</div>
+          <div class="persona-role">SNF, Staffing, Hospital, DME, Home Health</div>
+        </div>
+      </div>
+      <div class="journey-info">
+        <p><strong>Reassessment:</strong> Periodic re-validation also runs for ancillary providers — facility-specific verification requirements.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>6</span></div>
+  </div>
+
+  <!-- SLIDE 7: JOURNEY 5 — DELEGATED -->
+  <div class="slide slide--journey" data-notes="Most complex flow — 54+ records per submission. Async refactor shipped. Delegated-only flag restricts Off-Cycle access.">
+    <div class="journey-header">
+      <div class="journey-title">The Delegated Credentialing Journey</div>
+      <div class="journey-badge" style="background: var(--sf-health-blue);">High Complexity</div>
+    </div>
+    <div class="journey-map">
+      <svg class="journey-path" viewBox="0 0 1180 540" preserveAspectRatio="xMidYMid meet">
+        <path d="M 80,200 C 180,200 240,120 340,140 C 440,160 480,280 580,260 C 680,240 700,140 800,160 C 900,180 940,260 1040,240 C 1080,230 1100,220 1120,210" />
+        <path class="path-accent" d="M 80,200 C 180,200 240,120 340,140 C 440,160 480,280 580,260 C 680,240 700,140 800,160 C 900,180 940,260 1040,240 C 1080,230 1100,220 1120,210" style="stroke: var(--sf-health-blue);" />
+      </svg>
+      <div class="journey-waypoints">
+        <div class="waypoint" style="left: 7%; top: 26%;">
+          <div class="waypoint-icon" style="background: var(--sf-health-blue);">&#128100;</div>
+          <div class="waypoint-name">Practitioner Details</div>
+          <div class="waypoint-desc">Entry via delegated arrangement</div>
+        </div>
+        <div class="waypoint" style="left: 24%; top: 14%;">
+          <div class="waypoint-icon" style="background: var(--sf-health-blue);">&#127968;</div>
+          <div class="waypoint-name">Address &amp; Facility</div>
+          <div class="waypoint-desc">Practice location assignment</div>
+        </div>
+        <div class="integration-badge" style="left: 24%; top: 40%;">&#128279; Precisely Address</div>
+
+        <div class="waypoint" style="left: 42%; top: 34%;">
+          <div class="waypoint-icon" style="background: var(--sf-health-blue);">&#128279;</div>
+          <div class="waypoint-name">Network Creation</div>
+          <div class="waypoint-desc">HCF network records (3+ locations x 15+ networks)</div>
+        </div>
+        <div class="waypoint" style="left: 59%; top: 22%;">
+          <div class="waypoint-icon" style="background: var(--sf-health-blue);">&#128064;</div>
+          <div class="waypoint-name">Review Screen</div>
+          <div class="waypoint-desc">Validation before submission</div>
+        </div>
+        <div class="waypoint" style="left: 76%; top: 16%;">
+          <div class="waypoint-icon" style="background: var(--sf-health-blue);">&#128203;</div>
+          <div class="waypoint-name">QC Review</div>
+          <div class="waypoint-desc">Quality gate before record creation</div>
+        </div>
+        <div class="waypoint" style="left: 91%; top: 28%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#9889;</div>
+          <div class="waypoint-name">54+ Records</div>
+          <div class="waypoint-desc">Async creation via TX1/TX2/TX3 Queueable</div>
+        </div>
+      </div>
+      <div class="persona-badge">
+        <div class="persona-avatar">D</div>
+        <div class="persona-info">
+          <div class="persona-name">Delegated Practitioner</div>
+          <div class="persona-role">Hospital/Health System Arrangement</div>
+        </div>
+      </div>
+      <div class="journey-info">
+        <p><strong>Scale:</strong> 3+ locations x 3+ taxonomies x 15+ networks = 54+ records. Async refactor eliminates governor-limit failures.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>7</span></div>
+  </div>
+
+  <!-- SLIDE 8: JOURNEY 6 — TERMINATION & REINSTATEMENT (with letter integration) -->
+  <div class="slide slide--journey" data-notes="Termination can be manual or via RCAT. Reinstatement loops back into App Review. Letters generated at closure.">
+    <div class="journey-header">
+      <div class="journey-title">Termination &amp; Reinstatement Journey</div>
+      <div class="journey-badge" style="background: var(--sf-red);">Lifecycle Loop</div>
+    </div>
+    <div class="journey-map">
+      <svg class="journey-path" viewBox="0 0 1180 540" preserveAspectRatio="xMidYMid meet">
+        <path d="M 80,140 C 180,140 240,200 340,220 C 440,240 500,180 580,160" style="stroke: #FEE2E2; stroke-width: 36;" />
+        <path d="M 80,140 C 180,140 240,200 340,220 C 440,240 500,180 580,160" class="path-accent" style="stroke: var(--sf-red);" />
+        <path d="M 580,380 C 680,380 740,320 840,300 C 940,280 980,340 1060,360 C 1100,370 1120,360 1130,340" style="stroke: #DCFCE7; stroke-width: 36;" />
+        <path d="M 580,380 C 680,380 740,320 840,300 C 940,280 980,340 1060,360 C 1100,370 1120,360 1130,340" class="path-accent" style="stroke: var(--sf-green);" />
+        <path d="M 1130,340 C 1150,280 1100,200 1020,160 C 940,120 860,100 780,90" style="stroke: #E5E7EB; stroke-width: 20; stroke-dasharray: 12 8;" />
+      </svg>
+      <div class="journey-waypoints">
+        <div class="waypoint" style="left: 7%; top: 14%;">
+          <div class="waypoint-icon" style="background: var(--sf-red);">&#128680;</div>
+          <div class="waypoint-name">Termination Request</div>
+          <div class="waypoint-desc">Manual trigger or RCAT auto-route</div>
+        </div>
+        <div class="waypoint" style="left: 23%; top: 28%;">
+          <div class="waypoint-icon" style="background: var(--sf-red);">&#128465;</div>
+          <div class="waypoint-name">Network Removal</div>
+          <div class="waypoint-desc">Locations &amp; networks disconnected</div>
+        </div>
+        <div class="waypoint" style="left: 39%; top: 22%;">
+          <div class="waypoint-icon" style="background: var(--sf-red);">&#128232;</div>
+          <div class="waypoint-name">Letter &amp; Closure</div>
+          <div class="waypoint-desc">Notification sent, record closed</div>
+        </div>
+        <div class="integration-badge" style="left: 39%; top: 46%;">&#128232; Termination Letter</div>
+
+        <div class="waypoint" style="left: 50%; top: 38%;">
+          <div class="waypoint-icon" style="background: #6B7280; font-size: 14px;">&#9679;</div>
+          <div class="waypoint-name" style="color: #6B7280;">TERMINATED</div>
+        </div>
+        <!-- Reinstatement -->
+        <div class="waypoint" style="left: 50%; top: 58%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#128260;</div>
+          <div class="waypoint-name">Reinstatement Request</div>
+          <div class="waypoint-desc">From terminated provider pool</div>
+        </div>
+        <div class="waypoint" style="left: 66%; top: 48%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#128279;</div>
+          <div class="waypoint-name">Re-Associate</div>
+          <div class="waypoint-desc">Networks &amp; locations reconnected</div>
+        </div>
+        <div class="waypoint" style="left: 80%; top: 42%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#9989;</div>
+          <div class="waypoint-name">Verify (if gap)</div>
+          <div class="waypoint-desc">PSV if termination exceeded threshold</div>
+        </div>
+        <div class="integration-badge" style="left: 80%; top: 66%;">&#128279; NPDB Query</div>
+
+        <div class="waypoint" style="left: 93%; top: 50%;">
+          <div class="waypoint-icon" style="background: var(--sf-blue);">&#128257;</div>
+          <div class="waypoint-name">Back to App Review</div>
+          <div class="waypoint-desc">Re-enters credentialing cycle</div>
+        </div>
+      </div>
+      <div class="persona-badge">
+        <div class="persona-avatar" style="background: var(--sf-red);">T</div>
+        <div class="persona-info">
+          <div class="persona-name">Provider Lifecycle</div>
+          <div class="persona-role">Exit &amp; Re-entry — the complete loop</div>
+        </div>
+      </div>
+      <div class="journey-info">
+        <p><strong>Lifecycle Loop:</strong> Reinstatement feeds back into App Review. Duration determines verification requirements.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>8</span></div>
+  </div>
+
+  <!-- SLIDE 9: SECTION — PDM -->
+  <div class="slide slide--section" data-notes="Credentialing gets providers into the network. PDM keeps their information accurate. PDM volume dwarfs credentialing.">
+    <div class="section-title">Provider Data Management</div>
+    <div class="section-subtitle">The ongoing data accuracy engine — keeping the record correct after credentialing</div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>9</span></div>
+  </div>
+
+  <!-- SLIDE 10: PDM JOURNEY (with Precisely integration) -->
+  <div class="slide slide--journey" data-notes="PDM is 5 guided flows plus validation backbone. Main journey: intake, business rules, Precisely address validation, cross-reference, 5-step QC, push to all systems.">
+    <div class="journey-header">
+      <div class="journey-title">The PDM Journey</div>
+      <div class="journey-badge" style="background: #028a76;">Daily Operations</div>
+    </div>
+    <div class="journey-map">
+      <svg class="journey-path" viewBox="0 0 1180 540" preserveAspectRatio="xMidYMid meet">
+        <path d="M 80,220 C 180,220 240,140 360,160 C 480,180 500,300 620,280 C 740,260 760,160 880,180 C 1000,200 1020,280 1100,260" />
+        <path class="path-accent" d="M 80,220 C 180,220 240,140 360,160 C 480,180 500,300 620,280 C 740,260 760,160 880,180 C 1000,200 1020,280 1100,260" style="stroke: var(--sf-sea);" />
+      </svg>
+      <div class="journey-waypoints">
+        <div class="waypoint" style="left: 7%; top: 28%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#128221;</div>
+          <div class="waypoint-name">Change Request</div>
+          <div class="waypoint-desc">Demographic, contractual, or operational update</div>
+        </div>
+        <div class="waypoint" style="left: 23%; top: 14%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#9997;</div>
+          <div class="waypoint-name">Data Entry</div>
+          <div class="waypoint-desc">Business rule validation at entry</div>
+        </div>
+        <div class="waypoint" style="left: 40%; top: 32%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#127968;</div>
+          <div class="waypoint-name">Address Validation</div>
+          <div class="waypoint-desc">Precisely API standardization</div>
+        </div>
+        <div class="integration-badge" style="left: 40%; top: 58%;">&#128279; Precisely API</div>
+
+        <div class="waypoint" style="left: 56%; top: 30%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#128279;</div>
+          <div class="waypoint-name">Cross-Ref Check</div>
+          <div class="waypoint-desc">Consistency across related records</div>
+        </div>
+        <div class="waypoint" style="left: 72%; top: 16%;">
+          <div class="waypoint-icon" style="background: #028a76;">&#128203;</div>
+          <div class="waypoint-name">QC Review</div>
+          <div class="waypoint-desc">5-step quality chain</div>
+        </div>
+        <div class="waypoint" style="left: 90%; top: 30%;">
+          <div class="waypoint-icon" style="background: var(--sf-green);">&#127760;</div>
+          <div class="waypoint-name">Published</div>
+          <div class="waypoint-desc">All systems updated simultaneously</div>
+        </div>
+      </div>
+      <div class="persona-badge">
+        <div class="persona-avatar" style="background: #028a76;">N</div>
+        <div class="persona-info">
+          <div class="persona-name">Network Ops Team</div>
+          <div class="persona-role">Daily provider data maintenance</div>
+        </div>
+      </div>
+      <div class="journey-info">
+        <p><strong>5 PDM Flows:</strong> Manual Changes, Practitioner Updates, Practice-Location, Vendor/Ancillary, HCF Associations.</p>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>10</span></div>
+  </div>
+
+  <!-- SLIDE 11: TILES — Provider Change Request Types -->
+  <div class="slide slide--tiles" data-notes="The Provider Change Form handles multiple request types. Each type routes through PDA Update and QC before publishing.">
+    <div class="tiles-header">
+      <div class="tiles-title">Provider Change Request Types</div>
+      <div class="tiles-subtitle">Each request type follows the guided flow: Change Form &rarr; PDA Update &rarr; Provider Change QC &rarr; Complete</div>
+    </div>
+    <div class="tiles-grid cols-4">
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-blue);">&#127968;</div>
+        <div class="tile-name">Address Change</div>
+        <div class="tile-desc">Practice or mailing address update with Precisely validation</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-blue);">&#128222;</div>
+        <div class="tile-name">Phone / Fax</div>
+        <div class="tile-desc">Office phone, fax, after-hours contact updates</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-purple);">&#128100;</div>
+        <div class="tile-name">Panel Status</div>
+        <div class="tile-desc">Open/close panel, accepting new patients status</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-purple);">&#128218;</div>
+        <div class="tile-name">Specialty Update</div>
+        <div class="tile-desc">Add/change specialty, board certification updates</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-orange);">&#128101;</div>
+        <div class="tile-name">Group Affiliation</div>
+        <div class="tile-desc">Provider-to-group association changes</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-orange);">&#128196;</div>
+        <div class="tile-name">Contract Modification</div>
+        <div class="tile-desc">Network tier, fee schedule, contract terms</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-health-blue);">&#128336;</div>
+        <div class="tile-name">Office Hours</div>
+        <div class="tile-desc">Schedule, availability, languages spoken</div>
+      </div>
+      <div class="tile">
+        <div class="tile-icon" style="background: var(--sf-health-blue);">&#128279;</div>
+        <div class="tile-name">Hospital Affiliation</div>
+        <div class="tile-desc">Admitting privileges, facility linkages</div>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>11</span></div>
+  </div>
+
+  <!-- SLIDE 12: PDM Manual Change — Entity Types with Sub-tiles -->
+  <div class="slide slide--tiles" data-notes="PDM Manual Changes flow handles three entity types. Each has its own set of request types that flow through cross-reference validation and QC chain.">
+    <div class="tiles-header">
+      <div class="tiles-title">PDM Manual Change — Request Types by Entity</div>
+      <div class="tiles-subtitle">Each entity has specialized request types &mdash; all follow: Entry &rarr; Cross-Ref Validation &rarr; QC Chain &rarr; Published</div>
+    </div>
+    <div class="entity-columns">
+      <!-- PRACTITIONER COLUMN -->
+      <div class="entity-column">
+        <div class="entity-header" style="background: var(--sf-blue);">
+          <span class="entity-icon">&#128100;</span>
+          <span class="entity-name">Practitioner</span>
+        </div>
+        <div class="entity-tiles">
+          <div class="entity-tile">NPI Update</div>
+          <div class="entity-tile">Taxonomy Change</div>
+          <div class="entity-tile">Demographics</div>
+          <div class="entity-tile">Board Certification</div>
+          <div class="entity-tile">DEA Registration</div>
+          <div class="entity-tile">State License</div>
+          <div class="entity-tile">NPPES Validation</div>
+          <div class="entity-tile">Specialty Update</div>
+        </div>
+      </div>
+      <!-- PRACTICE LOCATION COLUMN -->
+      <div class="entity-column">
+        <div class="entity-header" style="background: var(--sf-orange);">
+          <span class="entity-icon">&#127968;</span>
+          <span class="entity-name">Practice Location</span>
+        </div>
+        <div class="entity-tiles">
+          <div class="entity-tile">Billing Address</div>
+          <div class="entity-tile">Mailing Address</div>
+          <div class="entity-tile">Network Assignment</div>
+          <div class="entity-tile">Capitation</div>
+          <div class="entity-tile">Phone / Fax</div>
+          <div class="entity-tile">Office Hours</div>
+          <div class="entity-tile">Accessibility</div>
+          <div class="entity-tile">Bundle Validation</div>
+        </div>
+      </div>
+      <!-- ACCOUNT COLUMN -->
+      <div class="entity-column">
+        <div class="entity-header" style="background: var(--sf-navy);">
+          <span class="entity-icon">&#127970;</span>
+          <span class="entity-name">Account</span>
+        </div>
+        <div class="entity-tiles">
+          <div class="entity-tile">TIN Change</div>
+          <div class="entity-tile">Group Demographics</div>
+          <div class="entity-tile">Vendor Association</div>
+          <div class="entity-tile">Contract Linkage</div>
+          <div class="entity-tile">Organization Name</div>
+          <div class="entity-tile">Panel Status</div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>12</span></div>
+  </div>
+
+  <!-- SLIDE 13: DEMO TRANSITION -->
+  <div class="slide slide--demo" data-notes="DEMO: Switching to live environment. Walking through Initial Credentialing from PAR Form intake all the way through to Activation.">
+    <div class="demo-badge"><span>Live Walkthrough</span></div>
+    <div class="demo-title">Seeing It in Action</div>
+    <div class="demo-subtitle">Initial Credentialing: PAR Form to Activation</div>
+    <div class="slide-footer"><span>Salesforce | Health Cloud</span><span>13</span></div>
+  </div>
+
+</div>
+
+<!-- Controls -->
+<div class="slide-counter" id="slideCounter">1 / 13</div>
+<div class="nav-controls">
+  <button class="nav-btn" onclick="prevSlide()">&#9664;</button>
+  <button class="nav-btn" onclick="nextSlide()">&#9654;</button>
+</div>
+<button class="notes-toggle" onclick="toggleNotes()">Speaker Notes (N)</button>
+<div class="notes-panel" id="notesPanel"></div>
+<div class="progress-bar" id="progressBar"></div>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  const notesPanel = document.getElementById('notesPanel');
+  let notesVisible = false;
+
+  function showSlide(i) {
+    slides.forEach((s, idx) => {
+      if (idx === i) {
+        s.classList.add('active');
+        s.style.display = 'flex';
+      } else {
+        s.classList.remove('active');
+        s.style.display = 'none';
+      }
+    });
+    currentSlide = i;
+    document.getElementById('slideCounter').textContent = (i+1) + ' / ' + totalSlides;
+    document.getElementById('progressBar').style.width = ((i+1)/totalSlides*100)+'%';
+    notesPanel.textContent = slides[i].getAttribute('data-notes') || '';
+  }
+
+  function nextSlide() { if (currentSlide < totalSlides-1) showSlide(currentSlide+1); }
+  function prevSlide() { if (currentSlide > 0) showSlide(currentSlide-1); }
+  function toggleNotes() { notesVisible = !notesVisible; notesPanel.classList.toggle('visible', notesVisible); }
+
+  document.addEventListener('keydown', function(e) {
+    if (['ArrowRight','ArrowDown',' ','PageDown'].indexOf(e.key) >= 0) { e.preventDefault(); nextSlide(); }
+    if (['ArrowLeft','ArrowUp','PageUp'].indexOf(e.key) >= 0) { e.preventDefault(); prevSlide(); }
+    if (e.key==='n'||e.key==='N') toggleNotes();
+    if (e.key==='f'||e.key==='F') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+  });
+
+  var tx=0;
+  document.addEventListener('touchstart', function(e) { tx=e.touches[0].clientX; });
+  document.addEventListener('touchend', function(e) { var d=e.changedTouches[0].clientX-tx; if(Math.abs(d)>50){d<0?nextSlide():prevSlide();} });
+
+  document.getElementById('presentation').addEventListener('click', function(e) {
+    if (e.target.closest('.nav-controls,.notes-toggle')) return;
+    var r=e.currentTarget.getBoundingClientRect();
+    (e.clientX-r.left)>r.width*0.5 ? nextSlide() : prevSlide();
+  });
+
+  showSlide(0);
+</script>
+</body>
+</html>

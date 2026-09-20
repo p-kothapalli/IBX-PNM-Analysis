@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBX Provider Operations Modernization</title>
+<style>
+  :root {
+    --ibx-blue:    #003087;
+    --ibx-med:     #0057B8;
+    --ibx-light:   #009CDE;
+    --ibx-teal:    #00B4C8;
+    --ibx-green:   #00A651;
+    --ibx-orange:  #F47920;
+    --ibx-red:     #E22C2C;
+    --ibx-gold:    #F5A623;
+    --ibx-bg:      #F4F7FB;
+    --ibx-card:    #FFFFFF;
+    --ibx-border:  #D0DFF0;
+    --ibx-text:    #1A2B45;
+    --ibx-muted:   #5A7090;
+    --ibx-shadow:  rgba(0,48,135,0.12);
+    --radius:      14px;
+    --radius-sm:   8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--ibx-bg);
+    color: var(--ibx-text);
+    line-height: 1.6;
+  }
+
+  /* ── SLIDE WRAPPER ── */
+  .deck { width: 100%; }
+  .slide {
+    min-height: 100vh;
+    padding: 60px 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    page-break-after: always;
+  }
+  .slide + .slide { border-top: 6px solid var(--ibx-blue); }
+
+  /* ── BACKGROUNDS ── */
+  .slide-hero {
+    background: linear-gradient(135deg, var(--ibx-blue) 0%, var(--ibx-med) 60%, var(--ibx-light) 100%);
+    color: #fff;
+  }
+  .slide-dark {
+    background: linear-gradient(150deg, #0A1F44 0%, #003087 100%);
+    color: #fff;
+  }
+  .slide-light { background: var(--ibx-bg); }
+  .slide-white { background: #fff; }
+
+  /* ── TYPOGRAPHY ── */
+  .overline {
+    font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+    text-transform: uppercase; opacity: .65; margin-bottom: 12px;
+  }
+  h1 { font-size: 52px; font-weight: 800; line-height: 1.1; }
+  h2 { font-size: 38px; font-weight: 800; line-height: 1.15; }
+  h3 { font-size: 24px; font-weight: 700; }
+  h4 { font-size: 17px; font-weight: 700; }
+  .lead { font-size: 21px; opacity: .88; margin-top: 18px; max-width: 780px; }
+  .caption { font-size: 13px; color: var(--ibx-muted); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--ibx-card);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 24px var(--ibx-shadow);
+    padding: 28px 32px;
+    border: 1px solid var(--ibx-border);
+  }
+  .card-dark {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius);
+    padding: 28px 32px;
+    color: #fff;
+    backdrop-filter: blur(6px);
+  }
+  .card-accent {
+    border-left: 5px solid var(--ibx-light);
+  }
+  .card-green  { border-left: 5px solid var(--ibx-green); }
+  .card-orange { border-left: 5px solid var(--ibx-orange); }
+  .card-gold   { border-left: 5px solid var(--ibx-gold); }
+
+  /* ── GRIDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+
+  /* ── BIG NUMBERS ── */
+  .big-num {
+    font-size: 58px; font-weight: 900; line-height: 1;
+    letter-spacing: -2px;
+  }
+  .big-num-sm {
+    font-size: 40px; font-weight: 900; line-height: 1.1;
+    letter-spacing: -1px;
+  }
+  .big-label { font-size: 13px; font-weight: 600; opacity: .7; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ── STAT BOXES ── */
+  .stat-box {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    box-shadow: 0 3px 16px var(--ibx-shadow);
+    text-align: center;
+    border-top: 4px solid var(--ibx-light);
+  }
+  .stat-box.green  { border-top-color: var(--ibx-green); }
+  .stat-box.orange { border-top-color: var(--ibx-orange); }
+  .stat-box.gold   { border-top-color: var(--ibx-gold); }
+  .stat-box.red    { border-top-color: var(--ibx-red); }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+  }
+  .badge-blue   { background: #E0EEFF; color: var(--ibx-blue); }
+  .badge-green  { background: #E0F7EC; color: #006633; }
+  .badge-orange { background: #FFF0E0; color: #C05A00; }
+  .badge-gold   { background: #FFF8E0; color: #7A5000; }
+  .badge-red    { background: #FFE8E8; color: #990000; }
+  .badge-teal   { background: #E0F8FC; color: #006080; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead tr { background: var(--ibx-blue); color: #fff; }
+  thead th { padding: 12px 16px; text-align: left; font-weight: 600; font-size: 13px; }
+  tbody tr:nth-child(even) { background: #F4F7FB; }
+  tbody tr:hover { background: #E8F0FA; }
+  tbody td { padding: 11px 16px; border-bottom: 1px solid #E2EBF8; vertical-align: middle; }
+  .td-green  { color: var(--ibx-green);  font-weight: 700; }
+  .td-red    { color: var(--ibx-red);    font-weight: 700; }
+  .td-orange { color: var(--ibx-orange); font-weight: 700; }
+  .td-blue   { color: var(--ibx-blue);   font-weight: 700; }
+
+  /* ── BEFORE/AFTER ── */
+  .before-after {
+    display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center;
+  }
+  .before-box {
+    background: #FFF2F2; border: 2px solid #FFCCCC; border-radius: var(--radius);
+    padding: 24px; position: relative;
+  }
+  .after-box {
+    background: #F0FFF6; border: 2px solid #99DDBB; border-radius: var(--radius);
+    padding: 24px; position: relative;
+  }
+  .arrow-divider {
+    font-size: 40px; color: var(--ibx-med); font-weight: 900; text-align: center;
+  }
+
+  /* ── TIMELINE ── */
+  .timeline { display: flex; gap: 0; position: relative; margin-top: 8px; }
+  .timeline::before {
+    content: '';
+    position: absolute; top: 28px; left: 0; right: 0; height: 4px;
+    background: var(--ibx-border);
+  }
+  .t-step {
+    flex: 1; padding-top: 60px; position: relative; padding-right: 12px;
+  }
+  .t-dot {
+    width: 20px; height: 20px; border-radius: 50%;
+    position: absolute; top: 18px; left: 0;
+    background: var(--ibx-blue); z-index: 1;
+    box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--ibx-blue);
+  }
+  .t-dot.done   { background: var(--ibx-green); box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--ibx-green); }
+  .t-dot.active { background: var(--ibx-orange); box-shadow: 0 0 0 4px #fff, 0 0 0 6px var(--ibx-orange); }
+  .t-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--ibx-muted); }
+  .t-title { font-size: 14px; font-weight: 700; color: var(--ibx-text); margin-top: 4px; }
+  .t-note  { font-size: 12px; color: var(--ibx-muted); margin-top: 3px; }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow-row { display: flex; align-items: center; gap: 0; margin-bottom: 8px; }
+  .flow-box {
+    padding: 10px 18px; border-radius: var(--radius-sm);
+    font-size: 13px; font-weight: 600; text-align: center; min-width: 130px;
+  }
+  .flow-arrow { font-size: 20px; color: var(--ibx-muted); padding: 0 8px; }
+
+  /* ── PILL LIST ── */
+  .pill-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+  .pill {
+    padding: 6px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 600;
+    background: var(--ibx-bg);
+    border: 1.5px solid var(--ibx-border);
+    color: var(--ibx-text);
+  }
+  .pill.free { background: #E8FFF2; border-color: #99DDC0; color: #006633; }
+  .pill.new  { background: #E8F0FF; border-color: #99BBEE; color: var(--ibx-blue); }
+
+  /* ── PROGRESS BAR ── */
+  .progress-wrap { background: #E2EBF8; border-radius: 10px; height: 18px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 10px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 700; color: #fff; }
+
+  /* ── SECTION HEADER ── */
+  .slide-header { margin-bottom: 36px; }
+  .slide-header .overline { color: var(--ibx-light); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 2px solid var(--ibx-border); margin: 24px 0; }
+  .divider-light { border-color: rgba(255,255,255,0.2); }
+
+  /* ── ICON CIRCLE ── */
+  .icon-circle {
+    width: 52px; height: 52px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; flex-shrink: 0;
+  }
+  .icon-blue   { background: #E0EEFF; }
+  .icon-green  { background: #E0F7EC; }
+  .icon-orange { background: #FFF0E0; }
+  .icon-gold   { background: #FFF8E0; }
+  .icon-teal   { background: #E0F8FC; }
+
+  /* ── HIGHLIGHT BOX ── */
+  .highlight {
+    background: linear-gradient(135deg, #EBF3FF, #F0F8FF);
+    border: 2px solid var(--ibx-light);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+  }
+  .highlight-gold {
+    background: linear-gradient(135deg, #FFFBE8, #FFF6D0);
+    border: 2px solid var(--ibx-gold);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+  }
+
+  /* ── SAVINGS TAG ── */
+  .savings-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ibx-green); color: #fff;
+    font-size: 13px; font-weight: 700;
+    padding: 5px 14px; border-radius: 20px;
+  }
+
+  /* ── FOOTER ── */
+  .slide-footer {
+    position: absolute; bottom: 24px; left: 72px; right: 72px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--ibx-muted);
+    border-top: 1px solid var(--ibx-border); padding-top: 12px;
+  }
+  .slide-footer.dark-footer { color: rgba(255,255,255,0.5); border-top-color: rgba(255,255,255,0.15); }
+
+  /* ── REUSE METER ── */
+  .reuse-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .reuse-label { min-width: 220px; font-size: 14px; font-weight: 600; }
+  .reuse-bar-wrap { flex: 1; background: #E2EBF8; border-radius: 8px; height: 22px; overflow: hidden; }
+  .reuse-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 700; color: #fff; }
+  .reuse-pct { min-width: 50px; font-size: 14px; font-weight: 800; text-align: right; }
+
+  /* ── OPERATION GRID ── */
+  .op-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .op-card {
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    text-align: center;
+    border: 2px solid;
+  }
+  .op-free   { background: #F0FFF8; border-color: #99DDB8; }
+  .op-light  { background: #F0F6FF; border-color: #99BBDD; }
+  .op-medium { background: #FFF8F0; border-color: #FFCC88; }
+  .op-name { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+  .op-note { font-size: 11px; color: var(--ibx-muted); }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 1 — TITLE / HERO
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-hero" id="s1">
+  <div style="max-width:900px">
+    <div class="overline" style="color:rgba(255,255,255,0.7)">IBX Provider Network Management · April 2026</div>
+    <h1 style="color:#fff; margin-bottom:20px; font-size:56px;">
+      Provider Operations<br>Modernization
+    </h1>
+    <div style="width:80px; height:5px; background:var(--ibx-teal); border-radius:3px; margin-bottom:28px;"></div>
+    <p class="lead" style="color:rgba(255,255,255,0.9);">
+      How one shared platform investment delivers mass bulk updates and faster credentialing reviews — built once, deployed everywhere.
+    </p>
+    <div style="margin-top:48px; display:flex; gap:32px; flex-wrap:wrap;">
+      <div style="color:#fff; text-align:center;">
+        <div class="big-num" style="color:var(--ibx-gold);">13</div>
+        <div class="big-label" style="color:rgba(255,255,255,0.7);">Mass Update Operations</div>
+      </div>
+      <div style="color:#fff; text-align:center;">
+        <div class="big-num" style="color:#90FFD0;">80+</div>
+        <div class="big-label" style="color:rgba(255,255,255,0.7);">Reusable Components</div>
+      </div>
+      <div style="color:#fff; text-align:center;">
+        <div class="big-num" style="color:var(--ibx-teal);">4 of 13</div>
+        <div class="big-label" style="color:rgba(255,255,255,0.7);">Operations Already Covered</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer dark-footer">
+    <span>Independence Blue Cross · Provider Network Management</span>
+    <span>Confidential · For Internal Use</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 2 — THE PROBLEM TODAY
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s2">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">The Problem Today</div>
+    <h2>Our teams are doing work that technology should do</h2>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:32px;">
+    <div>
+      <div class="grid-2" style="gap:16px; margin-bottom:16px;">
+        <div class="stat-box red">
+          <div class="big-num-sm" style="color:var(--ibx-red);">3–8 min</div>
+          <div class="big-label">Screen freezes on every update with 3+ locations</div>
+        </div>
+        <div class="stat-box red">
+          <div class="big-num-sm" style="color:var(--ibx-red);">15–20</div>
+          <div class="big-label">Support tickets per week from PDM timeouts</div>
+        </div>
+      </div>
+      <div class="grid-2" style="gap:16px;">
+        <div class="stat-box orange">
+          <div class="big-num-sm" style="color:var(--ibx-orange);">1 record</div>
+          <div class="big-label">at a time — no way to update many records at once</div>
+        </div>
+        <div class="stat-box orange">
+          <div class="big-num-sm" style="color:var(--ibx-orange);">2–3 hrs</div>
+          <div class="big-label">manual work per failed update to reconcile data</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">🔴 What happens right now</h4>
+        <div class="before-after" style="grid-template-columns:1fr auto 1fr; gap:14px; align-items:start;">
+          <div class="before-box" style="padding:16px;">
+            <div style="font-size:12px; font-weight:700; color:var(--ibx-red); margin-bottom:8px;">TODAY</div>
+            <div style="font-size:13px; line-height:1.7;">
+              Coordinator updates a practitioner with 5 locations →<br>
+              screen spins for 5+ minutes →<br>
+              times out → data partially saved →<br>
+              no error message →<br>
+              Data Admin spends 2 hrs reconciling
+            </div>
+          </div>
+          <div class="arrow-divider">→</div>
+          <div class="after-box" style="padding:16px;">
+            <div style="font-size:12px; font-weight:700; color:var(--ibx-green); margin-bottom:8px;">AFTER THIS INVESTMENT</div>
+            <div style="font-size:13px; line-height:1.7;">
+              Submit in &lt; 3 seconds →<br>
+              work processes in background →<br>
+              email confirmation when done →<br>
+              any errors surfaced clearly →<br>
+              Data Admin fixes with one click
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-orange">
+        <h4 style="margin-bottom:8px;">📋 Business ask that can't be done today</h4>
+        <p style="font-size:14px; color:var(--ibx-muted);">
+          "I would like the ability to update multiple records at the same time without having to go into each record." — Network Maintenance Team
+        </p>
+        <div class="pill-list" style="margin-top:12px;">
+          <span class="pill">Group Name</span><span class="pill">Phone Number</span>
+          <span class="pill">Networks</span><span class="pill">Office Hours</span>
+          <span class="pill">NPI / Tax ID</span><span class="pill">Panel Status</span>
+          <span class="pill">Locations</span><span class="pill">Cap Sites</span>
+          <span class="pill">+5 more</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-gold">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="icon-circle icon-gold" style="font-size:28px;">💡</div>
+      <div>
+        <h4>The good news: we can solve all of this with one shared investment</h4>
+        <p style="font-size:14px; color:var(--ibx-muted); margin-top:4px;">
+          Instead of building each fix separately, we are designing a shared platform that solves performance problems, enables bulk updates, and redesigns the review experience — all at once.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 2 of 9</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 3 — THE BIG PICTURE: ONE PLATFORM, THREE OUTCOMES
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s3">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Strategic Overview</div>
+    <h2>One platform investment — three business outcomes</h2>
+  </div>
+
+  <div class="grid-3" style="margin-bottom:32px;">
+    <div class="card" style="border-top:5px solid var(--ibx-blue); text-align:center;">
+      <div style="font-size:36px; margin-bottom:12px;">⚡</div>
+      <h4 style="color:var(--ibx-blue); margin-bottom:8px;">No More Freezes</h4>
+      <p style="font-size:13px; color:var(--ibx-muted);">PDM updates for any size practitioner complete in the background. Screen returns in under 3 seconds.</p>
+      <div style="margin-top:14px;"><span class="badge badge-blue">Waves 1–3</span></div>
+    </div>
+    <div class="card" style="border-top:5px solid var(--ibx-green); text-align:center;">
+      <div style="font-size:36px; margin-bottom:12px;">📊</div>
+      <h4 style="color:var(--ibx-green); margin-bottom:8px;">Mass Bulk Updates</h4>
+      <p style="font-size:13px; color:var(--ibx-muted);">Update hundreds of records at once — networks, locations, providers, addresses — from a single screen.</p>
+      <div style="margin-top:14px;"><span class="badge badge-green">Wave 4 + Mass Grid</span></div>
+    </div>
+    <div class="card" style="border-top:5px solid var(--ibx-orange); text-align:center;">
+      <div style="font-size:36px; margin-bottom:12px;">🪟</div>
+      <h4 style="color:var(--ibx-orange); margin-bottom:8px;">Redesigned Reviews</h4>
+      <p style="font-size:13px; color:var(--ibx-muted);">App Review, PSV, QC, and ReCred flows rebuilt as modern tile dashboards — editable, resumable, no data loss.</p>
+      <div style="margin-top:14px;"><span class="badge badge-orange">Tile Redesigns</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="padding:28px 32px;">
+    <h4 style="margin-bottom:20px; color:var(--ibx-blue);">Why these three outcomes are connected — not three separate projects</h4>
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="icon-circle icon-blue" style="font-size:18px;">1</div>
+        <div>
+          <div style="font-weight:700; font-size:14px;">Shared processing engine</div>
+          <div style="font-size:13px; color:var(--ibx-muted);">A single background processing system handles all record updates — whether it's one record or 10,000. Built once, used everywhere.</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="icon-circle icon-green" style="font-size:18px;">2</div>
+        <div>
+          <div style="font-weight:700; font-size:14px;">Shared screen components</div>
+          <div style="font-size:13px; color:var(--ibx-muted);">The tiles, progress bars, modals, and autosave UI built for App Review are the same components used in the mass grid.</div>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="icon-circle icon-orange" style="font-size:18px;">3</div>
+        <div>
+          <div style="font-weight:700; font-size:14px;">Shared error handling</div>
+          <div style="font-size:13px; color:var(--ibx-muted);">Every operation — large or small — uses the same error log and Data Admin recovery tools. One place to see all issues.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 3 of 9</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 4 — THE 13 MASS OPERATIONS
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s4">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Mass Bulk Update Capability</div>
+    <h2>All 13 requested operations — mapped and costed</h2>
+  </div>
+
+  <div style="margin-bottom:24px;">
+    <p style="font-size:15px; color:var(--ibx-muted); max-width:900px;">
+      Every one of the 13 operations the business requested has been mapped to the exact records it touches and the processing module that handles it. The color coding shows how much of the work is already being done elsewhere.
+    </p>
+  </div>
+
+  <div style="display:flex; gap:18px; margin-bottom:18px; flex-wrap:wrap; align-items:center;">
+    <div style="display:flex; align-items:center; gap:8px;"><div style="width:16px;height:16px;border-radius:4px;background:#E8FFF2;border:2px solid #99DDB8;"></div><span style="font-size:13px;">Covered by existing plans — no new work needed</span></div>
+    <div style="display:flex; align-items:center; gap:8px;"><div style="width:16px;height:16px;border-radius:4px;background:#F0F6FF;border:2px solid #99BBDD;"></div><span style="font-size:13px;">Thin extension — reuses most components</span></div>
+    <div style="display:flex; align-items:center; gap:8px;"><div style="width:16px;height:16px;border-radius:4px;background:#FFF8F0;border:2px solid #FFCC88;"></div><span style="font-size:13px;">New work — but shares the common processing engine</span></div>
+  </div>
+
+  <div class="op-grid" style="margin-bottom:24px;">
+    <!-- FREE - already in Wave 4 -->
+    <div class="op-card op-free">
+      <div style="font-size:24px;">📍</div>
+      <div class="op-name">Locations</div>
+      <div><span class="badge badge-green" style="font-size:10px;">Already Built</span></div>
+      <div class="op-note" style="margin-top:6px;">Add or remove practice locations at scale</div>
+    </div>
+    <div class="op-card op-free">
+      <div style="font-size:24px;">🔗</div>
+      <div class="op-name">Linking Providers</div>
+      <div><span class="badge badge-green" style="font-size:10px;">Already Built</span></div>
+      <div class="op-note" style="margin-top:6px;">Link many providers at once (UPHS 107-provider scenario)</div>
+    </div>
+    <div class="op-card op-free">
+      <div style="font-size:24px;">🌐</div>
+      <div class="op-name">Networks</div>
+      <div><span class="badge badge-green" style="font-size:10px;">Already Built</span></div>
+      <div class="op-note" style="margin-top:6px;">Bulk add or remove payer networks</div>
+    </div>
+    <div class="op-card op-free">
+      <div style="font-size:24px;">🚫</div>
+      <div class="op-name">Terming Practitioners</div>
+      <div><span class="badge badge-green" style="font-size:10px;">Already Built</span></div>
+      <div class="op-note" style="margin-top:6px;">Terminate practitioners + retire networks at scale</div>
+    </div>
+
+    <!-- THIN EXTENSIONS -->
+    <div class="op-card op-light">
+      <div style="font-size:24px;">🕐</div>
+      <div class="op-name">Office Hours</div>
+      <div><span class="badge badge-blue" style="font-size:10px;">Thin Extension</span></div>
+      <div class="op-note" style="margin-top:6px;">Bulk update hours across locations</div>
+    </div>
+    <div class="op-card op-light">
+      <div style="font-size:24px;">ℹ️</div>
+      <div class="op-name">Info Indicator</div>
+      <div><span class="badge badge-blue" style="font-size:10px;">Thin Extension</span></div>
+      <div class="op-note" style="margin-top:6px;">Update directory / info flags in bulk</div>
+    </div>
+    <div class="op-card op-light">
+      <div style="font-size:24px;">🎚️</div>
+      <div class="op-name">Panel Status</div>
+      <div><span class="badge badge-blue" style="font-size:10px;">Thin Extension</span></div>
+      <div class="op-note" style="margin-top:6px;">Open / close panels across many providers</div>
+    </div>
+    <div class="op-card op-light">
+      <div style="font-size:24px;">📞</div>
+      <div class="op-name">Phone Number</div>
+      <div><span class="badge badge-blue" style="font-size:10px;">Thin Extension</span></div>
+      <div class="op-note" style="margin-top:6px;">Update contact numbers at scale</div>
+    </div>
+
+    <!-- NEW WORK -->
+    <div class="op-card op-medium">
+      <div style="font-size:24px;">🏷️</div>
+      <div class="op-name">Group Name</div>
+      <div><span class="badge badge-orange" style="font-size:10px;">New Module</span></div>
+      <div class="op-note" style="margin-top:6px;">Rename group accounts across records</div>
+    </div>
+    <div class="op-card op-medium">
+      <div style="font-size:24px;">🏢</div>
+      <div class="op-name">DBA Name</div>
+      <div><span class="badge badge-orange" style="font-size:10px;">New Module</span></div>
+      <div class="op-note" style="margin-top:6px;">Update doing-business-as names in bulk</div>
+    </div>
+    <div class="op-card op-medium">
+      <div style="font-size:24px;">🔢</div>
+      <div class="op-name">NPI</div>
+      <div><span class="badge badge-orange" style="font-size:10px;">New Module</span></div>
+      <div class="op-note" style="margin-top:6px;">Bulk NPI identifier updates with validation</div>
+    </div>
+    <div class="op-card op-medium">
+      <div style="font-size:24px;">🧾</div>
+      <div class="op-name">Tax ID</div>
+      <div><span class="badge badge-orange" style="font-size:10px;">New Module</span></div>
+      <div class="op-note" style="margin-top:6px;">Update Tax IDs with cross-reference cascade</div>
+    </div>
+    <div class="op-card op-medium">
+      <div style="font-size:24px;">💰</div>
+      <div class="op-name">Cap Sites</div>
+      <div><span class="badge badge-orange" style="font-size:10px;">New Module</span></div>
+      <div class="op-note" style="margin-top:6px;">Bulk capitation site assignment</div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="gap:16px;">
+    <div class="stat-box green">
+      <div class="big-num-sm" style="color:var(--ibx-green);">4 of 13</div>
+      <div class="big-label">operations have zero new build cost — covered by existing plans</div>
+    </div>
+    <div class="stat-box" style="border-top-color:var(--ibx-blue);">
+      <div class="big-num-sm" style="color:var(--ibx-blue);">4 of 13</div>
+      <div class="big-label">are thin extensions — 70%+ reuse of existing components</div>
+    </div>
+    <div class="stat-box orange">
+      <div class="big-num-sm" style="color:var(--ibx-orange);">5 of 13</div>
+      <div class="big-label">are new modules — but share the common engine so each is fast to build</div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 4 of 9</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 5 — NETWORK RETIREMENT / MASS TERMINATION
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s5">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Mass Termination Scenario</div>
+    <h2>Retiring a network — terminating 500 to 1,000+ relationships at once</h2>
+  </div>
+
+  <p style="font-size:15px; color:var(--ibx-muted); max-width:960px; margin-bottom:28px;">
+    When a healthcare facility network is retired, every provider linked to that network must be terminated on the same date. Today that means opening each record individually. With this capability, a PDA selects the network, sets one termination date, and the platform handles the rest — intelligently choosing the right processing method based on volume.
+  </p>
+
+  <div class="grid-2" style="gap:28px; margin-bottom:28px; align-items:start;">
+
+    <!-- LEFT: Smart routing diagram -->
+    <div>
+      <div class="card" style="padding:24px 28px;">
+        <h4 style="color:var(--ibx-blue); margin-bottom:20px;">🔀 Smart Volume Routing — Automatic</h4>
+
+        <!-- Top: Trigger -->
+        <div style="text-align:center; margin-bottom:16px;">
+          <div style="display:inline-block; background:var(--ibx-blue); color:#fff; border-radius:10px; padding:12px 28px; font-size:14px; font-weight:700;">
+            PDA selects network(s) → sets Termination Date → clicks Terminate
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-bottom:16px; font-size:22px; color:var(--ibx-muted);">↓</div>
+
+        <!-- Split -->
+        <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:16px; align-items:start;">
+          <!-- Under 500 -->
+          <div style="background:#F0FFF8; border:2px solid #99DDB8; border-radius:var(--radius); padding:20px;">
+            <div style="font-size:12px; font-weight:700; color:var(--ibx-green); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Under 500 Records</div>
+            <div style="font-size:13px; font-weight:700; color:var(--ibx-green); margin-bottom:10px;">✅ Manual — In Screen</div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:12px; color:var(--ibx-text);">→ Preview list of affected providers</div>
+              <div style="font-size:12px; color:var(--ibx-text);">→ Confirm termination date</div>
+              <div style="font-size:12px; color:var(--ibx-text);">→ Process immediately in background</div>
+              <div style="font-size:12px; color:var(--ibx-text);">→ Email confirmation on completion</div>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div style="text-align:center; padding-top:40px;">
+            <div style="font-size:13px; font-weight:800; color:var(--ibx-muted);">OR</div>
+          </div>
+
+          <!-- Over 500 -->
+          <div style="background:#FFF8F0; border:2px solid #FFCC88; border-radius:var(--radius); padding:20px;">
+            <div style="font-size:12px; font-weight:700; color:var(--ibx-orange); margin-bottom:10px; text-transform:uppercase; letter-spacing:1px;">Over 500 Records</div>
+            <div style="font-size:13px; font-weight:700; color:var(--ibx-orange); margin-bottom:10px;">⚙️ Mass-Load — Batch Queue</div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="font-size:12px; color:var(--ibx-text);">→ Queued as a background job</div>
+              <div style="font-size:12px; color:var(--ibx-text);">→ Processed in chunks — no timeout</div>
+              <div style="font-size:12px; color:var(--ibx-text);">→ Live status: Queued → Processing → Done</div>
+              <div style="font-size:12px; color:var(--ibx-text);">→ Email confirmation + failure report</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px; padding:12px 16px; background:var(--ibx-bg); border-radius:var(--radius-sm); font-size:12px; color:var(--ibx-muted); text-align:center;">
+          Platform detects volume automatically — PDA uses the same screen for both paths
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Key capabilities & reuse -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
+
+      <div class="card card-green">
+        <h4 style="margin-bottom:14px;">What this handles</h4>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="color:var(--ibx-green); font-size:16px; margin-top:1px;">✓</div>
+            <div style="font-size:13px;"><strong>Single termination date applied to all records</strong> — set it once, applied consistently across every provider relationship</div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="color:var(--ibx-green); font-size:16px; margin-top:1px;">✓</div>
+            <div style="font-size:13px;"><strong>Same Tax ID / NPI or mixed</strong> — works whether the network covers one group or hundreds of different providers</div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="color:var(--ibx-green); font-size:16px; margin-top:1px;">✓</div>
+            <div style="font-size:13px;"><strong>Select one or multiple networks</strong> — retire several networks in one action if they share the same termination date</div>
+          </div>
+          <div style="display:flex; align-items:flex-start; gap:10px;">
+            <div style="color:var(--ibx-green); font-size:16px; margin-top:1px;">✓</div>
+            <div style="font-size:13px;"><strong>Partial success</strong> — if any individual record fails, the rest still terminate. Failures are logged for Data Admin review</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card card-accent">
+        <h4 style="margin-bottom:12px;">🔁 Reuse connection</h4>
+        <p style="font-size:13px; color:var(--ibx-muted); line-height:1.7;">
+          The <strong>batch termination processor</strong> built for the "Terming Practitioners" operation (Wave 4) is the <strong>same engine</strong> used here — extended with a network-level selector and the smart routing switch. No separate system required.
+        </p>
+        <div style="margin-top:12px; display:flex; flex-wrap:wrap; gap:8px;">
+          <span class="badge badge-blue">Wave 4 Batch Engine</span>
+          <span class="badge badge-blue">Error &amp; Recovery Tools</span>
+          <span class="badge badge-blue">Email Notifications</span>
+          <span class="badge badge-green">Already In Plan</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="grid-4" style="gap:14px;">
+    <div class="stat-box red">
+      <div class="big-num-sm" style="color:var(--ibx-red);">1,000+</div>
+      <div class="big-label">provider relationships terminated in a single action</div>
+    </div>
+    <div class="stat-box green">
+      <div class="big-num-sm" style="color:var(--ibx-green);">&lt;3 sec</div>
+      <div class="big-label">screen response — PDA is not blocked while processing runs</div>
+    </div>
+    <div class="stat-box" style="border-top-color:var(--ibx-orange);">
+      <div class="big-num-sm" style="color:var(--ibx-orange);">1 date</div>
+      <div class="big-label">set once and applied consistently to every affected record</div>
+    </div>
+    <div class="stat-box gold">
+      <div class="big-num-sm" style="color:var(--ibx-gold);">Auto</div>
+      <div class="big-label">routing — manual or mass-load chosen by volume, not by the user</div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 5 of 9</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 6 — THE REUSE ENGINE
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-dark" id="s5">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-teal)">The Reuse Advantage</div>
+    <h2 style="color:#fff;">Every investment pays for itself multiple times over</h2>
+  </div>
+
+  <p style="font-size:16px; color:rgba(255,255,255,0.8); max-width:850px; margin-bottom:32px;">
+    The key to our cost reduction is that we are not building separate systems for each initiative. We build shared components once, then connect them to each business need. The chart below shows how much of each initiative is already paid for by work happening elsewhere.
+  </p>
+
+  <div style="margin-bottom:28px;">
+    <div class="reuse-row">
+      <div class="reuse-label" style="color:#fff;">Mass Grid (13 operations)</div>
+      <div class="reuse-bar-wrap">
+        <div class="reuse-fill" style="width:65%; background:linear-gradient(90deg,var(--ibx-green),var(--ibx-teal));">~65% already built</div>
+      </div>
+      <div class="reuse-pct" style="color:var(--ibx-green);">65%</div>
+    </div>
+    <div class="reuse-row">
+      <div class="reuse-label" style="color:#fff;">PSV / QC / ReCred Redesigns</div>
+      <div class="reuse-bar-wrap">
+        <div class="reuse-fill" style="width:55%; background:linear-gradient(90deg,var(--ibx-orange),var(--ibx-gold));">~55% reused from App Review</div>
+      </div>
+      <div class="reuse-pct" style="color:var(--ibx-gold);">55%</div>
+    </div>
+    <div class="reuse-row">
+      <div class="reuse-label" style="color:#fff;">PDM Performance Fix (Waves 2+3)</div>
+      <div class="reuse-bar-wrap">
+        <div class="reuse-fill" style="width:72%; background:linear-gradient(90deg,var(--ibx-green),var(--ibx-teal));">~72% reused from Wave 1</div>
+      </div>
+      <div class="reuse-pct" style="color:var(--ibx-green);">72%</div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="gap:18px;">
+    <div class="card-dark">
+      <div style="font-size:28px; margin-bottom:10px;">🔧</div>
+      <h4 style="color:var(--ibx-teal); margin-bottom:8px;">Processing Engine</h4>
+      <p style="font-size:13px; color:rgba(255,255,255,0.75); line-height:1.6;">
+        Built once for the Practitioner Creation performance fix. Reused by every subsequent initiative — PDM updates, mass grid, review redesigns — at zero additional cost.
+      </p>
+      <div style="margin-top:12px; font-size:22px; font-weight:900; color:var(--ibx-teal);">6 flows</div>
+      <div style="font-size:12px; color:rgba(255,255,255,0.5);">powered by one engine</div>
+    </div>
+    <div class="card-dark">
+      <div style="font-size:28px; margin-bottom:10px;">🪟</div>
+      <h4 style="color:var(--ibx-gold); margin-bottom:8px;">Tile UI Framework</h4>
+      <p style="font-size:13px; color:rgba(255,255,255,0.75); line-height:1.6;">
+        Built once for App Review redesign. The same progress bars, tile cards, modals, and autosave components power PSV, QC, ReCred, and the Mass Grid.
+      </p>
+      <div style="margin-top:12px; font-size:22px; font-weight:900; color:var(--ibx-gold);">6 flows</div>
+      <div style="font-size:12px; color:rgba(255,255,255,0.5);">use the same UI components</div>
+    </div>
+    <div class="card-dark">
+      <div style="font-size:28px; margin-bottom:10px;">🛠️</div>
+      <h4 style="color:var(--ibx-orange); margin-bottom:8px;">Error &amp; Recovery Tooling</h4>
+      <p style="font-size:13px; color:rgba(255,255,255,0.75); line-height:1.6;">
+        Built once in Wave 1. Every operation — PDM update, mass grid row, review submission — logs errors the same way and is fixed by the same Data Admin screen.
+      </p>
+      <div style="margin-top:12px; font-size:22px; font-weight:900; color:var(--ibx-orange);">All flows</div>
+      <div style="font-size:12px; color:rgba(255,255,255,0.5);">one error dashboard</div>
+    </div>
+  </div>
+
+  <div class="slide-footer dark-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:rgba(255,255,255,0.7);">Slide 6 of 9</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 6 — THE TILE / REVIEW REDESIGN
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s6">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Review Flow Redesign</div>
+    <h2>Replacing monolithic screens with a modern tile experience</h2>
+  </div>
+
+  <div class="grid-2-1" style="gap:28px; margin-bottom:28px;">
+    <div>
+      <div class="before-after">
+        <div class="before-box">
+          <div style="font-size:12px; font-weight:700; color:var(--ibx-red); margin-bottom:10px;">❌ TODAY: Single Long OmniScript</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#FFE8E8; border-radius:6px; padding:10px; font-size:13px;">21-step PSV screen — can't save halfway through</div>
+            <div style="background:#FFE8E8; border-radius:6px; padding:10px; font-size:13px;">4 MB data limit causes crashes and data loss</div>
+            <div style="background:#FFE8E8; border-radius:6px; padding:10px; font-size:13px;">Fields not editable inline — must re-enter everything</div>
+            <div style="background:#FFE8E8; border-radius:6px; padding:10px; font-size:13px;">Session times out — work lost if browser closes</div>
+          </div>
+        </div>
+        <div class="arrow-divider" style="font-size:28px;">→</div>
+        <div class="after-box">
+          <div style="font-size:12px; font-weight:700; color:var(--ibx-green); margin-bottom:10px;">✅ NEW: Tile Dashboard</div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="background:#E0FFF0; border-radius:6px; padding:10px; font-size:13px;">Each section is its own tile — save one at a time</div>
+            <div style="background:#E0FFF0; border-radius:6px; padding:10px; font-size:13px;">Auto-saves every 2 minutes — never lose work</div>
+            <div style="background:#E0FFF0; border-radius:6px; padding:10px; font-size:13px;">Edit fields directly in the tile — no re-entry</div>
+            <div style="background:#E0FFF0; border-radius:6px; padding:10px; font-size:13px;">Resume anywhere — close browser, come back tomorrow</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card">
+        <div style="font-size:13px; font-weight:700; color:var(--ibx-muted); margin-bottom:10px;">FLOWS BEING REDESIGNED</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--ibx-bg); border-radius:var(--radius-sm);">
+            <span style="font-size:13px; font-weight:600;">Application Review</span>
+            <span class="badge badge-blue">In Progress</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--ibx-bg); border-radius:var(--radius-sm);">
+            <span style="font-size:13px; font-weight:600;">Primary Source Verification</span>
+            <span class="badge badge-blue">Queued</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--ibx-bg); border-radius:var(--radius-sm);">
+            <span style="font-size:13px; font-weight:600;">PSV / QC Review</span>
+            <span class="badge badge-gold">Planned</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--ibx-bg); border-radius:var(--radius-sm);">
+            <span style="font-size:13px; font-weight:600;">Re-Credentialing Review</span>
+            <span class="badge badge-gold">Planned</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 12px; background:var(--ibx-bg); border-radius:var(--radius-sm);">
+            <span style="font-size:13px; font-weight:600;">PDA QC Review</span>
+            <span class="badge badge-gold">Planned</span>
+          </div>
+        </div>
+      </div>
+      <div class="highlight">
+        <div style="font-size:13px; font-weight:700; color:var(--ibx-blue); margin-bottom:8px;">REUSE CONNECTION</div>
+        <p style="font-size:13px;">The panel status, networks, and cap sites tile components built for PDA QC Review are the <strong>same components used as cells in the mass update grid</strong>. One build, two purposes.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-4" style="gap:14px;">
+    <div class="stat-box">
+      <div class="big-num-sm" style="color:var(--ibx-blue);">5</div>
+      <div class="big-label">major review flows being redesigned</div>
+    </div>
+    <div class="stat-box green">
+      <div class="big-num-sm" style="color:var(--ibx-green);">80%</div>
+      <div class="big-label">of tile components reused across all flows</div>
+    </div>
+    <div class="stat-box" style="border-top-color:var(--ibx-orange);">
+      <div class="big-num-sm" style="color:var(--ibx-orange);">~40%</div>
+      <div class="big-label">cost reduction vs. redesigning each flow independently</div>
+    </div>
+    <div class="stat-box gold">
+      <div class="big-num-sm" style="color:var(--ibx-gold);">6+</div>
+      <div class="big-label">total flows that benefit from the tile UI framework</div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 7 of 9</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 7 — COMPONENT REUSE ACROSS ALL FLOWS (TABLE)
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s7">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Cross-Flow Reuse Map</div>
+    <h2>Where every key component gets used — built once, deployed many times</h2>
+  </div>
+
+  <p style="font-size:14px; color:var(--ibx-muted); margin-bottom:20px; max-width:900px;">
+    The table below translates the component inventory into plain business language. Each row is a capability — and shows which initiatives benefit from it being built.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:28%;">Capability</th>
+        <th style="width:15%;">Built When</th>
+        <th>PDM<br>Fix</th>
+        <th>Mass<br>Grid</th>
+        <th>App Review<br>/ PSV / QC</th>
+        <th style="width:20%;">Business Benefit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Background processing engine</strong><br><span class="caption">Submit → instant response → work happens in background</span></td>
+        <td><span class="badge badge-blue">Wave 1<br>(Now)</span></td>
+        <td class="td-green">✓</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>No more waiting. Every operation returns in &lt;3 seconds.</td>
+      </tr>
+      <tr>
+        <td><strong>Taxonomy &amp; Network processor</strong><br><span class="caption">Creates/updates provider–network links at scale</span></td>
+        <td><span class="badge badge-blue">Wave 1<br>(Now)</span></td>
+        <td class="td-green">✓</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>Handles unlimited locations &amp; networks in one submission.</td>
+      </tr>
+      <tr>
+        <td><strong>Error log &amp; recovery tools</strong><br><span class="caption">Tracks any failed rows; Data Admin can fix with one click</span></td>
+        <td><span class="badge badge-blue">Wave 1<br>(Now)</span></td>
+        <td class="td-green">✓</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>No more silent failures. Every error visible and self-serviceable.</td>
+      </tr>
+      <tr>
+        <td><strong>Mass update dispatcher</strong><br><span class="caption">Accepts bulk payloads; routes to correct processor</span></td>
+        <td><span class="badge badge-green">Wave 4<br>(Q3 2026)</span></td>
+        <td>—</td><td class="td-green">✓</td><td>—</td>
+        <td>Single intake point for all bulk operations — UPHS-style loads.</td>
+      </tr>
+      <tr>
+        <td><strong>Job status tracker</strong><br><span class="caption">Real-time: Queued → Processing → Completed</span></td>
+        <td><span class="badge badge-green">Wave 4<br>(Q3 2026)</span></td>
+        <td>—</td><td class="td-green">✓</td><td>—</td>
+        <td>Users see live progress without refreshing the page.</td>
+      </tr>
+      <tr>
+        <td><strong>Tile dashboard UI framework</strong><br><span class="caption">Tile grid, progress bar, autosave, resume-anywhere</span></td>
+        <td><span class="badge badge-orange">App Review<br>(Q3 2026)</span></td>
+        <td>—</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>Modern, reliable review experience. Session never lost.</td>
+      </tr>
+      <tr>
+        <td><strong>Session autosave</strong><br><span class="caption">Saves work every 2 minutes; resume after close</span></td>
+        <td><span class="badge badge-orange">App Review<br>(Q3 2026)</span></td>
+        <td>—</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>Reviewers and bulk editors never lose work.</td>
+      </tr>
+      <tr>
+        <td><strong>Networks cell editor</strong><br><span class="caption">Multi-select add/remove networks in a tile or grid cell</span></td>
+        <td><span class="badge badge-orange">App Review<br>(Q3 2026)</span></td>
+        <td>—</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>Same UI in the review screen and the mass grid. Familiar to users.</td>
+      </tr>
+      <tr>
+        <td><strong>Cap site picker</strong><br><span class="caption">Capitation site assignment with rule validation</span></td>
+        <td><span class="badge badge-orange">PDA QC<br>(Q4 2026)</span></td>
+        <td>—</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>One component; used in QC review tile and mass grid cell.</td>
+      </tr>
+      <tr>
+        <td><strong>Address validation service</strong><br><span class="caption">Confirms address is real and deliverable</span></td>
+        <td><span class="badge badge-teal">Phase 5<br>(Built)</span></td>
+        <td class="td-green">✓</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>Address quality protected across all entry points.</td>
+      </tr>
+      <tr>
+        <td><strong>Provider search service</strong><br><span class="caption">Lookup practitioner by NPI, Tax ID, or name</span></td>
+        <td><span class="badge badge-teal">Existing<br>(Built)</span></td>
+        <td class="td-green">✓</td><td class="td-green">✓</td><td class="td-green">✓</td>
+        <td>Single lookup service — no duplicate implementations.</td>
+      </tr>
+      <tr>
+        <td><strong>Practitioner link/term batches</strong><br><span class="caption">Bulk add or remove practitioners from locations</span></td>
+        <td><span class="badge badge-green">Wave 4<br>(Q3 2026)</span></td>
+        <td>—</td><td class="td-green">✓</td><td>—</td>
+        <td>UPHS 107-provider scenario handled automatically.</td>
+      </tr>
+      <tr>
+        <td><strong>Email notifications</strong><br><span class="caption">Success / failure email to submitting user</span></td>
+        <td><span class="badge badge-blue">Wave 1<br>(Now)</span></td>
+        <td class="td-green">✓</td><td class="td-green">✓</td><td>—</td>
+        <td>Users know when their request is done — no need to check.</td>
+      </tr>
+      <tr>
+        <td><strong>Rollback &amp; safety net</strong><br><span class="caption">If anything fails mid-way, only that record is affected</span></td>
+        <td><span class="badge badge-blue">Wave 1<br>(Now)</span></td>
+        <td class="td-green">✓</td><td class="td-green">✓</td><td>—</td>
+        <td>Partial success — good records save; bad records log for review.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top:18px; display:flex; gap:20px; flex-wrap:wrap;">
+    <div style="display:flex; align-items:center; gap:6px;"><span class="badge badge-blue">Wave 1</span><span style="font-size:12px;">In-flight · delivers core engine</span></div>
+    <div style="display:flex; align-items:center; gap:6px;"><span class="badge badge-green">Wave 4</span><span style="font-size:12px;">Q3 2026 · mass update dispatcher + bulk operations</span></div>
+    <div style="display:flex; align-items:center; gap:6px;"><span class="badge badge-orange">App Review / PDA QC</span><span style="font-size:12px;">Q3–Q4 2026 · tile UI framework</span></div>
+    <div style="display:flex; align-items:center; gap:6px;"><span class="badge badge-teal">Phase 5 / Existing</span><span style="font-size:12px;">Already built</span></div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 8 of 9</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 8 — ROADMAP & NEXT STEPS
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s8">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Roadmap</div>
+    <h2>How we get there — what's happening when</h2>
+  </div>
+
+  <div style="margin-bottom:36px;">
+    <div style="display:grid; grid-template-columns: 90px repeat(4,1fr); gap:0; position:relative;">
+      <!-- Header row -->
+      <div></div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-blue); color:#fff; font-weight:700; font-size:13px; border-radius:8px 0 0 0;">Q2 2026<br><span style="font-weight:400; font-size:11px;">Now</span></div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-med); color:#fff; font-weight:700; font-size:13px;">Q3 2026</div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-light); color:#fff; font-weight:700; font-size:13px;">Q4 2026</div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-teal); color:#fff; font-weight:700; font-size:13px; border-radius:0 8px 0 0;">Q1 2027+</div>
+
+      <!-- Row 1: Performance Fix -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-blue); border-right:2px solid var(--ibx-border);">Performance Fix</div>
+      <div style="padding:8px; background:#E8F4FF; border:1px solid var(--ibx-border);">
+        <div style="background:var(--ibx-blue); color:#fff; border-radius:6px; padding:8px 10px; font-size:12px; font-weight:600;">⚡ Wave 1: Practitioner Creation Fix — ACTIVE</div>
+        <div style="font-size:11px; color:var(--ibx-muted); margin-top:6px;">Delivers: processing engine, error tools</div>
+      </div>
+      <div style="padding:8px; background:#E8F4FF; border:1px solid var(--ibx-border);">
+        <div style="background:var(--ibx-med); color:#fff; border-radius:6px; padding:8px 10px; font-size:12px; font-weight:600;">Waves 2+3: PDM Practitioner &amp; Practice Location</div>
+        <div style="font-size:11px; color:var(--ibx-muted); margin-top:6px;">Removes all freezes and limits</div>
+      </div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+
+      <!-- Row 2: Mass Updates -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-green); border-right:2px solid var(--ibx-border);">Mass Updates</div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+      <div style="padding:8px; background:#F0FFF8; border:1px solid var(--ibx-border);">
+        <div style="background:var(--ibx-green); color:#fff; border-radius:6px; padding:8px 10px; font-size:12px; font-weight:600;">Wave 4: Mass Update Backbone</div>
+        <div style="font-size:11px; color:var(--ibx-muted); margin-top:6px;">8 bulk operations, UPHS scenario</div>
+      </div>
+      <div style="padding:8px; background:#F0FFF8; border:1px solid var(--ibx-border);">
+        <div style="background:#00874A; color:#fff; border-radius:6px; padding:8px 10px; font-size:12px; font-weight:600;">Mass Grid: All 13 operations</div>
+        <div style="font-size:11px; color:var(--ibx-muted); margin-top:6px;">Full bulk update UI live</div>
+      </div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+
+      <!-- Row 3: Review Redesigns -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-orange); border-right:2px solid var(--ibx-border);">Review Redesigns</div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+      <div style="padding:8px; background:#FFF8F0; border:1px solid var(--ibx-border);">
+        <div style="background:var(--ibx-orange); color:#fff; border-radius:6px; padding:8px 10px; font-size:12px; font-weight:600;">App Review + PSV tile redesigns</div>
+        <div style="font-size:11px; color:var(--ibx-muted); margin-top:6px;">Tile framework + autosave</div>
+      </div>
+      <div style="padding:8px; background:#FFF8F0; border:1px solid var(--ibx-border);">
+        <div style="background:#C05A00; color:#fff; border-radius:6px; padding:8px 10px; font-size:12px; font-weight:600;">PSV QC + PDA QC + ReCred redesigns</div>
+        <div style="font-size:11px; color:var(--ibx-muted); margin-top:6px;">80% reuse from App Review</div>
+      </div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="gap:16px;">
+    <div class="card card-green">
+      <h4 style="margin-bottom:10px;">✅ What's already happening</h4>
+      <p style="font-size:13px; color:var(--ibx-muted);">Wave 1 (core engine) is actively in development. This is the foundational investment that makes everything else more efficient. It's already funded and on track.</p>
+    </div>
+    <div class="card card-accent">
+      <h4 style="margin-bottom:10px;">📋 Decision needed</h4>
+      <p style="font-size:13px; color:var(--ibx-muted);">Approve Wave 4 (Mass Updates backbone) and the App Review tile redesign to start in Q3. These are the two key unlocks for the Mass Grid and all review modernizations.</p>
+    </div>
+    <div class="card card-gold">
+      <h4 style="margin-bottom:10px;">🎯 By Q1 2027</h4>
+      <p style="font-size:13px; color:var(--ibx-muted);">All 13 mass operations live. PSV and QC redesigned. ReCred in progress. All built on one shared, maintainable platform — not five separate systems.</p>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX Provider Operations Modernization</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 9 of 9</span>
+  </div>
+</section>
+
+</div><!-- end .deck -->
+</body>
+</html>

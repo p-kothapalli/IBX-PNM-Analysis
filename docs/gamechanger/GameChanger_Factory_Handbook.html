@@ -1,0 +1,2857 @@
+<!DOCTYPE html>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  THE GAMECHANGER FACTORY — an illustrated handbook to the multi-agentic SDLC
+  ═══════════════════════════════════════════════════════════════════════════
+
+  TO MAKE THE PDF:
+    Chrome → Print (⌘P) → Destination "Save as PDF" → Paper size "Custom"
+    1024 × 1536 px → Margins "None" → Background graphics ON → Save.
+
+  Grounded in docs/gamechanger/01_GameChanger_System_Explained.md
+  Every monospace identifier in this document is copied from that source.
+  22 pages. No JavaScript. No external images.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The GameChanger Factory — 10 stations, 13 back offices, 1 house rule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* An editorial-explainer setting: warm paper, a display serif for every
+   heading, a humanist sans for everything you actually read, and a single
+   terracotta accent kept back for warnings. Rules and washes do the work
+   that boxes and marker outlines used to. */
+:root{
+  --paper:#FBF8F3; --panel:#FFFFFF; --ink:#1F3A5F; --ink2:#23262E;
+  --accent:#B4442E; --wash:#F3EFE7; --th:#E7E0D3; --muted:#797466;
+  --rule:#DED7C9; --green:#3F6B4A; --plum:#6C4A7E;
+  --blue:#1F3A5F; --teal:#3C7A78; --orange:#B07A2A; --note:#F6EFDC;
+  --redwash:#FBF0EC; --redrule:#E3C7BE;
+  --hand:'Inter',system-ui,-apple-system,sans-serif;
+  --pen:'Inter',system-ui,-apple-system,sans-serif;
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --marker:'Fraunces',Georgia,serif;
+  --mono:'JetBrains Mono',ui-monospace,'SF Mono',Menlo,monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+/* every 24-grid icon is a line drawing; the swooshes carry their own attrs */
+svg[viewBox="0 0 24 24"]{
+  fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round
+}
+html{background:#4A453D}
+body{font-family:var(--hand);color:var(--ink2);font-weight:400;letter-spacing:-.005em;
+  -webkit-font-smoothing:antialiased}
+
+/* ── PAGE ───────────────────────────────────────────────────────── */
+@page{size:1024px 1536px;margin:0}
+.page{
+  width:1024px;height:1536px;background:var(--paper);position:relative;
+  overflow:hidden;padding:38px 48px 26px;display:flex;flex-direction:column;
+  page-break-after:always;break-after:page;margin:0 auto 22px;
+}
+.page:last-of-type{page-break-after:auto;break-after:auto;margin-bottom:0}
+@media print{
+  html,body{background:#fff}
+  .page{margin:0;box-shadow:none}
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .noprint{display:none!important}
+}
+@media screen{ .page{box-shadow:0 8px 34px rgba(0,0,0,.4)} }
+
+/* ── PAGE FURNITURE ─────────────────────────────────────────────── */
+.head{display:flex;align-items:baseline;gap:14px;margin-bottom:12px;flex:0 0 auto}
+.badge{
+  width:54px;height:54px;flex:0 0 54px;border:none;background:none;border-radius:0;
+  display:flex;align-items:flex-start;justify-content:center;font-family:var(--serif);
+  font-size:42px;font-weight:700;color:var(--accent);line-height:1;letter-spacing:-1px
+}
+.htitle{flex:1;text-align:center;padding-top:2px}
+.htitle h1{
+  font-family:var(--serif);font-size:44px;font-weight:700;letter-spacing:-1.2px;
+  color:var(--ink2);line-height:1.1
+}
+.htitle .sub{font-family:var(--pen);font-size:17.5px;font-style:italic;color:var(--muted);margin-top:4px}
+.swoosh{display:block;margin:9px auto 0;width:130px;height:11px;color:var(--accent)}
+.brand{
+  flex:0 0 136px;text-align:right;font-family:var(--pen);font-size:11.5px;font-weight:500;
+  letter-spacing:1.4px;color:var(--muted);line-height:1.4;text-transform:uppercase;padding-top:5px
+}
+.brand b{display:block;font-weight:700;font-size:13px;letter-spacing:1.1px;color:var(--ink2)}
+.brand svg{display:block;margin-left:auto;width:96px;height:7px;color:var(--accent)}
+.idbar{
+  display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:-2px 0 12px;flex:0 0 auto
+}
+.pageno{
+  position:absolute;right:48px;bottom:12px;font-family:var(--mono);font-size:12px;color:var(--muted)
+}
+/* Slack is absorbed by the panels themselves rather than pooling into dead
+   gaps between them. Full-width banner strips (.flat) keep their natural
+   height so a two-line note never becomes a tall empty box. */
+.body{flex:1 1 auto;display:flex;flex-direction:column;gap:11px;min-height:0}
+.body>.p:not(.flat),.body>.row,.body>.g2,.body>.g3{flex:1 1 auto}
+.body>.unit{flex:0 0 auto}
+.body>.p:not(.flat){display:flex;flex-direction:column}
+.body>.p:not(.flat)>.ph,.body>.p:not(.flat)>.lg,.body>.p:not(.flat)>.lgL{flex:0 0 auto}
+
+/* ── PANELS ─────────────────────────────────────────────────────── */
+.p{
+  border:1px solid var(--rule);border-radius:3px;background:var(--panel);
+  padding:13px 16px;position:relative
+}
+.p.dash{background:var(--wash)}
+.p.wash{background:var(--wash);padding:13px 16px}
+.p.red{background:var(--redwash);border-color:var(--redrule)}
+.p.tilt,.p.tilt2{transform:none}
+.p.flat{padding:11px 14px}
+.lg{ /* legend title sitting on the top rule */
+  position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--panel);
+  padding:0 11px;font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink2);
+  white-space:nowrap;text-transform:uppercase;letter-spacing:.2px
+}
+.p.wash .lg,.p.dash .lg{background:var(--wash)}
+.p.red .lg{background:var(--redwash);color:var(--accent)}
+.lgL{ /* legend anchored left */
+  position:absolute;top:-11px;left:16px;transform:none;background:var(--panel);
+  padding:0 9px;font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink2);
+  white-space:nowrap;text-transform:uppercase;letter-spacing:.2px
+}
+.p.wash .lgL,.p.dash .lgL{background:var(--wash)}
+.p.red .lgL{background:var(--redwash);color:var(--accent)}
+.ph{ /* inline panel heading */
+  font-family:var(--serif);font-size:17.5px;font-weight:700;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:.3px;
+  display:flex;align-items:center;gap:9px;margin-bottom:8px
+}
+.ph svg{width:19px;height:19px;flex:0 0 19px;color:var(--accent)}
+.sect{ /* numbered section header, page-level */
+  font-family:var(--serif);font-size:17.5px;font-weight:700;color:var(--ink2);
+  text-transform:uppercase;letter-spacing:.3px;
+  display:flex;align-items:center;gap:9px;margin:1px 0 -2px
+}
+.sect svg{width:19px;height:19px;color:var(--accent)}
+/* keeps a numbered header glued to the block it introduces when the page
+   distributes its slack */
+.unit{display:flex;flex-direction:column;gap:8px}
+
+/* ── LAYOUT HELPERS ─────────────────────────────────────────────── */
+.row{display:flex;gap:12px}
+.row>*{min-width:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.f1{flex:1}.f2{flex:2}.f3{flex:3}.f4{flex:4}.f5{flex:5}.f7{flex:7}
+.grow{flex:1 1 auto;min-height:0}
+.ctr{text-align:center}
+
+/* ── TEXT ───────────────────────────────────────────────────────── */
+p,li{font-size:18px;line-height:1.55}
+.sm p,.sm li,p.sm,.sm{font-size:16.5px;line-height:1.5}
+.xs{font-size:14.5px;line-height:1.42;color:var(--muted)}
+.lead{font-family:var(--serif);font-size:21.5px;font-weight:600;line-height:1.34;
+  color:var(--ink2);letter-spacing:-.3px}
+b,strong{font-weight:600;color:var(--ink2)}
+em{font-style:normal;color:var(--accent);font-weight:600}
+.nav{color:var(--ink)}.red{color:var(--accent);font-weight:600}
+.gr{color:var(--green);font-weight:600}
+ul,ol{list-style:none}
+.dot li{padding-left:16px;position:relative;margin-bottom:3px}
+.dot li::before{content:'';position:absolute;left:2px;top:9px;width:5px;height:5px;
+  border-radius:50%;background:var(--accent)}
+.chk li{padding-left:23px;position:relative;margin-bottom:4px}
+.chk li::before{
+  content:'';position:absolute;left:2px;top:5px;width:11px;height:6px;
+  border-left:2px solid var(--green);border-bottom:2px solid var(--green);
+  transform:rotate(-45deg)
+}
+.chk.r li::before{border-color:var(--accent)}
+.num{counter-reset:n}
+.num li{padding-left:29px;position:relative;margin-bottom:5px;counter-increment:n}
+.num li::before{
+  content:counter(n);position:absolute;left:0;top:3px;width:20px;height:20px;
+  border:none;background:var(--ink2);border-radius:50%;font-size:12px;font-weight:600;
+  color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--pen)
+}
+.tag{
+  font-family:var(--mono);font-size:13px;background:var(--wash);color:var(--ink);
+  border:1px solid var(--th);padding:1px 7px;border-radius:3px;white-space:nowrap;font-weight:400
+}
+.tag.a{background:#F7E7E2;color:var(--accent);border-color:var(--redrule)}
+.tag.k{background:#E6EEE7;color:var(--green);border-color:#C9DACD}
+code{font-family:var(--mono);font-size:13.5px;background:var(--wash);color:var(--ink);
+  padding:1px 5px;border-radius:3px;border:1px solid var(--th)}
+
+/* ── TABLE ──────────────────────────────────────────────────────── */
+table{width:100%;border-collapse:collapse;font-size:16px}
+th{
+  background:var(--th);font-family:var(--serif);font-size:15px;font-weight:700;color:var(--ink2);
+  border:1px solid var(--rule);padding:5px 8px;text-align:left;letter-spacing:.1px
+}
+td{border:1px solid var(--rule);padding:5px 8px;vertical-align:top;line-height:1.38}
+td.c,th.c{text-align:center}
+td .tag{font-size:12.5px;padding:1px 5px}
+
+/* ── FLOW DIAGRAM ───────────────────────────────────────────────── */
+.flow{display:flex;align-items:center;justify-content:space-between;gap:4px;padding:5px 2px}
+.node{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;flex:1}
+.node svg{width:30px;height:30px;color:var(--ink)}
+.node span{font-size:14px;line-height:1.25;color:var(--ink2)}
+.arw{flex:0 0 18px;color:var(--accent);font-size:18px;line-height:1;padding-bottom:15px;
+  text-align:center;font-weight:500}
+.circ{
+  width:32px;height:32px;border:1.4px solid var(--ink);border-radius:50%;display:flex;
+  align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;
+  font-size:16px;color:var(--ink)
+}
+.circ.a{border-color:var(--accent);color:var(--accent)}
+.circ.g{border-color:var(--green);color:var(--green)}
+.circ.p{border-color:var(--plum);color:var(--plum)}
+
+/* ── EXAMPLE BLOCK ──────────────────────────────────────────────── */
+.ex{
+  background:var(--note);border-left:3px solid var(--accent);border-radius:0;
+  padding:13px 16px;position:relative
+}
+.ex .exh{
+  font-family:var(--serif);font-size:17.5px;font-weight:700;color:var(--accent);
+  text-transform:uppercase;letter-spacing:.3px;
+  display:flex;align-items:center;gap:9px;margin-bottom:8px
+}
+.ex .exh svg{width:19px;height:19px;color:var(--accent)}
+.ex .exh .job{font-family:var(--mono);font-size:12.5px;color:var(--ink);text-transform:none;
+  background:#fff;border:1px solid var(--th);padding:2px 8px;border-radius:3px;
+  margin-left:auto;font-weight:400;letter-spacing:0}
+.ex dl{display:grid;grid-template-columns:56px 1fr;gap:5px 12px}
+.ex dt{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink2);
+  text-align:left;text-transform:uppercase;padding-top:2px}
+.ex dd{font-size:18px;line-height:1.5}
+
+/* ── STRIP ──────────────────────────────────────────────────────── */
+.strip{
+  border:none;border-top:2px solid var(--ink2);border-bottom:2px solid var(--ink2);
+  border-radius:0;background:none;padding:11px 10px;display:flex;
+  align-items:center;gap:16px;flex:0 0 auto;margin-top:auto
+}
+.strip svg{width:24px;height:24px;flex:0 0 24px;color:var(--accent)}
+.strip p{flex:1;text-align:center;font-family:var(--serif);font-size:20.5px;font-weight:600;
+  line-height:1.34;color:var(--ink2);letter-spacing:-.2px}
+.strip p em{color:var(--accent)}
+.strip p b{color:var(--ink2)}
+
+/* ── COVER ──────────────────────────────────────────────────────── */
+.cov-hand{
+  border:none;border-bottom:1px solid var(--muted);border-radius:0;padding:0 0 3px;font-size:14px;
+  font-family:var(--mono);color:var(--muted);display:inline-block;transform:none;background:none;
+  letter-spacing:.4px
+}
+.cov-t{font-family:var(--serif);color:var(--ink2);line-height:1.0;letter-spacing:-2.5px}
+.cov-t .l1{font-size:40px;display:block;margin-bottom:7px;letter-spacing:-1px;color:var(--muted)}
+.cov-t .l2{font-size:86px;display:block;font-weight:700}
+.cov-t .l3{font-size:86px;display:block;font-weight:700}
+.cov-hl{
+  display:inline-block;background:var(--accent);color:#fff;font-family:var(--serif);
+  font-weight:700;font-size:46px;padding:4px 18px 9px;transform:none;margin-top:12px;
+  border-radius:2px;letter-spacing:-1px
+}
+.toc{display:flex;flex-direction:column;gap:0;flex:1 1 auto;justify-content:space-between}
+.toc li{display:flex;align-items:center;gap:11px;padding:4px 0;border-bottom:1px solid var(--rule)}
+.toc li:last-child{border-bottom:none}
+.toc .n{
+  width:24px;height:24px;flex:0 0 24px;border:none;border-radius:0;font-family:var(--mono);
+  font-size:12.5px;color:var(--muted);display:flex;align-items:center;justify-content:center
+}
+.toc .t{flex:1;font-size:17px;line-height:1.2;font-weight:500;color:var(--ink2)}
+.toc svg{width:18px;height:18px;flex:0 0 18px;color:var(--teal)}
+.foot4{display:grid;grid-template-columns:repeat(4,1fr);border:none;border-top:2px solid var(--ink2);
+  border-radius:0;background:none}
+.foot4>div{
+  display:flex;align-items:center;gap:9px;padding:11px 12px;border-right:1px solid var(--rule)
+}
+.foot4>div:last-child{border-right:none}
+.foot4 svg{width:22px;height:22px;flex:0 0 22px;color:var(--accent)}
+.foot4 span{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.16;color:var(--ink2)}
+
+/* ── FLOOR PLAN ─────────────────────────────────────────────────── */
+.fp-st{
+  border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:8px 5px 7px;
+  text-align:center;position:relative
+}
+.fp-st .n{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ink);line-height:1}
+.fp-st .nm{font-family:var(--pen);font-size:15.5px;font-weight:600;color:var(--ink2);
+  line-height:1.15;margin:4px 0}
+.fp-st .id{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.fp-st svg{width:21px;height:21px;color:var(--teal);margin-top:3px}
+.fp-st.hot{border-color:var(--redrule);background:var(--redwash)}
+.fp-st.hot .n,.fp-st.hot svg{color:var(--accent)}
+.belt{height:8px;background:var(--wash);border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);border-radius:0;margin:6px 0;opacity:1}
+.office{border:1px solid var(--rule);border-radius:2px;background:var(--wash);padding:8px 10px}
+.office .t{font-family:var(--serif);font-size:16px;font-weight:700;color:var(--ink2);
+  display:flex;gap:7px;align-items:center;text-transform:uppercase;letter-spacing:.2px}
+.office .t svg{width:18px;height:18px;color:var(--accent)}
+.office p{font-size:15px;line-height:1.38;color:var(--ink2);margin-top:4px}
+
+/* ── SHELVES (trust ladder) ─────────────────────────────────────── */
+.shelf{display:flex;align-items:center;gap:12px;border:1px solid var(--rule);border-radius:2px;
+  background:var(--panel);padding:8px 12px}
+.shelf.top{border-color:var(--redrule);background:var(--redwash);border-width:1px;
+  border-left:3px solid var(--accent)}
+.shelf .r{font-family:var(--serif);font-size:21px;font-weight:700;color:var(--ink);flex:0 0 28px}
+.shelf .nm{font-family:var(--mono);font-size:14.5px;font-weight:500;color:var(--ink2);flex:0 0 145px}
+.shelf.top .nm,.shelf.top .r{color:var(--accent)}
+.shelf .d{flex:1;font-size:16.5px;line-height:1.36}
+.shelf .w{flex:0 0 100px;text-align:right;font-size:13px;font-family:var(--mono);color:var(--muted)}
+.rung{display:flex;align-items:center;gap:12px;padding:6px 0;border-bottom:1px solid var(--rule)}
+.rung:last-child{border-bottom:none}
+.rung .k{width:23px;height:23px;flex:0 0 23px;border:1px solid var(--rule);border-radius:2px;
+  font-family:var(--mono);font-size:12.5px;display:flex;align-items:center;justify-content:center;
+  color:var(--ink)}
+.rung.last .k{border-color:var(--redrule);color:var(--accent)}
+.rung .x{flex:1;font-size:16.5px;line-height:1.36}
+
+/* ── MISC ───────────────────────────────────────────────────────── */
+.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);border-radius:2px;
+  padding:3px 11px;color:var(--ink2);font-family:var(--pen);font-size:15.5px;background:var(--wash)}
+.big{font-family:var(--serif);font-size:34px;font-weight:700;color:var(--accent);line-height:1}
+.bigN{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--ink);line-height:1}
+.kv{display:flex;justify-content:space-between;gap:9px;font-size:16.5px;padding:3px 0;
+  border-bottom:1px solid var(--rule)}
+.kv:last-child{border-bottom:none}
+.kv b{font-weight:600}
+.jar{width:64px;height:82px;border:1px solid var(--rule);border-radius:2px 2px 4px 4px;
+  position:relative;overflow:hidden;background:var(--panel);margin:0 auto}
+.jar i{position:absolute;left:0;right:0;bottom:0;height:38%;background:var(--wash);
+  border-top:1px solid var(--rule)}
+.jar u{position:absolute;inset:0;display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:6px;font-family:var(--mono);font-size:11.5px;color:var(--ink2);text-decoration:none}
+.stamp{border:1px solid var(--rule);border-radius:2px;padding:6px 11px;font-family:var(--mono);
+  font-size:13px;font-weight:500;color:var(--ink);transform:none;text-align:center;
+  background:var(--wash)}
+.stamp.done{border-color:#C9DACD;color:var(--green);background:#E6EEE7}
+.stamp.bad{border-color:var(--redrule);color:var(--accent);background:var(--redwash)}
+.hole{border:1px solid var(--rule);border-radius:2px;background:var(--panel);padding:7px 9px;
+  text-align:center}
+.hole .f{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--ink2);line-height:1.3}
+.hole .w{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.2}
+.warnbox{display:flex;gap:11px;align-items:flex-start}
+.warnbox svg{width:28px;height:28px;flex:0 0 28px;color:var(--accent)}
+
+/* a denser table for the one page that carries a nine-row comparison */
+table.tight{font-size:15px}
+table.tight th{font-size:14px;padding:4px 7px}
+table.tight td{padding:4px 7px;line-height:1.34}
+table.tight td .tag{font-size:12px}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ ICON LIBRARY ═══════════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<g id="i-bell"><path d="M12 3.5c-3.1 0-5 2.1-5 5.2 0 3.6-1.2 5-2 5.8h14c-.8-.8-2-2.2-2-5.8 0-3.1-1.9-5.2-5-5.2z"/><path d="M9.6 17.2c.3 1.2 1.2 2 2.4 2s2.1-.8 2.4-2"/></g>
+<g id="i-clip"><path d="M6.5 4.6h11c.6 0 1 .5 1 1.1v13.6c0 .6-.4 1.1-1 1.1h-11c-.6 0-1-.5-1-1.1V5.7c0-.6.4-1.1 1-1.1z"/><path d="M9.2 4.6c0-1 .9-1.9 2.8-1.9s2.8.9 2.8 1.9"/><path d="M8.4 10.2h7.2M8.4 13.4h7.2M8.4 16.4h4.6"/></g>
+<g id="i-mag"><circle cx="10.6" cy="10.4" r="5.6"/><path d="M14.8 14.8l4.4 4.6"/></g>
+<g id="i-ruler"><path d="M3.4 14.2L14.4 3.3l6.3 6.4L9.7 20.6z"/><path d="M7 10.6l2 2M9.6 8l2 2M12.2 5.4l2 2"/></g>
+<g id="i-compass"><circle cx="12" cy="12" r="8.6"/><path d="M15.4 8.4l-2 5.4-5.2 2.1 2-5.4z"/><circle cx="12" cy="12" r="1.1"/></g>
+<g id="i-blue"><path d="M4 5.4h16v13.2H4z"/><path d="M7.4 8.6h5.2v4.2H7.4zM15 8.6h2.2M15 11.4h2.2M7.4 16h9.8"/></g>
+<g id="i-jig"><path d="M4.6 19.4V7.2h6.2v12.2z"/><path d="M13.2 19.4V4.6h6.2v14.8z"/><path d="M4.6 11.6h6.2M13.2 9.4h6.2M13.2 14.2h6.2"/></g>
+<g id="i-pen"><path d="M4.4 19.6l1-4.2L15.6 5.2a2 2 0 012.8 0l.6.6a2 2 0 010 2.8L8.8 18.7z"/><path d="M14 6.8l3.4 3.4"/></g>
+<g id="i-span"><path d="M14.8 6.4a3.6 3.6 0 104.8 4.8L12 18.8 8.6 22 5 18.4l3.2-3.4z"/><circle cx="16.6" cy="7.4" r="1"/></g>
+<g id="i-belt"><rect x="3" y="9.6" width="18" height="6.4" rx="3.2"/><circle cx="7.4" cy="12.8" r="1.5"/><circle cx="12" cy="12.8" r="1.5"/><circle cx="16.6" cy="12.8" r="1.5"/></g>
+<g id="i-car"><path d="M3.6 15.4l1.6-4.6a2 2 0 011.9-1.3h9.8a2 2 0 011.9 1.3l1.6 4.6"/><path d="M3.6 15.4h16.8v2.6H3.6z"/><circle cx="7.2" cy="18.4" r="1.6"/><circle cx="16.8" cy="18.4" r="1.6"/></g>
+<g id="i-flag"><path d="M6.4 3.6v17"/><path d="M6.4 4.6h11.4l-2.2 3.6 2.2 3.6H6.4z"/></g>
+<g id="i-lock"><rect x="5.4" y="10.6" width="13.2" height="9.4" rx="2"/><path d="M8.4 10.6V8a3.6 3.6 0 017.2 0v2.6"/><circle cx="12" cy="15" r="1.3"/></g>
+<g id="i-key"><circle cx="8" cy="8.4" r="3.8"/><path d="M10.6 11l7.6 7.8M15.4 15.8l1.8-1.8M17.6 18l1.8-1.8"/></g>
+<g id="i-broom"><path d="M12.4 3.6L9 12.4M8.2 12h8.4l1.6 8.4H6.6z"/><path d="M11 15.6v4.8M14 15.6v4.8"/></g>
+<g id="i-box"><path d="M4.4 8.2L12 4.6l7.6 3.6v8.4L12 20.2l-7.6-3.6z"/><path d="M4.4 8.2L12 11.8l7.6-3.6M12 11.8v8.4"/></g>
+<g id="i-book"><path d="M4.4 5.2h6a2.4 2.4 0 012.4 2.4v12a2 2 0 00-2-2h-6.4z"/><path d="M19.6 5.2h-6a2.4 2.4 0 00-2.4 2.4v12a2 2 0 012-2h6.4z"/></g>
+<g id="i-shelf"><rect x="3.4" y="4.6" width="17.2" height="14.8" rx="1.4"/><path d="M3.4 9.4h17.2M3.4 14.4h17.2M9.4 4.6v4.8M14.4 9.4v5M7.4 14.4v5"/></g>
+<g id="i-cab"><rect x="4.6" y="3.6" width="14.8" height="16.8" rx="1.6"/><path d="M4.6 9.2h14.8M4.6 14.8h14.8M10.4 6.2h3.2M10.4 11.8h3.2M10.4 17.4h3.2"/></g>
+<g id="i-stamp"><path d="M8 4.6h8l-1.4 6.4h-5.2z"/><rect x="4.6" y="11.4" width="14.8" height="4.4" rx="1.4"/><path d="M5.6 18.6h12.8"/></g>
+<g id="i-traffic"><rect x="7.6" y="3" width="8.8" height="16.4" rx="4.4"/><circle cx="12" cy="7.2" r="1.4"/><circle cx="12" cy="11.2" r="1.4"/><circle cx="12" cy="15.2" r="1.4"/></g>
+<g id="i-watch"><circle cx="12" cy="13.2" r="7.4"/><path d="M12 9.6v3.6l2.6 1.8M9.4 3.2h5.2"/></g>
+<g id="i-warn"><path d="M12 4l8.4 15.4H3.6z"/><path d="M12 9.4v4.4M12 16.4v.1"/></g>
+<g id="i-bulb"><path d="M12 3.4a5.6 5.6 0 00-3.2 10.2v2.2h6.4v-2.2A5.6 5.6 0 0012 3.4z"/><path d="M10 18.6h4M10.8 21h2.4"/></g>
+<g id="i-target"><circle cx="12" cy="12" r="8.4"/><circle cx="12" cy="12" r="4.6"/><circle cx="12" cy="12" r="1.1"/></g>
+<g id="i-arm"><path d="M4 20.4h6.4M7.2 20.4v-5l6.4-4.4"/><rect x="12.6" y="4.2" width="7.4" height="5" rx="1.2" transform="rotate(9 16.3 6.7)"/><circle cx="7.2" cy="15.4" r="1.4"/></g>
+<g id="i-ladder"><path d="M7.4 3.4v17.2M16.6 3.4v17.2M7.4 7.4h9.2M7.4 11.4h9.2M7.4 15.4h9.2"/></g>
+<g id="i-tray"><path d="M3.6 13.4l2.6-6.8h11.6l2.6 6.8v4.6H3.6z"/><path d="M3.6 13.4h5l1 2h4.8l1-2h5"/></g>
+<g id="i-gear"><circle cx="12" cy="12" r="3"/><path d="M12 3.4v3M12 17.6v3M4.6 12h3M16.4 12h3M6.7 6.7l2.1 2.1M15.2 15.2l2.1 2.1M17.3 6.7l-2.1 2.1M8.8 15.2l-2.1 2.1"/></g>
+<g id="i-star"><path d="M12 3.6l2.7 5.7 6.1.8-4.5 4.3 1.1 6.1-5.4-3-5.4 3 1.1-6.1L3.2 10l6.1-.8z"/></g>
+<g id="i-scale"><path d="M12 4v16M6 20h12M4 9h16M4 9l-2.4 5h4.8zM20 9l-2.4 5h4.8z"/></g>
+<g id="i-users"><circle cx="9" cy="8.4" r="3.2"/><path d="M3.4 19.6c0-3.1 2.5-5.4 5.6-5.4s5.6 2.3 5.6 5.4"/><path d="M16 6.6a3 3 0 010 5.8M17.4 14.6c1.8.6 3.2 2.4 3.2 5"/></g>
+<g id="i-doc"><path d="M6.4 3.6h7.4l4.4 4.4v12.4H6.4z"/><path d="M13.4 3.6V8h4.4M9 12h6M9 15.4h6M9 18.4h3.6"/></g>
+<g id="i-shield"><path d="M12 3.4l7.4 2.6v6c0 4.4-3 7.4-7.4 8.6-4.4-1.2-7.4-4.2-7.4-8.6V6z"/><path d="M9 12.2l2.2 2.2 4-4.2"/></g>
+</defs></svg>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 1 — COVER
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex:0 0 auto">
+    <span class="cov-hand">an illustrated tour</span>
+    <div class="brand" style="flex:0 0 auto"><b>#thefactory</b></div>
+  </div>
+
+  <div class="row" style="flex:1 1 auto;gap:20px;margin-top:14px;min-height:0">
+    <!-- LEFT -->
+    <div class="f5" style="display:flex;flex-direction:column;justify-content:space-between">
+      <div class="cov-t">
+        <span class="l1">THE</span>
+        <span class="l2">GAME</span>
+        <span class="l3">CHANGER</span>
+      </div>
+      <div><span class="cov-hl">FACTORY</span></div>
+      <p class="lead" style="margin-top:16px;font-family:var(--pen);font-size:23px;color:var(--ink)">
+        <b style="color:var(--accent)">10 stations.</b> 13 back offices.<br>
+        <b>One house rule.</b>
+      </p>
+      <p class="xs" style="margin-top:4px;font-size:14.5px">
+        The multi-agentic Salesforce SDLC, explained as a factory floor.
+      </p>
+
+      <div class="p dash tilt" style="margin-top:15px">
+        <span class="lgL">HOW THE WORKS WORK</span>
+        <div class="flow" style="margin-top:4px">
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-doc"/></svg><span>one<br>story</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg><span>ten<br>stations</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg><span>ten<br>notes</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg><span>eight<br>inspectors</span></div>
+        </div>
+        <p class="xs ctr" style="margin-top:5px">
+          Each station writes exactly one note. When something is wrong,<br>
+          you know <b>the station</b>, <b>the agent</b> and <b>the rule it broke</b>.
+        </p>
+      </div>
+
+      <div class="p" style="margin-top:12px">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>WHY BUILD A FACTORY AT ALL?</div>
+        <ul class="chk sm">
+          <li>One prompt gives you one blob — <span class="red">nothing ever "failed"</span></li>
+          <li>Ten stages give you ten decisions you can review</li>
+          <li>Every claim traced to the real org, or marked unverified</li>
+          <li>23 agents, so you get to ask <b>which one</b></li>
+        </ul>
+      </div>
+
+      <div class="p red" style="margin-top:12px">
+        <div class="warnbox">
+          <svg viewBox="0 0 24 24"><use href="#i-warn"/></svg>
+          <p class="sm"><b style="color:var(--accent)">The twist:</b> the factory prints the job cards
+          and <b>stops</b>. A human opens Cursor and works them. There is no CLI flag for that step —
+          see page 3.</p>
+        </div>
+      </div>
+
+      <div class="p" style="margin-top:12px">
+        <span class="lgL">HOW TO READ A STATION PAGE</span>
+        <div class="g2" style="gap:4px 12px;margin-top:6px">
+          <p class="xs"><b class="nav">The station, in one line</b><br>what it is, in plain English</p>
+          <p class="xs"><b class="nav">What lands in the in-tray</b><br>its actual inputs</p>
+          <p class="xs"><b class="nav">The example</b><br>one real job, all the way down</p>
+          <p class="xs"><b class="nav">What it actually does</b><br>its own rules, numbered</p>
+          <p class="xs"><b class="nav">The inspector</b><br>who grades it, and on what</p>
+          <p class="xs"><b class="nav">When the line jams</b><br>where to go when it fails</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="f4" style="display:flex;flex-direction:column;min-height:0">
+      <div class="p" style="flex:1 1 auto;display:flex;flex-direction:column;min-height:0">
+        <span class="lg">20 STOPS INSIDE</span>
+        <ul class="toc" style="margin-top:6px">
+          <li><span class="n">01</span><span class="t">The Factory Floor Plan</span><svg viewBox="0 0 24 24"><use href="#i-blue"/></svg></li>
+          <li><span class="n">02</span><span class="t">How A Job Moves Through</span><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg></li>
+          <li><span class="n">03</span><span class="t">The House Rule</span><svg viewBox="0 0 24 24"><use href="#i-ruler"/></svg></li>
+          <li><span class="n">04</span><span class="t">Goods-In &amp; The Front Desk</span><svg viewBox="0 0 24 24"><use href="#i-bell"/></svg></li>
+          <li><span class="n">05</span><span class="t">The Planning Desk</span><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg></li>
+          <li><span class="n">06</span><span class="t">The Drawing Office</span><svg viewBox="0 0 24 24"><use href="#i-compass"/></svg></li>
+          <li><span class="n">07</span><span class="t">The Test-Rig Bay</span><svg viewBox="0 0 24 24"><use href="#i-jig"/></svg></li>
+          <li><span class="n">08</span><span class="t">The Red-Pen Desk</span><svg viewBox="0 0 24 24"><use href="#i-pen"/></svg></li>
+          <li><span class="n">09</span><span class="t">The Assembly Bay</span><svg viewBox="0 0 24 24"><use href="#i-span"/></svg></li>
+          <li><span class="n">10</span><span class="t">The Test Track</span><svg viewBox="0 0 24 24"><use href="#i-flag"/></svg></li>
+          <li><span class="n">11</span><span class="t">The Locks &amp; Keys Bench</span><svg viewBox="0 0 24 24"><use href="#i-lock"/></svg></li>
+          <li><span class="n">12</span><span class="t">The Clean-Down Bay</span><svg viewBox="0 0 24 24"><use href="#i-broom"/></svg></li>
+          <li><span class="n">13</span><span class="t">The Despatch Desk</span><svg viewBox="0 0 24 24"><use href="#i-box"/></svg></li>
+          <li><span class="n">14</span><span class="t">The Inspectors' Walkway</span><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg></li>
+          <li><span class="n">15</span><span class="t">The Rule Book &amp; The Cupboard</span><svg viewBox="0 0 24 24"><use href="#i-key"/></svg></li>
+          <li><span class="n">16</span><span class="t">The Reading Room</span><svg viewBox="0 0 24 24"><use href="#i-book"/></svg></li>
+          <li><span class="n">17</span><span class="t">The Records Office</span><svg viewBox="0 0 24 24"><use href="#i-cab"/></svg></li>
+          <li><span class="n">18</span><span class="t">The Aftercare Garage</span><svg viewBox="0 0 24 24"><use href="#i-arm"/></svg></li>
+          <li><span class="n">19</span><span class="t">What Every Station Writes</span><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg></li>
+          <li><span class="n">20</span><span class="t">When The Line Jams</span><svg viewBox="0 0 24 24"><use href="#i-warn"/></svg></li>
+        </ul>
+      </div>
+
+      <div class="p wash" style="margin-top:12px">
+        <p class="sm ctr" style="font-family:var(--pen);font-size:19px">
+          Every station page carries <b>one worked example</b> —<br>
+          the same job, followed all the way down the line.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot4" style="margin-top:14px">
+    <div><svg viewBox="0 0 24 24"><use href="#i-blue"/></svg><span>ONE<br>ANALOGY</span></div>
+    <div><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg><span>TEN<br>STATIONS</span></div>
+    <div><svg viewBox="0 0 24 24"><use href="#i-target"/></svg><span>REAL<br>EXAMPLES</span></div>
+    <div><svg viewBox="0 0 24 24"><use href="#i-warn"/></svg><span>HONEST<br>CAVEATS</span></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 2 — THE FACTORY FLOOR PLAN
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">01</div>
+    <div class="htitle">
+      <h1>The Factory Floor Plan</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr"><b>One line, ten stations, left to right.</b> Inspectors on the walkway above.
+      The warehouse feeds in from the left. Back offices around the edge. One locked cupboard in the corner.</p>
+    </div>
+
+    <!-- WALKWAY -->
+    <div class="p dash flat">
+      <span class="lgL">THE INSPECTORS' WALKWAY <span style="font-family:var(--mono);font-size:12px">8 critics + 3 contract checks</span></span>
+      <div style="display:flex;gap:6px;margin-top:7px">
+        <div class="hole" style="flex:1"><div class="f">01-plan<br>-critique</div></div>
+        <div class="hole" style="flex:1;border-color:var(--accent)"><div class="f" style="color:var(--accent)">02-arch<br>-critique</div></div>
+        <div class="hole" style="flex:1"><div class="f">03-tdd<br>-critique</div></div>
+        <div class="hole" style="flex:1"><div class="f">04-review<br>-critique</div></div>
+        <div class="hole" style="flex:1"><div class="f">05-build-fix<br>-critique</div></div>
+        <div class="hole" style="flex:1"><div class="f">06-e2e<br>-critique</div></div>
+        <div class="hole" style="flex:1;border-color:var(--accent)"><div class="f" style="color:var(--accent)">07-security<br>-critique</div></div>
+        <div class="hole" style="flex:1"><div class="f">10-caag<br>-critique</div></div>
+      </div>
+      <p class="xs ctr" style="margin-top:5px">Any inspector may return <span class="tag a">REFINE_AGAIN</span> and hand the note back.
+        <span class="red">Red = full tier.</span> Stations <span class="tag">00</span> <span class="tag">08</span> <span class="tag">09</span> get a structural check instead.</p>
+    </div>
+
+    <!-- THE LINE -->
+    <div class="row" style="align-items:stretch;flex:1 1 auto">
+      <div class="office" style="flex:0 0 180px;border-style:solid">
+        <div class="t"><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg>WAREHOUSE</div>
+        <p>The org itself. Plus the <b>tape measure</b> — you may only claim a part exists if you went and looked.</p>
+        <p style="margin-top:6px"><span class="tag">knowledge-prep</span></p>
+        <p class="xs" style="margin-top:6px"><b>On the shelves:</b></p>
+        <ul class="dot xs" style="margin-top:2px">
+          <li>objects &amp; fields</li>
+          <li>profiles &amp; permission sets</li>
+          <li>apps and automation</li>
+          <li>the repository</li>
+          <li>the ticket system</li>
+        </ul>
+        <p class="xs" style="margin-top:6px">Snapshot cached <b>4 h</b>. Older than that and it
+        refreshes only what changed.</p>
+        <p class="xs" style="margin-top:5px">A failed fetch sets <b>degraded</b> and carries on —
+        <span class="red">so check the flag, not just the file.</span></p>
+      </div>
+      <div class="f1" style="display:flex;flex-direction:column;justify-content:space-evenly">
+        <div class="belt"></div>
+        <div class="g3" style="grid-template-columns:repeat(5,1fr);gap:7px">
+          <div class="fp-st"><div class="n">00</div><div class="nm">Goods-In &amp;<br>Front Desk</div><div class="id">00-intake</div><svg viewBox="0 0 24 24"><use href="#i-bell"/></svg></div>
+          <div class="fp-st"><div class="n">01</div><div class="nm">Planning<br>Desk</div><div class="id">01-plan</div><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg></div>
+          <div class="fp-st hot"><div class="n">02</div><div class="nm">Drawing<br>Office</div><div class="id">02-architecture</div><svg viewBox="0 0 24 24"><use href="#i-compass"/></svg></div>
+          <div class="fp-st"><div class="n">03</div><div class="nm">Test-Rig<br>Bay</div><div class="id">03-tdd</div><svg viewBox="0 0 24 24"><use href="#i-jig"/></svg></div>
+          <div class="fp-st"><div class="n">04</div><div class="nm">Red-Pen<br>Desk</div><div class="id">04-code-review</div><svg viewBox="0 0 24 24"><use href="#i-pen"/></svg></div>
+        </div>
+        <div class="belt"></div>
+        <div class="g3" style="grid-template-columns:repeat(5,1fr);gap:7px">
+          <div class="fp-st"><div class="n">05</div><div class="nm">Assembly<br>Bay</div><div class="id">05-build-fix</div><svg viewBox="0 0 24 24"><use href="#i-span"/></svg></div>
+          <div class="fp-st"><div class="n">06</div><div class="nm">Test<br>Track</div><div class="id">06-e2e</div><svg viewBox="0 0 24 24"><use href="#i-flag"/></svg></div>
+          <div class="fp-st hot"><div class="n">07</div><div class="nm">Locks &amp;<br>Keys Bench</div><div class="id">07-security</div><svg viewBox="0 0 24 24"><use href="#i-lock"/></svg></div>
+          <div class="fp-st"><div class="n">08</div><div class="nm">Clean-Down<br>Bay</div><div class="id">08-refactor</div><svg viewBox="0 0 24 24"><use href="#i-broom"/></svg></div>
+          <div class="fp-st"><div class="n">09</div><div class="nm">Despatch<br>Desk</div><div class="id">09-docs</div><svg viewBox="0 0 24 24"><use href="#i-box"/></svg></div>
+        </div>
+        <div class="belt"></div>
+      </div>
+      <div class="office" style="flex:0 0 180px;border-color:var(--accent);border-style:solid">
+        <div class="t" style="color:var(--accent)"><svg viewBox="0 0 24 24" style="color:var(--accent)"><use href="#i-key"/></svg>THE LOCKED<br>CUPBOARD</div>
+        <p><b>One</b> writable org. Every other alias is look-don't-touch, and a hook at the door checks your hands.</p>
+        <p class="xs" style="margin-top:6px">Blocked command → <b>exit 2</b>, before it ever runs.</p>
+        <p class="xs" style="margin-top:6px">If the registry can't be read it <b>falls back to a
+        hardcoded list</b> and still protects the known production aliases.</p>
+        <p class="xs" style="margin-top:5px"><em>It fails closed, not open.</em></p>
+        <p class="xs" style="margin-top:6px"><b class="red">Before your first run:</b> the registry
+        ships pre-populated with <b>placeholder orgs</b>. Replace it from the template — see page 16.</p>
+      </div>
+    </div>
+
+    <!-- BACK OFFICES -->
+    <div class="unit">
+    <div class="sect"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>THE BACK OFFICES — 13 agents who are not on the line</div>
+    <div class="g2" style="gap:9px">
+      <div class="office">
+        <div class="t"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>THE READING ROOM <span class="tag" style="font-size:11px">4</span></div>
+        <p>Four people argue about the order <b>before a bolt is turned</b>, in a fixed sequence.</p>
+        <p class="xs" style="margin-top:3px"><span class="tag">ba-context</span> <span class="tag">sf-tech-reviewer</span> <span class="tag">gov-risk</span> <span class="tag">refinement</span></p>
+      </div>
+      <div class="office">
+        <div class="t"><svg viewBox="0 0 24 24"><use href="#i-cab"/></svg>THE RECORDS OFFICE <span class="tag" style="font-size:11px">5</span></div>
+        <p>Gather the evidence, check it's complete, score it, decide who signs, staple the folder.</p>
+        <p class="xs" style="margin-top:3px"><span class="tag">knowledge-agent</span> <span class="tag">evidence-auditor</span> <span class="tag">scoring-agent</span> <span class="tag">policy-router-agent</span> <span class="tag">packet-synthesizer</span></p>
+      </div>
+      <div class="office">
+        <div class="t"><svg viewBox="0 0 24 24"><use href="#i-arm"/></svg>THE AFTERCARE GARAGE <span class="tag" style="font-size:11px">3</span></div>
+        <p>Road-test properly, log every mistake — and <b>one mechanic</b> who may only lift a spanner when a human hands over the key.</p>
+        <p class="xs" style="margin-top:3px"><span class="tag">qa-e2e-tcoe-tester</span> <span class="tag">self-improvement</span> <span class="tag">sia-fixer</span></p>
+      </div>
+      <div class="office" style="opacity:.62">
+        <div class="t"><svg viewBox="0 0 24 24"><use href="#i-lock"/></svg>THE ANNEXE <span class="tag" style="font-size:11px">1</span></div>
+        <p>A specialist for a different vehicle. <b>Lights off, door shut.</b> Leave the switch alone and the factory behaves as if it weren't there.</p>
+        <p class="xs" style="margin-top:3px"><span class="tag">afls-agent</span> · <span class="tag">AFLS_ENABLED</span> off</p>
+      </div>
+    </div>
+    </div>
+
+    <div class="p red flat">
+      <p class="sm ctr"><b style="color:var(--accent)">THE HOUSE RULE, POSTED ON EVERY WALL:</b>
+      if the drawing and the real car disagree, <em>the real car wins</em>. Always.</p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>10 stations &middot; 13 back offices &middot; <b>23 agents</b>. The point isn't that 23 beats 1 —<br>
+      it's that when something goes wrong you get to ask <em>which one</em>.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-scale"/></svg>
+  </div>
+  <span class="pageno">2 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 3 — HOW A JOB MOVES THROUGH THE WORKS
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">02</div>
+    <div class="htitle">
+      <h1>How A Job Moves Through</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr">You would expect the pipeline to call a model API for each station.
+      <b>It does not.</b> It prints a <b>job card</b> per station and stops.</p>
+    </div>
+
+    <div class="unit">
+    <div class="sect"><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg>1. Three phases, with a human step in the middle</div>
+    <div class="g3">
+      <div class="p tilt">
+        <span class="lg">PHASE 1 &middot; DAY SHIFT</span>
+        <p class="sm" style="margin-top:5px"><b>Context assembly</b> — a CLI command. Deterministic. No model involved.</p>
+        <p class="xs" style="margin-top:5px">It prints the job cards and hangs them up.</p>
+        <div class="p wash flat" style="margin-top:7px">
+          <p style="font-family:var(--mono);font-size:11.5px;line-height:1.5">./scripts/run-production.sh<br>
+          &nbsp;--feature &lt;KEY&gt;<br>
+          &nbsp;--story-keys &lt;S1&gt;,&lt;S2&gt;<br>
+          &nbsp;--phase context-assembly<br>
+          &nbsp;--runs-dir ../runs</p>
+        </div>
+        <p class="xs" style="margin-top:6px"><b>Writes:</b><br>
+          <span class="tag">cursor-tasks/00-intake.task.json</span> … one per station, plus
+          <span class="tag">cursor-completion-manifest.json</span></p>
+      </div>
+      <div class="p red tilt2">
+        <span class="lg">PHASE 2 &middot; NIGHT SHIFT</span>
+        <p class="sm" style="margin-top:5px"><b style="color:var(--accent)">Generation — and there is no command.</b>
+        You open the workspace in Cursor and its agent works the cards.</p>
+        <ul class="dot xs" style="margin-top:6px">
+          <li>Read <span class="tag">&lt;stage&gt;.task.json</span> — prompts + hints</li>
+          <li><b>Run every</b> <span class="tag a">pendingVerifications</span> query <b>before</b> writing a field claim</li>
+          <li>Write the note to the card's <span class="tag">expectedOutputPath</span></li>
+        </ul>
+        <div class="p wash flat" style="margin-top:7px;border:none">
+          <p class="xs" style="font-style:italic">"For v1, Cursor AI is the only supported generation
+          runtime." · <b>"No API-key fallback is supported."</b></p>
+        </div>
+      </div>
+      <div class="p tilt">
+        <span class="lg">PHASE 3 &middot; DAY SHIFT</span>
+        <p class="sm" style="margin-top:5px"><b>Extraction</b> — a CLI command. Collects the notes, refuses the blank ones, closes the job.</p>
+        <div class="p wash flat" style="margin-top:7px">
+          <p style="font-family:var(--mono);font-size:11.5px;line-height:1.5">./scripts/run-production.sh<br>
+          &nbsp;--feature &lt;KEY&gt;<br>
+          &nbsp;--story-keys &lt;S1&gt;,&lt;S2&gt;<br>
+          &nbsp;--phase extract-only<br>
+          &nbsp;--runs-dir ../runs</p>
+        </div>
+        <p class="xs" style="margin-top:6px"><b>Writes:</b><br>
+          <span class="tag">story-extraction-packet.json</span>
+          <span class="tag">execution-manifest.json</span></p>
+      </div>
+    </div>
+    </div>
+
+    <div class="row">
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg>2. WHAT'S ON A JOB CARD</div>
+        <p style="font-family:var(--mono);font-size:12px;line-height:1.55">
+        { <span class="nav">stageId</span> · <span class="nav">storyKey</span> · <span class="nav">featureKey</span><br>
+        &nbsp;&nbsp;<span class="nav">expectedOutputPath</span><br>
+        &nbsp;&nbsp;<span class="nav">systemPrompt</span> · <span class="nav">userPrompt</span><br>
+        &nbsp;&nbsp;<span class="nav">contextHints</span>: { priorArtifacts,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;kpBundlePath, runsDir, storyRunDir,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent)">pendingVerifications[]</span> }<br>
+        &nbsp;&nbsp;<span class="nav">createdAt</span> }</p>
+        <p class="xs" style="margin-top:6px">Where paths disagree between layers, the card's
+        <span class="tag">expectedOutputPath</span> <b>is authoritative</b>.</p>
+      </div>
+      <div class="f5" style="display:flex;flex-direction:column;gap:11px">
+        <div class="p">
+          <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-shield"/></svg>3. CHECKPOINT AFTER EACH PHASE</div>
+          <ul class="chk sm">
+            <li><b>After 1:</b> the manifest lists one pending task per station per story.
+              <span class="red">An empty pending list means nothing was scheduled</span> — usually a story key that doesn't resolve.</li>
+            <li><b>After 2:</b> every station file exists and none still holds its placeholder marker.</li>
+            <li><b>After 3:</b> an extraction packet exists per story and the manifest is updated.</li>
+          </ul>
+        </div>
+        <div class="p wash flat">
+          <p class="sm"><b>A station sitting at</b> <span class="tag">cursor_pending</span>
+          <b>is waiting, not broken.</b> It means the card is written and Phase 2 hasn't reached it yet.
+          A placeholder that survives into Phase 3, though, <span class="red">fails extraction</span> —
+          go back to Cursor for <b>that one card</b>. Phase 1 does not need re-running.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="p dash f5">
+        <span class="lgL">WHERE THE ANALOGY BREAKS &nbsp;①</span>
+        <p class="sm" style="margin-top:5px">A real factory station <b>runs itself</b>. These don't.
+        The pipeline is deliberately built so the generating agent has <b>live tool access</b> — it can
+        run SOQL, retrieve metadata and read the repo <em>while it writes</em>.</p>
+        <p class="sm" style="margin-top:5px">A detached model call could not verify its own claims,
+        which would defeat the whole verification ladder. So <b>budget the editor time</b>:
+        <span class="red">this is not a fire-and-forget batch job.</span></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-watch"/></svg>4. WORTH KNOWING</div>
+        <div class="kv"><span>Knowledge snapshot cache-hit</span><b>&lt; 4 h</b></div>
+        <div class="kv"><span>Older than that</span><b>delta refresh</b></div>
+        <div class="kv"><span>Ignore the cache</span><b>--force-full-fetch</b></div>
+        <div class="kv"><span>Preflight mode</span><b>always strict</b></div>
+        <div class="kv"><span>Story filter</span><b>READY | ALL</b></div>
+        <div class="kv"><span>Max stories per run</span><b>50</b></div>
+        <p class="xs" style="margin-top:6px">Strict preflight <b>refuses to proceed on warnings</b>.
+        That is the intent, not a bug.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>The factory prints the cards and stops. <em>You are Phase 2</em> —<br>
+      and that is the design, because verification needs live hands on the real org.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-users"/></svg>
+  </div>
+  <span class="pageno">3 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 4 — THE HOUSE RULE
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">03</div>
+    <div class="htitle">
+      <h1>The House Rule</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p red flat">
+      <p class="ctr" style="font-family:var(--pen);font-size:22px;color:var(--accent)">
+        <b style="color:var(--accent)">If the drawing and the real car disagree, the real car wins.</b>
+      </p>
+      <p class="xs ctr" style="margin-top:2px">Not recency. Not specificity. And certainly not whichever
+      one the model found more convincing.</p>
+    </div>
+
+    <div class="unit">
+    <div class="sect"><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg>1. The five shelves — what a source is allowed to say</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="shelf top"><span class="r">0</span><span class="nm">authoritative</span>
+        <span class="d">Live org metadata and SOQL results. <b>Wins everything.</b></span>
+        <span class="w">Infinity</span></div>
+      <div class="shelf"><span class="r">1</span><span class="nm">scoping</span>
+        <span class="d">Contract / statement-of-work packs. Bounds what's in scope — <b>never states a platform fact</b>.</span>
+        <span class="w">800</span></div>
+      <div class="shelf"><span class="r">2</span><span class="nm">guidance</span>
+        <span class="d">Architecture standards and reference docs.</span><span class="w">1200</span></div>
+      <div class="shelf"><span class="r">3</span><span class="nm">persona</span>
+        <span class="d">Role profiles shaping tone and audience.</span><span class="w">600</span></div>
+      <div class="shelf"><span class="r">4</span><span class="nm">background</span>
+        <span class="d">Narrative colour. <b>Never decisive.</b></span><span class="w">400</span></div>
+    </div>
+    <p class="xs ctr">Right-hand column is the per-pack token cap. Lower rank number = higher authority.
+      Everything below <span class="tag">authoritative</span> competes for one shared budget of
+      <b>4000</b>; authoritative packs are admitted <b>regardless of what's left</b>.</p>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-ladder"/></svg>2. THE TAPE MEASURE — four rungs, in order</div>
+        <div class="rung"><span class="k">1</span><span class="x"><b>The warehouse snapshot.</b> Check the cached
+          org bundle → label it <span class="tag">[Verified: KP Bundle]</span></span></div>
+        <div class="rung"><span class="k">2</span><span class="x"><b>Go and look.</b> Run live SOQL against the
+          read-only org — <span class="tag">FieldDefinition</span>, <span class="tag">EntityDefinition</span></span></div>
+        <div class="rung"><span class="k">3</span><span class="x"><b>Ask the paperwork.</b> The ticket system,
+          then the wiki → <span class="tag">[Verified: Jira]</span></span></div>
+        <div class="rung last"><span class="k">4</span><span class="x"><b>Admit it.</b>
+          <span class="tag a">[Inferred: UNVERIFIED]</span> — and raise an open question if
+          anything downstream depends on it</span></div>
+        <p class="xs" style="margin-top:6px"><b>There is no fifth option.</b> Every claim is traceable to
+        something outside the model, or explicitly admitted as unverified.</p>
+      </div>
+      <div class="f4" style="display:flex;flex-direction:column;gap:11px">
+        <div class="p wash">
+          <span class="lg">GOLDEN RULE</span>
+          <p class="ctr sm" style="margin-top:6px;font-family:var(--pen);font-size:19px;line-height:1.35">
+            You may only claim a part exists<br><b>if you went and looked.</b></p>
+        </div>
+        <div class="p">
+          <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>3. THE CARD HANDS YOU THE QUERY</div>
+          <p class="sm">The factory <b>pre-computes the misses</b>. Goods-In scans the story text for
+          API names, diffs them against the warehouse snapshot, and emits ready-to-run SOQL as
+          <span class="tag a">pendingVerifications</span> on the job card.</p>
+          <p class="xs" style="margin-top:5px">The agent is handed <b>the exact query it needs</b> to
+          prove the field is real. Skipping it is a choice, not an accident.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="p f3" style="display:flex;gap:12px;align-items:center">
+        <div>
+          <div class="jar"><i></i><u>0.0</u></div>
+        </div>
+        <div>
+          <div class="ph" style="margin-bottom:3px">4. PACKS DECAY</div>
+          <p class="xs">Freshness falls <b>linearly over 24 h</b>, then resolves to
+          <b>nothing</b> — not "a bit less". A two-week-old planning note cannot quietly
+          overrule today's org.</p>
+        </div>
+      </div>
+      <div class="p dash f4">
+        <span class="lgL">TWO VOCABULARIES — DON'T CONFUSE THEM</span>
+        <p class="sm" style="margin-top:5px">The five-shelf ladder above governs <b>context packs</b>.
+        A second registry uses a <b>wider, different</b> enum that adds
+        <span class="tag">high-trust</span> <span class="tag">advisory</span> <span class="tag">experimental</span>.</p>
+        <p class="xs" style="margin-top:4px"><span class="red">They are not the same enum.</span>
+        Do not map one onto the other by name.</p>
+      </div>
+      <div class="p f3">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-warn"/></svg>5. THE TELL</div>
+        <p class="xs">If a station cites a field you don't recognise, look for the
+        <span class="tag a">[Inferred: UNVERIFIED]</span> label.</p>
+        <p class="xs" style="margin-top:5px"><b>If it isn't there, the agent skipped verification.</b>
+        Check the snapshot is fresh and the org connection is live, then re-run that one station.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-ruler"/></svg>
+    <p>Precedence decides, not persuasion. <em>Live org metadata outranks every document</em><br>
+      in the building — including the ones an earlier station wrote.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-scale"/></svg>
+  </div>
+  <span class="pageno">4 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 5 — STATION 00 · GOODS-IN & THE FRONT DESK
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">00</div>
+    <div class="htitle">
+      <h1>Goods-In &amp; The Front Desk</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">00-intake</span><span class="tag">agent orchestrator</span>
+    <span class="tag">writes 00-intake.md</span><span class="tag">+ 00-intake.meta.json</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-bell"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">The clerk who reads the order, checks it's a real order — then <b>walks to the
+        warehouse</b> to confirm the parts are actually on the shelf.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li>The requirement, and its parent</li>
+          <li>The warehouse snapshot (KP bundle)</li>
+          <li>The context pack — <b>quality-checked</b></li>
+          <li><span class="tag a">pendingVerifications</span> SOQL</li>
+          <li>A wiki search, only on fallback</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The requirement arrives — <i>"the Case Data Manager must be written once per submission."</i></dd>
+        <dt>Does:</dt><dd>Runs the supplied <span class="tag">pendingVerifications</span> SOQL to confirm
+          <span class="tag">PRM_CaseDataManager__c</span> and its link to
+          <span class="tag">IndividualApplication</span> genuinely exist — rather than assuming.</dd>
+        <dt>Out:</dt><dd><span class="tag">00-intake.md</span> — every field claim carrying a
+          <span class="tag">[Verified: …]</span> marker, plus a dependency diagram and the handoff to the planner.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li><b>Apply the status gate first.</b> A story that is Blocked, Cancelled, Won't Do or in
+          Technical Refinement <b>stops here</b> rather than generating content nobody will use.</li>
+        <li>Health-check the ticket connection before attempting anything else.</li>
+        <li>Pull the issue and its parent, then <b>quality-check the context pack</b> — if it's
+          irrelevant to the story, fall back to a wiki search rather than using it.</li>
+        <li>Extract requirements on a <b>fixed field priority</b>: acceptance criteria → high-level
+          design → description → parent → comments.</li>
+        <li><b>Run every</b> <span class="tag a">pendingVerifications</span> <b>query before writing a
+          single field claim.</b></li>
+        <li>Record legacy touchpoints, risks and references, plus a mandatory dependency diagram —
+          labelling anything unproven <span class="tag a">[Inferred: UNVERIFIED]</span> with an open
+          question attached.</li>
+        <li>Write the handoff section the Planning Desk will consume.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg>ON THE BENCH</div>
+        <div class="flow">
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-doc"/></svg><span>the<br>order</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-traffic"/></svg><span>status<br>gate</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg><span>walk to<br>warehouse</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-ruler"/></svg><span>measure<br>the part</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg><span>write<br>the brief</span></div>
+        </div>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><b>No scoring critic here.</b> Goods-In is classed <span class="tag">lightweight</span>
+        and gets a <b>structural contract check</b> instead.</p>
+        <div class="kv" style="margin-top:5px"><span>Artifact under <b>100</b> chars</span><b class="red">HIGH</b></div>
+        <div class="kv"><span>Status <span class="tag">failed</span></span><b class="red">CRITICAL</b></div>
+        <div class="kv"><span>Clean</span><b class="gr">score 1.0</b></div>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <div class="row" style="margin-top:5px;gap:14px">
+        <p class="sm f1">A story failing the status gate produces a stub <b>by design</b> —
+        <em>fix the status, don't fight the agent.</em></p>
+        <p class="sm f1" style="border-left:2px dashed var(--rule);padding-left:12px">
+        And note a live defect: <b>its rules require SOQL while its tool allowlist grants no Salesforce
+        tools at all.</b> If verification quietly degrades, that mismatch is the first place to look.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Nothing enters the works on trust. <em>You may only claim a part exists if you went and looked</em> —<br>
+      and the card already handed you the query to look with.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-ruler"/></svg>
+  </div>
+  <span class="pageno">5 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 6 — STATION 01 · THE PLANNING DESK
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">01</div>
+    <div class="htitle">
+      <h1>The Planning Desk</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">01-plan</span><span class="tag">agent planner</span>
+    <span class="tag">writes 01-plan.md</span><span class="tag">max 5 SOQL</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Turns a wish into a <b>numbered build sheet</b> — with honest sizes, and every
+        decision written down rather than assumed.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li><span class="tag">00-intake.md</span> — the brief</li>
+          <li>Requirements, risks, open questions</li>
+          <li>The warehouse snapshot, then live SOQL</li>
+          <li>The context pack</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The intake brief — "the CDM must be written once" — plus its risks and open questions.</dd>
+        <dt>Does:</dt><dd>Rewrites it as testable <span class="tag">AC-01…AC-NN</span>, and records the
+          <b>decision</b> to coalesce writes rather than write once per DataRaptor.</dd>
+        <dt>Out:</dt><dd><span class="tag">01-plan.md</span> — formalised criteria, phases sized S/M/L/XL,
+          and <span class="tag a">UNABLE_TO_LOCK_ROW</span> contention named in the risk register.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Consume the intake brief — requirements, criteria, risks, open questions.</li>
+        <li>Reconnoitre the org: profiles, permission sets, apps, objects, fields.
+          <b>Snapshot first, live SOQL second</b>, and no more than <b>five</b> queries.</li>
+        <li>Record <b>Decisions Made</b> explicitly, on an out-of-the-box-first ladder:
+          <span class="tag">validation rule</span> → <span class="tag">flow</span> →
+          <span class="tag">formula</span> → <span class="tag">Apex</span>.</li>
+        <li>Rewrite the acceptance criteria into <b>formalised, testable</b> form.
+          <em>This is the version every later station traces against.</em></li>
+        <li>Break the work into phases with T-shirt sizes; build the dependency list and risk register.</li>
+        <li>For integration stories, define the <b>Error Response Contract</b> — status codes, payload
+          schema, fault handlers — or raise an open question if it can't be determined.</li>
+        <li><b>Never invent an answer to a hard blocker.</b> Write <span class="tag">PLACEHOLDER</span> instead.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg>ON THE BENCH</div>
+        <div class="flow">
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-doc"/></svg><span>the<br>brief</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg><span>org<br>recon</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-scale"/></svg><span>OOB-first<br>ladder</span></div>
+          <div class="arw">→</div>
+          <div class="node"><span class="circ">AC</span><span>formalise<br>criteria</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg><span>size the<br>phases</span></div>
+        </div>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><span class="tag">01-plan-critique</span> · tier <b>standard</b></p>
+        <div class="kv" style="margin-top:5px"><span>Untraced requirements</span><b class="red">&gt; 5 = CRITICAL</b></div>
+        <div class="kv"><span>Keyword match below</span><b>0.4</b></div>
+        <div class="kv"><span>Score ≥ 0.8</span><b>caveats</b></div>
+        <div class="kv"><span>Coverage <b>and</b> testability fail</span><b class="red">ESCALATE</b></div>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <p class="sm" style="margin-top:5px"><b>If the plan keeps bouncing, the fault is upstream.</b>
+      The critic returns <span class="tag a">REFINE_AGAIN</span> when requirements can't be traced — and
+      critic feedback cannot fix a station whose input was wrong. <em>Fix the story, not the plan.</em></p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>The criteria formalised here become the yardstick for the whole line.<br>
+      <em>Every station after this one is measured against this build sheet.</em></p>
+    <svg viewBox="0 0 24 24"><use href="#i-clip"/></svg>
+  </div>
+  <span class="pageno">6 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 7 — STATION 02 · THE DRAWING OFFICE
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">02</div>
+    <div class="htitle">
+      <h1>The Drawing Office</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">02-architecture</span><span class="tag">agent architect</span>
+    <span class="tag">writes 02-architecture.md</span><span class="tag a">strictest critic on the line</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-compass"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Draws the blueprint — but <b>checks the parts bin before drawing a single bracket.</b></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li><span class="tag">01-plan.md</span> and <span class="tag">00-intake.md</span></li>
+          <li>Live SOQL <b>and</b> <span class="tag">retrieve_metadata</span></li>
+          <li>Optional governance injection from the councils</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The formalised criteria and the decision to coalesce writes.</dd>
+        <dt>Does:</dt><dd><b>Pre-flights every field it is about to design against</b>, then draws the
+          object model — <span class="tag">PRM_CaseDataManager__c</span> →
+          <span class="tag">IndividualApplication</span> — as a mandatory entity-relationship diagram.</dd>
+        <dt>Out:</dt><dd><span class="tag">02-architecture.md</span> — decision records, the coalesced-write
+          design, and an inventory of every piece of metadata the build will touch.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Read the plan and the brief, leaving any hard blocker as an <b>explicit placeholder</b>
+          rather than a guess.</li>
+        <li><b>Section-zero pre-flight:</b> confirm every platform event, object and field exists —
+          <em>before designing against it.</em> This is the single most load-bearing step on the page.</li>
+        <li>Author the decision records, the component diagram, and the object model with its
+          <b>mandatory</b> entity-relationship diagram.</li>
+        <li>Build the metadata inventory — and note the <b>automation paradigm the org is already
+          locked into</b>, so the design doesn't fight it.</li>
+        <li>Produce the integration handoff packet wherever a remote call-in is selected.</li>
+        <li>Walk the <b>twelve anti-pattern gates by name</b> — not as a vague "looks fine".</li>
+        <li>Write the test-design instructions the Test-Rig Bay will turn into specifications.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg>ON THE BENCH</div>
+        <div class="flow">
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg><span>build<br>sheet</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg><span>check the<br>parts bin</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-compass"/></svg><span>draw the<br>blueprint</span></div>
+          <div class="arw">→</div>
+          <div class="node"><span class="circ">12</span><span>anti-pattern<br>gates</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-blue"/></svg><span>metadata<br>inventory</span></div>
+        </div>
+      </div>
+      <div class="p red f4">
+        <div class="ph" style="color:var(--accent)"><svg viewBox="0 0 24 24" style="color:var(--accent)"><use href="#i-mag"/></svg>THE INSPECTOR — FULL TIER</div>
+        <p class="sm"><span class="tag a">02-arch-critique</span> — one of only <b>two</b> full-tier
+        inspectors in the building.</p>
+        <div class="kv" style="margin-top:5px"><span>Field or object not in the org</span><b class="red">CRITICAL</b></div>
+        <div class="kv"><span>Artifact under <b>300</b> chars</span><b class="red">CRITICAL</b></div>
+        <div class="kv"><span>Query-inside-a-loop language</span><b class="red">CRITICAL</b></div>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <div class="row" style="margin-top:5px;gap:14px">
+        <p class="sm f1"><b>Usually it's the diagram syntax, not the design.</b> Check the
+        entity-relationship block renders before assuming the architecture is wrong.</p>
+        <p class="sm f1" style="border-left:2px dashed var(--rule);padding-left:12px">
+        Worth knowing: the <b>documented</b> critical gates for diagram-parse failure and a missing
+        readiness table are <span class="red">described in the station's own rules but not implemented
+        in the running code.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p><em>Nothing gets drawn that wasn't first found in the warehouse.</em><br>
+      A hallucinated field here would be built, tested and shipped by six stations downstream.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-compass"/></svg>
+  </div>
+  <span class="pageno">7 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 8 — STATION 03 · THE TEST-RIG BAY
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">03</div>
+    <div class="htitle">
+      <h1>The Test-Rig Bay</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">03-tdd</span><span class="tag">agent tdd-guide</span>
+    <span class="tag">writes 03-tdd.md</span><span class="tag a">the declared rework destination</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-jig"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Builds the jig and writes the pass/fail checklist <b>before anyone assembles anything.</b></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li>The formalised acceptance criteria</li>
+          <li><span class="tag">02-architecture.md</span> — the design</li>
+          <li>The architect's test-design instructions</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The formalised criteria and the coalesced-write design.</dd>
+        <dt>Does:</dt><dd>Writes one specification per criterion — positive, negative and
+          <b>bulk at 200 records</b> — plus the SOQL that proves the CDM's <b>final field state</b>,
+          never merely the write count.</dd>
+        <dt>Out:</dt><dd><span class="tag">03-tdd.md</span> — a test-data factory design so no test leans
+          on org data, and a red → green → refactor walkthrough.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Take the formalised criteria and the approved design as its two inputs.</li>
+        <li>Write a test specification <b>per criterion</b> — positive, negative and bulk — each with a
+          naming convention, steps, expected results and a priority.</li>
+        <li>Add SOQL validation queries that prove the expected <b>data state</b>, and estimate coverage:
+          <b>≥ 75%</b> for platform code, <b>≥ 80%</b> for the harness.</li>
+        <li>Design the <b>test data factory</b> so tests never depend on whatever happens to be in the org.</li>
+        <li>Write the red → green → refactor walkthrough, with its mandatory cycle diagram.</li>
+        <li>On rework: <b>preserve and add</b> tests. Never remove a passing one to make a suite go green.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-belt"/></svg>ON THE BENCH</div>
+        <div class="flow">
+          <div class="node"><span class="circ">AC</span><span>each<br>criterion</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-jig"/></svg><span>build<br>the jig</span></div>
+          <div class="arw">→</div>
+          <div class="node"><span class="circ a">200</span><span>bulk<br>case</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-box"/></svg><span>data<br>factory</span></div>
+          <div class="arw">→</div>
+          <div class="node"><svg viewBox="0 0 24 24"><use href="#i-doc"/></svg><span>the<br>checklist</span></div>
+        </div>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><span class="tag">03-tdd-critique</span> · tier <b>standard</b></p>
+        <div class="kv" style="margin-top:5px"><span>Uncovered criteria</span><b class="red">&gt; 4 = CRITICAL</b></div>
+        <div class="kv"><span>Keyword match below</span><b>0.3</b></div>
+        <p class="xs" style="margin-top:5px">A looser match threshold than the Planning Desk —
+        test wording legitimately diverges from requirement wording.</p>
+      </div>
+    </div>
+
+    <div class="p red">
+      <span class="lgL">WHY THIS ONE MATTERS MORE THAN IT LOOKS</span>
+      <p class="sm" style="margin-top:5px">A weak artifact here doesn't fail once. <b>Four later
+      stations name</b> <span class="tag a">03-tdd</span> <b>as the place they send work back to.</b>
+      The Red-Pen Desk, the Assembly Bay, the Test Track and the Locks Bench all point here.
+      <em>Get it wrong and it returns four times.</em></p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>The jig is built before the part. <em>Four stations point back to this bay</em> —<br>
+      which makes it the cheapest place on the line to be thorough.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-jig"/></svg>
+  </div>
+  <span class="pageno">8 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 9 — STATION 04 · THE RED-PEN DESK
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">04</div>
+    <div class="htitle">
+      <h1>The Red-Pen Desk</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">04-code-review</span><span class="tag">agent code-reviewer</span>
+    <span class="tag">writes 04-code-review.md</span><span class="tag a">holds a gate decision</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-pen"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Marks everything up in red pen — then <b>decides whether the job is allowed to
+        move on at all.</b></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li>Artifacts <span class="tag">00</span> through <span class="tag">03</span></li>
+          <li>Any implementation that already exists</li>
+          <li>The platform rule set</li>
+        </ul>
+        <p class="xs" style="margin-top:5px"><b>A missing artifact is itself a critical finding.</b></p>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>Everything written so far, plus whatever implementation exists.</dd>
+        <dt>Does:</dt><dd>Checks <b>one bulk write per object type</b>, sharing enforced, field-level
+          security honoured, no hardcoded record identifiers — and numbers each finding with a severity.</dd>
+        <dt>Out:</dt><dd><span class="tag">04-code-review.md</span> — a pass / fail / pending checklist and
+          an explicit <b>may-this-proceed</b> decision.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Load artifacts 00–03. If one is missing, <b>that absence is logged as critical</b> rather
+          than worked around.</li>
+        <li>Review against the platform rule set: bulkification, governor limits, sharing and
+          field-level security, error handling, trigger patterns.</li>
+        <li>Emit <b>numbered findings with severities</b>, plus a checklist of at least seven named checks.</li>
+        <li>Apply the gate — no critical or high findings, proceed; a critical finding <b>blocks</b> and
+          marks the run degraded; missing or inadequate test design sends the work <b>back to</b>
+          <span class="tag a">03-tdd</span>.</li>
+        <li>Write prioritised recommendations and hand off to the Assembly Bay.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-traffic"/></svg>THE GATE — THREE OUTCOMES</div>
+        <div class="row" style="gap:8px;margin-top:4px">
+          <div class="stamp done f1">CLEAN<br>→ proceed</div>
+          <div class="stamp bad f1">CRITICAL<br>→ block · degraded</div>
+          <div class="stamp f1">WEAK TDD<br>→ back to 03</div>
+        </div>
+        <p class="xs" style="margin-top:7px">This is one of the few stations that holds a genuine
+        <b>stop</b> authority over the line, rather than simply writing an opinion.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><span class="tag">04-review-critique</span> · tier <b>standard</b></p>
+        <div class="kv" style="margin-top:5px"><span>Artifact too short</span><b class="red">CRITICAL</b></div>
+        <div class="kv"><span>Score ≥ 0.75</span><b>caveats</b></div>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <p class="sm" style="margin-top:5px"><b>Understating a severity to get through the gate does not
+      work</b> — there is an inspector reading the reviewer. And the rules are explicit about the
+      opposite error too: <em>a high finding that contradicts the approved architecture is a finding
+      against the reviewer</em>, not against the design.</p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>The desk that can stop the line. <em>Its own severities are graded by someone else</em> —<br>
+      which is what stops "no findings" from becoming the easy answer.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-pen"/></svg>
+  </div>
+  <span class="pageno">9 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 10 — STATION 05 · THE ASSEMBLY BAY
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">05</div>
+    <div class="htitle">
+      <h1>The Assembly Bay</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">05-build-fix</span><span class="tag">agent build-error-resolver</span>
+    <span class="tag">writes 05-build-fix.md</span><span class="tag a">the only station that deploys</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-span"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">The only station that touches metal — and it <b>only ever test-fits, never ships.</b></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li>The architecture decisions</li>
+          <li>The red-pen findings — <b>as one fix backlog</b></li>
+          <li>Deploy and test tooling, plus the org</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The decision records plus the red-pen findings, treated as a single backlog.</dd>
+        <dt>Does:</dt><dd>Generates <span class="tag">PRM_CaseDataManagerService</span> and its test class,
+          runs a <b>check-only</b> deploy against the one writable org, then classifies each error by kind
+          and applies the <b>minimal</b> fix.</dd>
+        <dt>Out:</dt><dd><span class="tag">05-build-fix.md</span> — the metadata, the deploy result, and
+          honest deploy and test counts.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Treat the decision records and review findings as <b>one fix backlog</b>, not two lists.</li>
+        <li>Generate the metadata — objects, fields, platform code.</li>
+        <li><b>Classify every error by kind</b> — compile, metadata, dependency, governor limit, test
+          failure. <em>The remedy differs by class</em>, and guessing wastes a deploy cycle.</li>
+        <li>Apply the minimal fix, re-run the <b>check-only</b> deploy, and confirm <b>that specific
+          error</b> is gone before moving on.</li>
+        <li>Run the validation checklist; record real deploy and test counts.</li>
+        <li>On rework, <b>patch in place — never regenerate.</b> Escalate after <b>three</b> identical
+          failures rather than looping.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-key"/></svg>THE CUPBOARD IS LOCKED</div>
+        <p class="sm">Exactly <b>one</b> org alias is write-allowed. Every other alias is
+        look-don't-touch, enforced by a shell hook that inspects the command <b>before</b> it runs and
+        exits with a refusal.</p>
+        <p class="xs" style="margin-top:5px">Deploys are <b>check-only</b>. This bay validates that the
+        parts fit; it is not despatch.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><span class="tag">05-build-fix-critique</span> · tier <b>standard</b></p>
+        <div class="kv" style="margin-top:5px"><span>Unresolved high/critical</span><b class="red">&gt; 4 = CRITICAL</b></div>
+        <div class="kv"><span>Failing tests</span><b class="red">CRITICAL</b></div>
+        <div class="kv"><span>Explicit regression</span><b class="red">CRITICAL</b></div>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <p class="sm" style="margin-top:5px"><b>If the deploy fails on permissions, check the org alias
+      before touching the metadata.</b> The guard is deliberate, and it is far more likely you are
+      pointed at a read-only org than that the generated code is wrong. <em>The metadata is usually
+      innocent.</em></p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>One writable org. Check-only deploys. <em>Every other alias is look-don't-touch</em> —<br>
+      and a hook at the door checks your hands on the way in.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-key"/></svg>
+  </div>
+  <span class="pageno">10 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 11 — STATION 06 · THE TEST TRACK
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">06</div>
+    <div class="htitle">
+      <h1>The Test Track</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">06-e2e</span><span class="tag">agent e2e-runner</span>
+    <span class="tag">writes 06-e2e.md</span><span class="tag a">readiness table is mandatory</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-flag"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Road-tests it — and writes <b>"couldn't test the brakes"</b> rather than ticking
+        the box anyway.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li>The test specification from the rig bay</li>
+          <li>The deploy status from the assembly bay</li>
+          <li>Test-execution tooling and org access</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The test specification and the deploy status.</dd>
+        <dt>Does:</dt><dd>Leads with the readiness table across <b>eight-plus</b> rated dimensions, then
+          asserts the halt-on-failure chain and the dead-letter path into
+          <span class="tag">PRM_FailedRecordStaging__c</span>.</dd>
+        <dt>Out:</dt><dd><span class="tag">06-e2e.md</span> — an execution matrix traced to each criterion,
+          with anything it genuinely could not run marked <b>NOT RUN</b>.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Build the test plan from the specification, mapping coverage back to <b>each criterion</b>.</li>
+        <li>Identify the critical flows: happy path, error path, boundary, bulk, permissions.</li>
+        <li><b>Lead with the readiness verdict</b> — eight-plus dimensions each rated, plus one overall
+          line. Mandatory, and it goes at the top so nobody has to hunt for it.</li>
+        <li>Maintain a <b>blocker registry</b> of every scenario not run or blocked — or state explicitly
+          that there are none.</li>
+        <li>Execute what can be executed and <b>mark the rest NOT RUN</b>.
+          <em>A fabricated pass is the exact failure this station exists to prevent.</em></li>
+        <li>Fill the execution matrix with criterion links and hand off to the Locks Bench.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-traffic"/></svg>THE READINESS TABLE — WHY IT'S FIRST</div>
+        <p class="sm">A rated table forces a <b>per-dimension</b> judgement. Burying a weak dimension
+        inside prose is easy; leaving it amber at the top of the page is not.</p>
+        <div class="row" style="gap:8px;margin-top:7px">
+          <div class="stamp done f1">RUN &amp; PASSED</div>
+          <div class="stamp f1">NOT RUN</div>
+          <div class="stamp bad f1">BLOCKED</div>
+        </div>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><span class="tag">06-e2e-critique</span> · tier <b>standard</b></p>
+        <div class="kv" style="margin-top:5px"><span>Criteria with no test path</span><b class="red">&gt; 3 = CRITICAL</b></div>
+        <p class="xs" style="margin-top:5px">The tightest coverage threshold of the three coverage
+        critics — by this point in the line there is no excuse for an untested criterion.</p>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <p class="sm" style="margin-top:5px"><b>Marking a test NOT RUN is fine.</b> Claiming it passed
+      when it did not is the thing the inspector hunts for. If the track is blocked — no data, no org,
+      no permission — <em>say so in the blocker registry and move on.</em> An honest gap is reviewable;
+      a fabricated pass is not.</p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>The readiness table and the blocker registry exist for one reason:<br>
+      <em>to make a fabricated pass visible from across the room.</em></p>
+    <svg viewBox="0 0 24 24"><use href="#i-flag"/></svg>
+  </div>
+  <span class="pageno">11 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 12 — STATION 07 · THE LOCKS & KEYS BENCH
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">07</div>
+    <div class="htitle">
+      <h1>The Locks &amp; Keys Bench</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">07-security</span><span class="tag">agent security-reviewer</span>
+    <span class="tag">writes 07-security.md</span><span class="tag a">full tier · zero tolerance</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-lock"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Asks who can open which door — and <b>refuses to shrug about the answer.</b></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li>The architecture and the plan</li>
+          <li>Whatever build and test evidence exists</li>
+          <li class="red">No org access in its allowlist</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The architecture and plan, plus the build and test evidence.</dd>
+        <dt>Does:</dt><dd>Builds the create/read/update/delete and field-level access matrix for
+          <span class="tag">PRM_CaseDataManager__c</span> and <span class="tag">IndividualApplication</span>,
+          walks the standard web risk checklist, and scans the artifacts for leaked secrets.</dd>
+        <dt>Out:</dt><dd><span class="tag">07-security.md</span> — the permission matrix, the completed
+          checklist, and the secret-scan result.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Review the architecture and plan alongside the build and test evidence.</li>
+        <li>Build the <b>object and field permission matrix</b>, naming the preferred enforcement method
+          for each entry — not just noting that access exists.</li>
+        <li>Walk the standard top-ten web risk checklist, adding the mobile list where warranted.</li>
+        <li>Review connected-app authorisation scopes. <b>An unjustified full-access scope is critical on
+          its own</b>, regardless of anything else on the page.</li>
+        <li>Run secret detection across the generated artifacts.</li>
+        <li>Classify every finding from critical down to low, and on rework <b>update the matrix</b>
+          rather than restating it.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p red f5">
+        <div class="ph" style="color:var(--accent)"><svg viewBox="0 0 24 24" style="color:var(--accent)"><use href="#i-mag"/></svg>THE INSPECTOR — FULL TIER</div>
+        <p class="sm"><span class="tag a">07-security-critique</span> — the second and last full-tier
+        inspector in the building.</p>
+        <div class="kv" style="margin-top:5px"><span>Objects present, no access matrix</span><b class="red">CRITICAL</b></div>
+        <div class="kv"><span>Unjustified full scope</span><b class="red">CRITICAL</b></div>
+        <p class="xs" style="margin-top:5px"><b>Zero tolerance on critical.</b> There is no
+        "accept with caveats" route past a critical finding here.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-shield"/></svg>THE MATRIX IS THE ARTIFACT</div>
+        <p class="sm">Not a paragraph saying access was considered. A <b>table</b>, per object and per
+        field, with the enforcement method named.</p>
+        <p class="xs" style="margin-top:5px">If objects appear in the design and no matrix appears here,
+        that alone is critical.</p>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <p class="sm" style="margin-top:5px"><b>This bench has no org access.</b> It reasons entirely from
+      the paperwork the earlier stations produced. <em>If those artifacts are vague, its findings will
+      be vague too</em> — and the fix is upstream, at the Drawing Office, not here.</p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Zero tolerance on critical — <em>and only ever as sharp as the paperwork it was handed.</em><br>
+      A vague blueprint produces a vague security review.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-lock"/></svg>
+  </div>
+  <span class="pageno">12 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 13 — STATION 08 · THE CLEAN-DOWN BAY
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">08</div>
+    <div class="htitle">
+      <h1>The Clean-Down Bay</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">08-refactor</span><span class="tag">agent refactor-cleaner</span>
+    <span class="tag">writes 08-refactor.md</span><span class="tag">lightweight check only</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-broom"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Sweeps up and puts the tools back — and is <b>forbidden from changing how the
+        thing drives.</b></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li>The delivered implementation</li>
+          <li>Everything written about it so far</li>
+          <li>The passing test suite</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>The delivered service and all the notes about it.</dd>
+        <dt>Does:</dt><dd>Extracts repeated literals into constants, aligns names to the
+          <span class="tag">PRM_</span> convention, and logs each entry with
+          <b>behavioural change explicitly false</b>.</dd>
+        <dt>Out:</dt><dd><span class="tag">08-refactor.md</span> plus a configuration-debt register —
+          anything that <em>would</em> alter behaviour is pushed into a separate story rather than done here.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Find dead code and unused imports — and remove them <b>only where the tests still pass
+          afterwards</b>.</li>
+        <li>Extract repeated literals into constants, labels or configuration metadata.</li>
+        <li>Align naming with platform conventions and apply the don't-repeat-yourself principle.</li>
+        <li><b>Log every entry with behavioural change marked false.</b> That field is the entire point
+          of the station.</li>
+        <li>Document configuration debt with priorities — <em>flag it, don't fix it.</em></li>
+        <li>If the check flags a behavioural change, <b>revert it</b> and re-validate.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-scale"/></svg>THE LINE IT MUST NOT CROSS</div>
+        <div class="row" style="gap:10px;margin-top:3px">
+          <div class="f1">
+            <p class="sm"><b class="gr">Allowed</b></p>
+            <ul class="chk xs" style="margin-top:3px">
+              <li>Rename for convention</li>
+              <li>Extract a repeated literal</li>
+              <li>Delete provably dead code</li>
+            </ul>
+          </div>
+          <div class="f1" style="border-left:2px dashed var(--rule);padding-left:11px">
+            <p class="sm"><b class="red">Not allowed</b></p>
+            <ul class="chk r xs" style="margin-top:3px">
+              <li>Any change to what it does</li>
+              <li>"While I'm in here" fixes</li>
+              <li>Paying down the debt it logs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><b>No scoring critic.</b> Classed <span class="tag">lightweight</span> — a
+        structural contract check only.</p>
+        <div class="kv" style="margin-top:5px"><span>Hard generation failure</span><b class="red">REFINE_AGAIN</b></div>
+        <div class="kv"><span>Anything else</span><b class="gr">passes</b></div>
+      </div>
+    </div>
+
+    <div class="p red">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <p class="sm" style="margin-top:5px"><b>The risk here isn't a block — it's a behaviour change
+      slipping through labelled as cleanup.</b> Because there is no scoring inspector on this bay,
+      the "behavioural change: false" claim is <em>largely taken at its word.</em>
+      <span class="red">This is the station most worth a human's eye.</span></p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Checked lightly — <em>which is exactly why this bay needs a human reading it.</em><br>
+      Tidying is safe. Tidying that quietly changes behaviour is not.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-broom"/></svg>
+  </div>
+  <span class="pageno">13 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 14 — STATION 09 · THE DESPATCH DESK
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">09</div>
+    <div class="htitle">
+      <h1>The Despatch Desk</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">09-docs</span><span class="tag">agent doc-updater</span>
+    <span class="tag">writes 09-docs.md</span><span class="tag">+ traceability.json</span>
+  </div>
+
+  <div class="body">
+    <div class="row">
+      <div class="p f5 tilt">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-box"/></svg>THE STATION, IN ONE LINE</div>
+        <p class="lead">Packs the owner's manual <b>and</b> the Friday-night delivery note.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-tray"/></svg>WHAT LANDS IN THE IN-TRAY</div>
+        <ul class="dot sm">
+          <li><b>All nine prior artifacts</b></li>
+          <li>Station statuses, findings, results</li>
+          <li>Every decision record made on the line</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="ex">
+      <div class="exh"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE EXAMPLE
+        <span class="job">the job we follow: PRM_CaseDataManagerService</span></div>
+      <dl>
+        <dt>In:</dt><dd>All nine prior artifacts — statuses, findings, test results, decisions.</dd>
+        <dt>Does:</dt><dd>Writes the runbook targeting <b>one org only</b>, documents the
+          <span class="tag">PRM_AsyncJob_Access</span> permission model, and builds full traceability.</dd>
+        <dt>Out:</dt><dd><span class="tag">09-docs.md</span> plus <span class="tag">traceability.json</span> —
+          evidence linked to criterion linked to artifact — and a summary that pastes straight into the ticket.</dd>
+      </dl>
+    </div>
+
+    <div class="p">
+      <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-gear"/></svg>WHAT IT ACTUALLY DOES</div>
+      <ol class="num sm">
+        <li>Synthesise <b>every</b> prior station — status, security findings, test results, decisions.</li>
+        <li>Write the deployment runbook: pre-deploy, deploy and post-deploy commands, targeting a
+          <b>single org</b>, with explicit wait and test-level settings.</li>
+        <li>Document the permission model — which permission sets, which objects, which personas, and
+          <b>which station each requirement came from</b>.</li>
+        <li>Build full traceability and emit it <b>machine-readable alongside the prose</b>, so the
+          linkage survives being read by something other than a human.</li>
+        <li>Produce a ticket-ready summary.</li>
+        <li>Cross-reference the decision records and security findings — and <b>list every degraded
+          station honestly</b>.</li>
+      </ol>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-doc"/></svg>TWO OUTPUTS, ON PURPOSE</div>
+        <div class="row" style="gap:10px;margin-top:3px">
+          <div class="f1"><p class="sm"><span class="tag">09-docs.md</span></p>
+            <p class="xs" style="margin-top:3px">The prose: runbook, permission model, ticket summary,
+            degraded-station list.</p></div>
+          <div class="f1" style="border-left:2px dashed var(--rule);padding-left:11px">
+            <p class="sm"><span class="tag">traceability.json</span></p>
+            <p class="xs" style="margin-top:3px">The same links, machine-readable — so an audit can be
+            run rather than read.</p></div>
+        </div>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>THE INSPECTOR</div>
+        <p class="sm"><b>No scoring critic.</b> Classed <span class="tag">lightweight</span> — a
+        structural contract check only.</p>
+        <p class="xs" style="margin-top:5px">Three stations get this treatment:
+          <span class="tag">00</span> <span class="tag">08</span> <span class="tag">09</span>.</p>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">WHEN THE LINE JAMS</span>
+      <p class="sm" style="margin-top:5px"><b>This desk inherits every placeholder the earlier stations
+      left.</b> A gap in the runbook is almost never a Despatch problem — it is an unanswered hard
+      blocker from the Planning Desk or the Drawing Office, arriving where you finally notice it.
+      <em>Read the degraded-station list first.</em></p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Only ever as good as its inputs. <em>A placeholder upstream becomes a hole in the runbook</em> —<br>
+      which is the last, and most expensive, place to find it.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-box"/></svg>
+  </div>
+  <span class="pageno">14 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 15 — THE INSPECTORS' WALKWAY
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">14</div>
+    <div class="htitle">
+      <h1>The Inspectors' Walkway</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr"><b>Eight inspectors with clipboards, walking above the line.</b>
+      They don't build anything. They read the note the station just wrote and give it one of four verdicts.</p>
+    </div>
+
+    <div class="unit">
+    <div class="sect"><svg viewBox="0 0 24 24"><use href="#i-clip"/></svg>1. The four verdicts</div>
+    <div class="g2" style="gap:9px">
+      <div class="p flat" style="border-color:var(--green)">
+        <p><b class="gr">ACCEPT</b> — good, carry on.</p></div>
+      <div class="p flat">
+        <p><b>ACCEPT_WITH_CAVEATS</b> — good enough, with noted reservations.</p></div>
+      <div class="p flat" style="border-color:var(--accent)">
+        <p><b class="red">REFINE_AGAIN</b> — do it again, here's what's wrong.</p></div>
+      <div class="p flat" style="border-color:var(--accent);border-style:dashed">
+        <p><b class="red">ESCALATE_TO_HUMAN</b> — this needs a person.</p></div>
+    </div>
+    </div>
+
+    <div class="unit">
+    <div class="sect"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>2. Who inspects what</div>
+    <table>
+      <tr><th style="width:22%">Inspector</th><th class="c" style="width:9%">Station</th>
+        <th class="c" style="width:11%">Tier</th><th>What makes it CRITICAL</th></tr>
+      <tr><td><span class="tag">01-plan-critique</span></td><td class="c">01</td><td class="c">standard</td>
+        <td>More than <b>5</b> requirements with nothing traceable to them</td></tr>
+      <tr style="background:#FDF3F1"><td><span class="tag a">02-arch-critique</span></td><td class="c">02</td>
+        <td class="c"><b class="red">full</b></td>
+        <td>A field or object that isn't in the org · artifact under <b>300</b> chars · query-inside-a-loop language</td></tr>
+      <tr><td><span class="tag">03-tdd-critique</span></td><td class="c">03</td><td class="c">standard</td>
+        <td>More than <b>4</b> criteria with no test covering them</td></tr>
+      <tr><td><span class="tag">04-review-critique</span></td><td class="c">04</td><td class="c">standard</td>
+        <td>Artifact too short to constitute a review</td></tr>
+      <tr><td><span class="tag">05-build-fix-critique</span></td><td class="c">05</td><td class="c">standard</td>
+        <td>More than <b>4</b> unresolved high/critical findings · failing tests · a declared regression</td></tr>
+      <tr><td><span class="tag">06-e2e-critique</span></td><td class="c">06</td><td class="c">standard</td>
+        <td>More than <b>3</b> criteria with no end-to-end path</td></tr>
+      <tr style="background:#FDF3F1"><td><span class="tag a">07-security-critique</span></td><td class="c">07</td>
+        <td class="c"><b class="red">full</b></td>
+        <td>Objects present with no access matrix · an unjustified full authorisation scope</td></tr>
+      <tr><td><span class="tag">10-caag-critique</span></td><td class="c">gov</td><td class="c">standard</td>
+        <td>Governance artifact fails its own structural contract</td></tr>
+      <tr style="background:var(--wash)"><td colspan="2"><b>Stations 00 · 08 · 09</b></td>
+        <td class="c"><b>light</b></td>
+        <td>No scoring. A structural contract check only: <b>&lt;100</b> chars is high,
+          a failed status is critical.</td></tr>
+    </table>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-watch"/></svg>3. HOW MANY SECOND CHANCES?</div>
+        <p class="sm"><b>One, by default.</b> The refine cap is <span class="tag">1</span> in the running
+        code — though the README says <b>2</b> and some command paths pass <b>3</b>.
+        <span class="red">Check the value you are actually running with.</span></p>
+        <p class="sm" style="margin-top:6px">At the cap the loop stops and <b>returns the last verdict
+        unchanged</b> — which may well still be <span class="tag a">REFINE_AGAIN</span>.</p>
+        <div class="p red flat" style="margin-top:7px">
+          <p class="xs"><b>The documentation says</b> a station is promoted to
+          <span class="tag">ACCEPT_WITH_CAVEATS</span> when it hits the cap.
+          <b class="red">The code does not do this.</b> Don't rely on it.</p>
+        </div>
+      </div>
+      <div class="f4" style="display:flex;flex-direction:column;gap:11px">
+        <div class="p">
+          <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-shield"/></svg>4. THE DOMAIN CHECK</div>
+          <p class="sm">One extra rule fires regardless of station: if the work touches
+          <b>regulated clinical data</b> and the artifact never mentions the governing privacy standard,
+          that is <b class="red">critical</b> on its own.</p>
+        </div>
+        <div class="p dash">
+          <span class="lgL">WHERE THE ANALOGY BREAKS &nbsp;②</span>
+          <p class="sm" style="margin-top:4px"><b>The belt doesn't actually stop.</b> Each station's
+          rules declare a rework trigger — the station it would send work back to.</p>
+          <p class="sm" style="margin-top:4px"><span class="red">Nothing in the running code reads
+          those declarations.</span> Refinement happens <em>within</em> a station's own loop; there is no
+          automatic reverse conveyor. <b>Backwards movement is a human decision.</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Eight inspectors, four verdicts, one refine by default. <em>Two of them are full tier</em> —<br>
+      the blueprint and the locks, which is where a mistake costs the most.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-mag"/></svg>
+  </div>
+  <span class="pageno">15 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 16 — THE RULE BOOK & THE LOCKED CUPBOARD
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">15</div>
+    <div class="htitle">
+      <h1>The Rule Book &amp; The Cupboard</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr">Judgement lives in the inspectors. <b>The rule book is different</b> — it holds
+      the rules that are not up for discussion, written as policy files rather than prose.</p>
+    </div>
+
+    <div class="unit">
+    <div class="sect"><svg viewBox="0 0 24 24"><use href="#i-book"/></svg>1. Seven rules nobody argues with</div>
+    <table>
+      <tr><th style="width:30%">Rule</th><th>What it insists on</th></tr>
+      <tr><td><span class="tag">evidence_completeness</span></td><td>Every required source is present before anything is scored</td></tr>
+      <tr><td><span class="tag">freshness</span></td><td>Stale evidence is capped as a proportion of the whole</td></tr>
+      <tr><td><span class="tag">risk_gates</span></td><td>Unmitigated critical or high risks cannot pass</td></tr>
+      <tr><td><span class="tag">quality_thresholds</span></td><td>Minimum quality scores are met</td></tr>
+      <tr><td><span class="tag">approval_routing</span></td><td>Who has to sign, given the score and the risk</td></tr>
+      <tr><td><span class="tag">waiver_validation</span></td><td>An exception is only an exception if it is properly justified</td></tr>
+      <tr><td><span class="tag">scoring_thresholds</span></td><td>The numeric bands that decide the route</td></tr>
+    </table>
+    </div>
+
+    <div class="row">
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-scale"/></svg>2. THE NUMBERS THAT DECIDE</div>
+        <div class="kv"><span>Auto-approve at or above</span><b>0.8</b></div>
+        <div class="kv"><span>Second-level review at or above</span><b>0.6</b></div>
+        <div class="kv"><span>Unmitigated critical allowed</span><b class="red">0</b></div>
+        <div class="kv"><span>Unmitigated high allowed</span><b class="red">0</b></div>
+        <div class="kv"><span>Maximum stale-evidence ratio</span><b>0.34</b></div>
+        <div class="kv"><span>Minimum rationale length</span><b>50 chars</b></div>
+        <p class="xs" style="margin-top:6px"><b>Zero unmitigated criticals and zero unmitigated
+        highs.</b> Not "few". The rationale minimum exists so a waiver cannot be justified with the
+        word <i>"fine"</i>.</p>
+      </div>
+      <div class="f5" style="display:flex;flex-direction:column;gap:11px">
+        <div class="p">
+          <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-key"/></svg>3. THE LOCKED TOOL CUPBOARD</div>
+          <p class="sm"><b>Exactly one org alias is write-allowed.</b> Every other alias in the registry
+          is read-only, and the enforcement is not a convention — it's a hook.</p>
+          <div class="flow" style="margin-top:5px">
+            <div class="node"><svg viewBox="0 0 24 24"><use href="#i-span"/></svg><span>you type a<br>deploy command</span></div>
+            <div class="arw">→</div>
+            <div class="node"><svg viewBox="0 0 24 24"><use href="#i-lock"/></svg><span>hook inspects<br>it first</span></div>
+            <div class="arw">→</div>
+            <div class="node"><span class="circ a">2</span><span>refused with<br>exit code 2</span></div>
+          </div>
+          <p class="xs" style="margin-top:6px">If the registry can't be read, the guard <b>falls back to
+          a hardcoded list</b> and still protects the known production aliases. <em>It fails closed,
+          not open.</em></p>
+        </div>
+        <div class="p red">
+          <div class="warnbox">
+            <svg viewBox="0 0 24 24"><use href="#i-warn"/></svg>
+            <div>
+              <p class="sm"><b style="color:var(--accent)">READ THIS BEFORE YOUR FIRST RUN.</b>
+              The org registry ships <b>pre-populated with placeholder orgs from another engagement</b>,
+              and the write guard reads that same file at runtime.</p>
+              <p class="sm" style="margin-top:4px"><b class="red">Replace it from the template before
+              the first run</b> — otherwise you are protecting somebody else's org names and not yours.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">TWO KINDS OF NO</span>
+      <div class="row" style="margin-top:5px;gap:14px">
+        <p class="sm f1"><b>The inspectors say no with judgement.</b> They read an artifact, score it,
+        and can be argued with across a refine cycle.</p>
+        <p class="sm f1" style="border-left:2px dashed var(--rule);padding-left:12px">
+        <b>The rule book and the cupboard say no with arithmetic.</b> A threshold is a threshold and a
+        blocked alias is a blocked alias. <em>Neither negotiates.</em></p>
+      </div>
+      <p class="sm" style="margin-top:9px;padding-top:8px;border-top:1px dashed var(--rule)">
+        <b>Which one you've hit changes what you do next.</b> An inspector returning
+        <span class="tag a">REFINE_AGAIN</span> is a conversation — improve the artifact and it may
+        accept. A policy threshold or a blocked alias is a <b>fact</b>: you either change the
+        underlying condition, or you record a properly justified waiver.
+        <em>Arguing with it in the artifact will not work.</em></p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Judgement is for the inspectors. <em>The rule book only does arithmetic</em> —<br>
+      and the cupboard door only does locked or unlocked.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-key"/></svg>
+  </div>
+  <span class="pageno">16 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 17 — THE READING ROOM
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">16</div>
+    <div class="htitle">
+      <h1>The Reading Room</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">the expert review quartet</span><span class="tag a">EXPERT_REVIEW_V2 · default OFF</span>
+    <span class="tag">runs in a fixed order</span>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr"><b>Four people who argue about the order before a bolt is turned.</b>
+      Not on the line — in a room off it. They run <b>in sequence</b>, and each one can only do its job
+      because the previous one already did theirs.</p>
+    </div>
+
+    <div class="flow" style="padding:2px">
+      <div class="node"><span class="circ">1</span><span><b>ba-context</b><br>is it ready?</span></div>
+      <div class="arw">→</div>
+      <div class="node"><span class="circ">2</span><span><b>sf-tech-reviewer</b><br>is it buildable?</span></div>
+      <div class="arw">→</div>
+      <div class="node"><span class="circ">3</span><span><b>gov-risk</b><br>is it allowed?</span></div>
+      <div class="arw">→</div>
+      <div class="node"><span class="circ">4</span><span><b>refinement</b><br>what changed?</span></div>
+    </div>
+
+    <div class="g2">
+      <div class="p">
+        <span class="lgL">1 · THE BUSINESS READER</span>
+        <p class="sm" style="margin-top:5px"><b>Reads the order like a customer would.</b> Is this
+        actually ready to hand to a builder?</p>
+        <div class="row" style="gap:6px;margin-top:6px">
+          <div class="stamp bad f1" style="font-size:11px">NOT READY</div>
+          <div class="stamp f1" style="font-size:11px">CONDITIONALLY<br>READY</div>
+          <div class="stamp done f1" style="font-size:11px">READY<br>FOR DEV</div>
+        </div>
+        <p class="xs" style="margin-top:7px"><b class="red">Failure mode:</b> if the knowledge bundle is
+        missing, this reviewer produces nothing — and because the other three run <b>after</b> it,
+        <em>the whole quartet returns empty.</em> One missing input silences four agents.</p>
+      </div>
+      <div class="p">
+        <span class="lgL">2 · THE PLATFORM READER</span>
+        <p class="sm" style="margin-top:5px">Reads it as a builder. Four domains, each judged separately —
+        and each can be <b>skipped</b> if there's nothing relevant to look at.</p>
+        <p class="xs" style="margin-top:6px"><b class="red">Failure mode:</b> if <b>all four</b> domains
+        skip, the verdict is <b>insufficient evidence</b>.
+        <em>That is not a pass.</em> It means nobody found anything to review, which is usually a
+        missing-input problem rather than a clean bill of health.</p>
+      </div>
+      <div class="p">
+        <span class="lgL">3 · THE COMPLIANCE READER</span>
+        <p class="sm" style="margin-top:5px">Asks whether the organisation is allowed to do this at all —
+        regulatory exposure, data handling, sign-off.</p>
+        <div class="row" style="gap:6px;margin-top:6px">
+          <div class="stamp done f1" style="font-size:11px">APPROVE</div>
+          <div class="stamp f1" style="font-size:11px">DEFER</div>
+          <div class="stamp bad f1" style="font-size:11px">REJECT</div>
+        </div>
+        <p class="xs" style="margin-top:7px"><b class="red">Failure mode:</b> it <b>defaults to approve</b>.
+        A run that approves with <em>no defer and no reject recorded anywhere</em> should raise
+        suspicion, not relief — it may mean the checks never had anything to bite on.</p>
+      </div>
+      <div class="p">
+        <span class="lgL">4 · THE MINUTE-TAKER</span>
+        <p class="sm" style="margin-top:5px">Records what a human said, detects when feedback is too
+        generic to act on, and decides <b>how much to re-run</b>.</p>
+        <p class="xs" style="margin-top:6px">Rerun scope: <span class="tag">none</span>
+          <span class="tag">ba-only</span> <span class="tag">ba-tech</span>
+          <span class="tag">gov-only</span> <span class="tag">full-replay</span></p>
+        <p class="xs" style="margin-top:6px"><b class="red">Failure mode:</b> with no human input it is a
+        <b>no-op</b>. <em>This agent has nothing to do unless a person actually reviewed something.</em></p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="p dash f5">
+        <span class="lgL">THE FLAG IS OFF BY DEFAULT</span>
+        <p class="sm" style="margin-top:5px">The quartet only runs when
+        <span class="tag">EXPERT_REVIEW_V2</span> is switched on. <b>If you have never turned it on,
+        none of this page has happened on your runs</b> — and the review artifacts you're looking for
+        simply won't exist.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-bulb"/></svg>THE PATTERN TO NOTICE</div>
+        <p class="sm">Every one of these four <b>degrades into silence</b> rather than into a wrong
+        answer. Empty, insufficient, no-op — never a confident fabrication.</p>
+        <p class="xs" style="margin-top:5px">Which means <em>an empty review is a signal</em>, not an
+        absence of one.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Four readers, in a fixed order, and every one fails quiet rather than loud.<br>
+      <em>An empty verdict here is telling you something — usually that an input is missing.</em></p>
+    <svg viewBox="0 0 24 24"><use href="#i-book"/></svg>
+  </div>
+  <span class="pageno">17 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 18 — THE RECORDS OFFICE
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">17</div>
+    <div class="htitle">
+      <h1>The Records Office</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">the assurance chain</span><span class="tag">five agents, strictly ordered</span>
+    <span class="tag">output: boardpacket-v2</span>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr"><b>Gather the evidence → check it's complete → score it → decide who signs →
+      staple the folder.</b> Five agents, and the order is not decorative: each one needs the one before it.</p>
+    </div>
+
+    <div class="flow" style="padding:2px">
+      <div class="node"><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg><span><b>knowledge</b><br>gather</span></div>
+      <div class="arw">→</div>
+      <div class="node"><svg viewBox="0 0 24 24"><use href="#i-mag"/></svg><span><b>auditor</b><br>is it complete?</span></div>
+      <div class="arw">→</div>
+      <div class="node"><svg viewBox="0 0 24 24"><use href="#i-scale"/></svg><span><b>scoring</b><br>rate it</span></div>
+      <div class="arw">→</div>
+      <div class="node"><svg viewBox="0 0 24 24"><use href="#i-traffic"/></svg><span><b>router</b><br>who signs?</span></div>
+      <div class="arw">→</div>
+      <div class="node"><svg viewBox="0 0 24 24"><use href="#i-box"/></svg><span><b>synthesizer</b><br>staple it</span></div>
+    </div>
+
+    <div class="g2">
+      <div class="p">
+        <span class="lgL">THE LIBRARIAN</span>
+        <p class="sm" style="margin-top:5px"><b>Read-only everywhere, and it never blocks anything.</b>
+        It fetches from the ticket system, the wiki, the org and the repository.</p>
+        <p class="xs" style="margin-top:5px"><b class="red">The trap:</b> when a source fails it sets a
+        <b>degraded</b> flag and carries on. <em>A bundle can look present while being nearly empty.</em>
+        Check the flag, not just the file.</p>
+      </div>
+      <div class="p">
+        <span class="lgL">THE AUDITOR</span>
+        <p class="sm" style="margin-top:5px">Asks whether the folder is complete <b>before anyone is
+        allowed to score it</b>. Three outcomes: pass, review, escalate.</p>
+        <p class="xs" style="margin-top:5px"><b class="red">If the bundle is missing entirely</b>, that
+        is a critical gap and an immediate escalation — <em>not a low score.</em></p>
+      </div>
+      <div class="p" style="opacity:.72;border-style:dashed">
+        <span class="lgL" style="color:var(--accent)">THE OLD SCORER — DEPRECATED</span>
+        <p class="sm" style="margin-top:5px">A four-part weighted score:</p>
+        <div class="kv"><span>Alignment</span><b>.30</b></div>
+        <div class="kv"><span>Process health</span><b>.25</b></div>
+        <div class="kv"><span>Evidence completeness</span><b>.25</b></div>
+        <div class="kv"><span>Risk readiness</span><b>.20</b></div>
+        <p class="xs" style="margin-top:5px">Approve at <b>0.8</b>, defer at <b>0.6</b>.
+        <b class="red">Marked deprecated in favour of the eight-dimension model.</b>
+        Both still appear in the codebase — <em>the eight-dimension card is the canonical one.</em></p>
+      </div>
+      <div class="p">
+        <span class="lgL">THE ROUTER</span>
+        <p class="sm" style="margin-top:5px">Runs the rule book and combines the results on a
+        <b>worst-wins</b> basis.</p>
+        <p class="sm" style="margin-top:4px"><b>One escalate escalates everything.</b> Not an average,
+        not a majority — the single worst outcome sets the route for the whole run.</p>
+        <p class="xs" style="margin-top:5px">It also validates waivers, so an exception has to be
+        properly justified rather than merely asserted.</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-box"/></svg>THE STAPLER</div>
+        <p class="sm">Assembles the final folder for the people who sign things —
+        one human-readable and one machine-readable, written side by side.</p>
+        <p class="xs" style="margin-top:5px">Filenames matter here:
+        <span class="tag">boardpacket-v2.md</span> and <span class="tag">boardpacket-v2.json</span>.
+        <b class="red">Not</b> <span class="tag">board-packet.md</span> — the hyphenated name appears in
+        some documentation and <em>does not match what the code writes.</em></p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-warn"/></svg>THE ORDER IS LOAD-BEARING</div>
+        <p class="sm">You cannot score what you haven't audited, and you cannot audit what nobody
+        gathered.</p>
+        <p class="xs" style="margin-top:5px">Which is why a quiet <b>degraded</b> flag at step one
+        propagates all the way to the signature at step five.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Worst-wins, all the way down. <em>One escalation escalates the whole run</em> —<br>
+      and a degraded fetch at the first desk is felt at the last.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-cab"/></svg>
+  </div>
+  <span class="pageno">18 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 19 — THE AFTERCARE GARAGE & THE ANNEXE
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">18</div>
+    <div class="htitle">
+      <h1>The Aftercare Garage</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+  <div class="idbar">
+    <span class="tag">what happens after the car leaves</span>
+    <span class="tag a">all three are flag-gated, all default OFF</span>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr">Three agents that only matter <b>after</b> something has shipped —
+      the proper road test, the mistake ledger, and <b>one mechanic who may only lift a spanner when a
+      human hands over the key.</b></p>
+    </div>
+
+    <div class="g3">
+      <div class="p">
+        <span class="lg">THE ROAD TESTER</span>
+        <p class="sm" style="margin-top:6px"><b>The one who actually drives it</b>, rather than reading
+        about it — real browser and platform test execution.</p>
+        <p class="xs" style="margin-top:5px">Flag <span class="tag">QA_TCOE_ENABLED</span>.
+        Two honest behaviours worth knowing:</p>
+        <ul class="dot xs" style="margin-top:4px">
+          <li>Flag off → it <b>reports failed</b>. It never silently skips and lets you think it ran.</li>
+          <li>Wrong org alias → a <b class="red">hard error</b>, not a warning.</li>
+        </ul>
+      </div>
+      <div class="p">
+        <span class="lg">THE MISTAKE LEDGER</span>
+        <p class="sm" style="margin-top:6px">Reads the complaint book and looks for <b>the same fault
+        happening repeatedly</b> — six phases, ending in a draft improvement.</p>
+        <p class="xs" style="margin-top:5px">Flag <span class="tag">SELF_IMPROVE_ENABLED</span>.</p>
+        <p class="xs" style="margin-top:5px">ingest → classify → root-cause → find the pattern → plan →
+        draft the change.</p>
+        <p class="xs" style="margin-top:5px"><b class="red">A run that finds zero issues is treated as
+        invalid</b> — because a factory with no complaints usually means nobody wrote them down.</p>
+      </div>
+      <div class="p red">
+        <span class="lg">THE MECHANIC</span>
+        <p class="sm" style="margin-top:6px"><b>The only agent allowed to change the factory itself.</b>
+        Six phases, and a <b class="red">human gate in the middle it cannot open.</b></p>
+        <p class="xs" style="margin-top:5px">Flag <span class="tag">SIA_FIXER_ENABLED</span>.</p>
+        <p class="sm" style="margin-top:5px"><b>It never marks its own work verified.</b>
+        <em>Ever.</em> Applying a fix and certifying a fix are deliberately two different jobs held by
+        two different parties.</p>
+      </div>
+    </div>
+
+    <div class="unit">
+    <div class="sect"><svg viewBox="0 0 24 24"><use href="#i-stamp"/></svg>The stamp chain — why the mechanic can't sign its own work</div>
+    <div class="row" style="gap:10px">
+      <div class="p f5" style="display:flex;align-items:center;gap:9px;justify-content:space-between">
+        <div class="stamp">PROPOSED</div><span class="arw" style="padding:0">→</span>
+        <div class="stamp">APPLIED</div><span class="arw" style="padding:0">→</span>
+        <div class="stamp done">VERIFIED</div><span class="arw" style="padding:0">→</span>
+        <div class="stamp bad">REGRESSED</div>
+      </div>
+      <div class="p f4">
+        <p class="sm">The mechanic can stamp <b>PROPOSED</b> and <b>APPLIED</b>.
+        <b class="red">It cannot stamp VERIFIED.</b></p>
+        <p class="xs" style="margin-top:4px">The ledger of drafts runs its own chain in parallel:
+        <span class="tag">DRAFT</span> → <span class="tag">READY</span> →
+        <span class="tag">POSTED</span> → <span class="tag">CLOSED</span>.</p>
+      </div>
+    </div>
+    </div>
+
+    <div class="row">
+      <div class="p dash f5" style="opacity:.72">
+        <span class="lgL">THE ANNEXE — LIGHTS OFF</span>
+        <p class="sm" style="margin-top:5px">One further agent handles a <b>different product line</b>
+        entirely. Its flag is off, and it is written to be honest about that:</p>
+        <ul class="dot xs" style="margin-top:5px">
+          <li>Without an explicit force, it <b>returns failed</b> rather than pretending</li>
+          <li>Missing inputs make it report <b>degraded</b> rather than invent content</li>
+          <li><b>It cannot deploy anything</b>, by design</li>
+        </ul>
+        <p class="xs" style="margin-top:5px">Leave the switch alone and the factory behaves exactly as
+        if this room weren't there.</p>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-bulb"/></svg>THE HABIT WORTH COPYING</div>
+        <p class="sm">Notice what every agent on this page does when it can't do its job:
+        <b>it says so.</b></p>
+        <p class="sm" style="margin-top:5px">Failed, degraded, invalid, hard error. <em>Never a quiet
+        skip that reads like a pass.</em></p>
+        <p class="xs" style="margin-top:5px">That is the single most valuable convention in the whole
+        building, and it costs nothing to adopt.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p><em>The mechanic who applies a fix is never the one who certifies it.</em><br>
+      Everything else in this garage is downstream of that one rule.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-arm"/></svg>
+  </div>
+  <span class="pageno">19 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 20 — WHAT EVERY STATION WRITES
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">19</div>
+    <div class="htitle">
+      <h1>What Every Station Writes</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr">Every station has a pigeonhole and puts exactly one note in it.
+      <b>If a pigeonhole is empty, you know precisely which station to go and ask.</b></p>
+    </div>
+
+    <div class="row" style="flex:1 1 auto;min-height:0">
+      <div class="p f5" style="display:flex;flex-direction:column">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg>THE PIGEONHOLES</div>
+        <div class="g2" style="gap:7px;grid-template-columns:1fr 1fr">
+          <div class="hole"><div class="f">00-intake.md</div><div class="w">the brief</div></div>
+          <div class="hole"><div class="f">01-plan.md</div><div class="w">the build sheet</div></div>
+          <div class="hole" style="border-color:var(--accent)"><div class="f" style="color:var(--accent)">02-architecture.md</div><div class="w">the blueprint</div></div>
+          <div class="hole"><div class="f">03-tdd.md</div><div class="w">the jig + checklist</div></div>
+          <div class="hole"><div class="f">04-code-review.md</div><div class="w">the red pen</div></div>
+          <div class="hole"><div class="f">05-build-fix.md</div><div class="w">the build record</div></div>
+          <div class="hole"><div class="f">06-e2e.md</div><div class="w">the road test</div></div>
+          <div class="hole" style="border-color:var(--accent)"><div class="f" style="color:var(--accent)">07-security.md</div><div class="w">the locks matrix</div></div>
+          <div class="hole"><div class="f">08-refactor.md</div><div class="w">the clean-down</div></div>
+          <div class="hole"><div class="f">09-docs.md</div><div class="w">the owner's manual</div></div>
+        </div>
+        <div class="p wash flat" style="margin-top:9px">
+          <p class="xs"><b>Plus, alongside them:</b><br>
+            <span class="tag">00-intake.meta.json</span>
+            <span class="tag">traceability.json</span></p>
+        </div>
+        <div class="p dash flat" style="margin-top:9px">
+          <p class="xs"><b>Whose path wins?</b> The job card's
+          <span class="tag">expectedOutputPath</span> <b>is authoritative</b> wherever layers disagree.
+          Don't infer the location from a folder listing.</p>
+        </div>
+      </div>
+
+      <div class="f4" style="display:flex;flex-direction:column;gap:11px;min-height:0">
+        <div class="p">
+          <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-cab"/></svg>AND AROUND THE RUN</div>
+          <div style="font-family:var(--mono);font-size:12.5px;line-height:1.75;color:var(--ink)">
+            runs/<br>
+            └─ &lt;feature&gt;/<br>
+            &nbsp;&nbsp;&nbsp;├─ cursor-tasks/<br>
+            &nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└─ &lt;stage&gt;.task.json<br>
+            &nbsp;&nbsp;&nbsp;├─ cursor-completion-<br>
+            &nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;manifest.json<br>
+            &nbsp;&nbsp;&nbsp;├─ story-extraction-<br>
+            &nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;packet.json<br>
+            &nbsp;&nbsp;&nbsp;├─ execution-manifest.json<br>
+            &nbsp;&nbsp;&nbsp;├─ boardpacket-v2.md<br>
+            &nbsp;&nbsp;&nbsp;└─ boardpacket-v2.json
+          </div>
+        </div>
+        <div class="p red">
+          <div class="warnbox">
+            <svg viewBox="0 0 24 24"><use href="#i-warn"/></svg>
+            <p class="sm">Watch the board-packet filename.
+            <b>The code writes</b> <span class="tag">boardpacket-v2</span>.
+            <b class="red">Some docs say</b> <span class="tag a">board-packet.md</span>.
+            They are not the same file, and only one of them exists.</p>
+          </div>
+        </div>
+        <div class="p">
+          <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-bulb"/></svg>HOW TO READ A RUN</div>
+          <ul class="chk sm">
+            <li>Ten notes present → the line completed</li>
+            <li>One missing → go to <b>that</b> station</li>
+            <li>Placeholder still in place → Phase 2 didn't reach it</li>
+            <li>Note present but thin → check the inspector's verdict before the content</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>Ten pigeonholes, ten notes. <em>This is the whole reason for splitting one prompt into ten</em> —<br>
+      a failure now has an address.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-shelf"/></svg>
+  </div>
+  <span class="pageno">20 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 21 — WHEN THE LINE JAMS
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">20</div>
+    <div class="htitle">
+      <h1>When The Line Jams</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p wash flat">
+      <p class="sm ctr">Seven symptoms you will actually hit, and where to go.
+      <b>Notice how often the answer is a station other than the one that's complaining.</b></p>
+    </div>
+
+    <table>
+      <tr><th style="width:31%">What you see</th><th style="width:34%">What it usually means</th><th>Where to go</th></tr>
+      <tr>
+        <td>Nothing was scheduled — the pending list is empty</td>
+        <td>The story keys didn't resolve, so no job cards were printed</td>
+        <td>Check the story keys and the filter mode, then re-run <b>Phase 1</b></td>
+      </tr>
+      <tr>
+        <td>A station sits at <span class="tag">cursor_pending</span></td>
+        <td><b>Nothing is wrong.</b> The card is written; Phase 2 hasn't reached it</td>
+        <td>Open the workspace in the editor and work that card</td>
+      </tr>
+      <tr>
+        <td>Extraction fails on a placeholder</td>
+        <td>Phase 2 skipped that card, or wrote to the wrong path</td>
+        <td>Back to the editor for <b>that one card</b>. <b class="red">Do not re-run Phase 1</b></td>
+      </tr>
+      <tr style="background:#FDF3F1">
+        <td>The blueprint keeps coming back <span class="tag a">REFINE_AGAIN</span></td>
+        <td>Almost always the diagram won't parse — not the design</td>
+        <td>Fix the diagram syntax first, before touching the architecture</td>
+      </tr>
+      <tr>
+        <td>The plan keeps bouncing</td>
+        <td>The brief was too vague to trace requirements against</td>
+        <td><b>Upstream.</b> Fix the story — critic feedback can't repair a bad input</td>
+      </tr>
+      <tr>
+        <td>Deploy fails on permissions</td>
+        <td>You're pointed at a read-only alias and the guard did its job</td>
+        <td>Check the org alias <b>before</b> touching the metadata</td>
+      </tr>
+      <tr>
+        <td>The whole expert review returns empty</td>
+        <td>The knowledge bundle is missing, so the first reader produced nothing —<br>and the other three run after it</td>
+        <td>Fix the bundle. <b>One missing input silences four agents</b></td>
+      </tr>
+    </table>
+
+    <div class="row">
+      <div class="p red f5">
+        <div class="warnbox">
+          <svg viewBox="0 0 24 24"><use href="#i-warn"/></svg>
+          <div>
+            <p class="lead" style="color:var(--accent)"><b style="color:var(--accent)">The one thing not to do</b></p>
+            <p class="sm" style="margin-top:4px">Do not hand-edit a bad artifact to make the run go green.
+            <b>The whole value of ten stations is that a failure has an address.</b>
+            <em>Editing the note by hand deletes the address and keeps the fault.</em></p>
+          </div>
+        </div>
+      </div>
+      <div class="p f4">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-target"/></svg>THE DIAGNOSTIC ORDER</div>
+        <ol class="num sm">
+          <li>Which pigeonhole is empty or thin?</li>
+          <li>What did that station's inspector say?</li>
+          <li>Was that station's <b>input</b> complete?</li>
+          <li>Only then: is the content actually wrong?</li>
+        </ol>
+        <p class="xs" style="margin-top:6px">Most jams resolve at step 3.</p>
+      </div>
+    </div>
+
+    <div class="p dash">
+      <span class="lgL">REMEMBER WHAT THE REFINE LOOP CAN AND CANNOT DO</span>
+      <div class="row" style="margin-top:5px;gap:14px">
+        <p class="sm f1"><b>It can</b> improve an artifact whose inputs were sound — that's exactly the
+        loop it was built for.</p>
+        <p class="sm f1" style="border-left:2px dashed var(--rule);padding-left:12px">
+        <b class="red">It cannot</b> repair a station whose input was wrong, and there is
+        <b>no automatic reverse conveyor</b> to send work back upstream. <em>That move is yours to make.</em></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>When a station complains, suspect its <em>input</em> before its output.<br>
+      Three of the seven jams above are fixed at a completely different station.</p>
+    <svg viewBox="0 0 24 24"><use href="#i-span"/></svg>
+  </div>
+  <span class="pageno">21 / 22</span>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE 22 — WHERE THE MANUAL LIES TO YOU
+     ══════════════════════════════════════════════════════════════ -->
+<section class="page">
+  <div class="head">
+    <div class="badge">21</div>
+    <div class="htitle">
+      <h1>Where The Manual Lies To You</h1>
+      <svg class="swoosh" viewBox="0 0 330 11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M4 5.5c60-3 120-3 160-1s100 2 162-1"/><circle cx="165" cy="9" r="2" fill="currentColor" stroke="none"/>
+      </svg>
+    </div>
+    <div class="brand">The GameChanger<b>Factory</b>
+      <svg viewBox="0 0 96 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 4c22-2.5 50-2.5 92-1"/></svg>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="p red flat">
+      <p class="sm ctr"><b style="color:var(--accent)">Places where the documentation and the running
+      code disagree.</b> None of these are fatal. All of them will waste an afternoon if you meet them
+      by surprise.</p>
+    </div>
+
+    <table class="tight">
+      <tr><th style="width:30%">The manual says</th><th style="width:34%">The machine does</th><th>What to do</th></tr>
+      <tr>
+        <td>Goods-In verifies field claims with SOQL</td>
+        <td>Its tool allowlist grants <b>no platform tools at all</b></td>
+        <td>Check verification actually ran; don't assume the label</td>
+      </tr>
+      <tr>
+        <td>Two refine attempts per station</td>
+        <td>The code default is <b>1</b>; some command paths pass <b>3</b></td>
+        <td><b>Check the value you're running with</b> before planning around it</td>
+      </tr>
+      <tr style="background:#FDF3F1">
+        <td>At the cap, a station is promoted to <span class="tag">ACCEPT_WITH_CAVEATS</span></td>
+        <td><b class="red">Not implemented.</b> The last verdict is returned unchanged — possibly still <span class="tag a">REFINE_AGAIN</span></td>
+        <td>Don't build a gate on the promotion happening</td>
+      </tr>
+      <tr>
+        <td>Stations send work back to a named earlier station</td>
+        <td>The rework triggers are <b>declared but never read</b> by the code</td>
+        <td>Treat backwards movement as a <b>human</b> decision</td>
+      </tr>
+      <tr>
+        <td>The blueprint station fails on an unparseable diagram or a missing readiness table</td>
+        <td>Those gates are in the station's rules but <b>not in the running code</b></td>
+        <td>Review those two things yourself</td>
+      </tr>
+      <tr>
+        <td>The board packet is <span class="tag">board-packet.md</span></td>
+        <td>The code writes <b><span class="tag">boardpacket-v2.md</span></b> and <span class="tag">.json</span></td>
+        <td>Use the name the code writes</td>
+      </tr>
+      <tr>
+        <td>One scoring model</td>
+        <td><b>Two.</b> The four-part model is <b>deprecated</b>; the eight-dimension card is canonical</td>
+        <td>Read the eight-dimension card, ignore the four-part score</td>
+      </tr>
+      <tr style="background:#FDF3F1">
+        <td>The org registry is yours</td>
+        <td><b class="red">It ships pre-populated with placeholder orgs</b> — and the write guard reads it at runtime</td>
+        <td><b>Replace it from the template before your first run</b></td>
+      </tr>
+    </table>
+
+    <div class="row">
+      <div class="p f5">
+        <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-bulb"/></svg>WHAT THE FACTORY IS ACTUALLY FOR</div>
+        <p class="sm">Not that twenty-three agents beat one. <b>That a failure gets an address.</b></p>
+        <p class="sm" style="margin-top:6px">One prompt gives you one blob, and nothing in it ever
+        "failed" — you just get a worse answer with no way to say where it went wrong.
+        Ten stations give you <b>ten reviewable decisions</b>, each with a named owner, a named rule,
+        and a note in a pigeonhole.</p>
+        <p class="sm" style="margin-top:6px">Everything else on the floor — the tape measure, the
+        inspectors, the locked cupboard, the mechanic who can't sign his own work —
+        <em>exists to protect that one property.</em></p>
+
+        <div class="p wash flat" style="margin-top:10px">
+          <div class="ph"><svg viewBox="0 0 24 24"><use href="#i-flag"/></svg>YOUR FIRST RUN, IN ORDER</div>
+          <ol class="num sm">
+            <li><b>Replace the org registry</b> from the template. Nothing else matters until this is done.</li>
+            <li>Run <b>Phase 1</b>. Confirm the manifest lists one task per station per story —
+              an empty pending list means nothing was scheduled.</li>
+            <li>Open the workspace in the editor and work each card. <b>Run the supplied verification
+              queries</b> rather than assuming a field exists.</li>
+            <li>Run <b>Phase 3</b>. Confirm no placeholder survived into the extraction packet.</li>
+            <li>Read the ten notes in order. <b>Start at the first thin one</b> — and check its
+              <em>input</em> before its output.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="f4" style="display:flex;flex-direction:column;gap:11px">
+        <div class="p wash">
+          <span class="lg">THE THREE TO REMEMBER</span>
+          <ul class="chk sm" style="margin-top:7px">
+            <li><b>You may only claim a part exists if you went and looked.</b></li>
+            <li><b>You are Phase 2.</b> Budget the editor time.</li>
+            <li><b>Replace the org registry first.</b></li>
+          </ul>
+        </div>
+        <div class="p dash">
+          <span class="lgL">HOW THIS BOOK WAS BUILT</span>
+          <p class="xs" style="margin-top:4px">Every identifier, threshold and number in these 22 pages
+          is copied from the grounded system write-up, which was itself read out of the source tree —
+          the execution contracts, the station rule files, the policy definitions and the agent
+          implementations.</p>
+          <p class="xs" style="margin-top:4px"><b>Nothing here was inferred to fill a gap.</b>
+          Where the code and the docs disagreed, that disagreement became a row in the table above
+          rather than a quiet choice.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip">
+    <svg viewBox="0 0 24 24"><use href="#i-star"/></svg>
+    <p>The point was never the twenty-three agents.<br>
+      <em>The point is that when something goes wrong, you get to ask which one.</em></p>
+    <svg viewBox="0 0 24 24"><use href="#i-scale"/></svg>
+  </div>
+  <span class="pageno">22 / 22</span>
+</section>
+
+</body>
+</html>

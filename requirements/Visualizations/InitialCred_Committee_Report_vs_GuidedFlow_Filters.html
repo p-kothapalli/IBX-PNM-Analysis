@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Initial Cred Committee — Guided Flow vs Report Filters</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#ffffff; --ink:#1e293b; --muted:#64748b;
+    --flow:#2563eb; --flow2:#7c3aed; --report:#0d9488;
+    --ok:#16a34a; --okbg:#dcfce7; --no:#dc2626; --nobg:#fee2e2;
+    --warnbg:#fef3c7; --warn:#b45309; --line:#e2e8f0;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:linear-gradient(160deg,#0f172a,#1e293b);color:var(--ink);padding:32px 20px;}
+  .wrap{max-width:1180px;margin:0 auto;}
+  header.page{color:#fff;text-align:center;margin-bottom:28px;}
+  header.page h1{font-size:26px;margin:0 0 6px;letter-spacing:.2px;}
+  header.page p{margin:0;color:#cbd5e1;font-size:14px;}
+  .meta{display:inline-flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:12px;font-size:12px;color:#94a3b8;}
+  .meta span{background:rgba(255,255,255,.06);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.12);}
+
+  .card{background:var(--card);border-radius:16px;padding:24px;margin-bottom:24px;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+  .card h2{margin:0 0 4px;font-size:19px;}
+  .card .sub{color:var(--muted);font-size:13px;margin:0 0 18px;}
+
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+  .kpi{background:var(--card);border-radius:14px;padding:18px;text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.2);}
+  .kpi .n{font-size:30px;font-weight:700;line-height:1;}
+  .kpi .l{font-size:12px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.5px;}
+  .kpi.report .n{color:var(--report);}
+  .kpi.flow .n{color:var(--flow);}
+  .kpi.gap .n{color:var(--no);}
+  .kpi.both .n{color:var(--ink);}
+
+  /* Comparison table */
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th,td{padding:12px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+  thead th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);position:sticky;top:0;}
+  th.colflow{color:var(--flow);}
+  th.colflow2{color:var(--flow2);}
+  th.colreport{color:var(--report);}
+  td.filter{font-weight:600;}
+  td.filter code, code{background:#f1f5f9;padding:1px 6px;border-radius:5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#0f172a;}
+  .cell{display:inline-flex;align-items:center;gap:6px;font-weight:600;font-size:12.5px;padding:3px 9px;border-radius:20px;}
+  .yes{background:var(--okbg);color:var(--ok);}
+  .none{background:#f1f5f9;color:#94a3b8;}
+  .missing{background:var(--nobg);color:var(--no);}
+  tr.groupdiff td{background:#fffbeb;}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px;font-size:12px;color:var(--muted);}
+  .legend .cell{font-size:11px;}
+
+  /* to-add list */
+  .addlist{list-style:none;padding:0;margin:0;}
+  .addlist li{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px;background:#fafafa;}
+  .addlist .badge{flex:0 0 auto;background:var(--nobg);color:var(--no);font-weight:700;font-size:11px;padding:3px 8px;border-radius:6px;margin-top:1px;}
+  .addlist .txt{font-size:13.5px;}
+  .addlist .txt small{display:block;color:var(--muted);margin-top:3px;font-size:12px;}
+
+  .finding{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .finding .box{border:1px solid var(--line);border-radius:12px;padding:18px;}
+  .finding h3{margin:0 0 8px;font-size:15px;display:flex;align-items:center;gap:8px;}
+  .pill{font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;}
+  .pill.bad{background:var(--nobg);color:var(--no);}
+  .pill.warn{background:var(--warnbg);color:var(--warn);}
+  .finding ul{margin:8px 0 0;padding-left:18px;font-size:13px;color:#334155;}
+  .finding ul li{margin-bottom:5px;}
+  .barrow{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:12px;}
+  .barrow .name{flex:0 0 210px;color:#475569;}
+  .bar{height:16px;border-radius:4px;background:var(--flow);}
+  .barrow .v{font-weight:700;}
+
+  .note{font-size:12px;color:var(--muted);margin-top:14px;border-left:3px solid var(--line);padding-left:12px;}
+  code.sql{display:block;white-space:pre-wrap;background:#0f172a;color:#e2e8f0;padding:14px;border-radius:10px;font-size:12px;line-height:1.5;margin-top:10px;}
+  @media (max-width:820px){.kpis{grid-template-columns:repeat(2,1fr);}.finding{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="page">
+    <h1>Initial Cred “Ready for Committee” — Guided Flow vs Report</h1>
+    <p>Filter comparison &amp; reconciliation of the record-count discrepancy</p>
+    <div class="meta">
+      <span>Org: IBXQA (pie.qa)</span>
+      <span>Report: Initial_Cred_Ready_for_Committee_Files</span>
+      <span>Flow: PRM_ReviewInitialCredApplicants → PRM_CommitteeReviewHelper</span>
+      <span>As of 2026-08-04</span>
+    </div>
+  </header>
+
+  <!-- KPI STRIP -->
+  <div class="kpis">
+    <div class="kpi report"><div class="n">485</div><div class="l">Report shows</div></div>
+    <div class="kpi flow"><div class="n">439</div><div class="l">Guided flow shows</div></div>
+    <div class="kpi both"><div class="n">439</div><div class="l">In both (flow ⊂ report)</div></div>
+    <div class="kpi gap"><div class="n">+46</div><div class="l">Report over-count</div></div>
+  </div>
+
+  <!-- SIDE BY SIDE FILTER TABLE -->
+  <div class="card">
+    <h2>Side-by-side: what each source filters on</h2>
+    <p class="sub">The guided flow runs one SOQL that pulls <strong>two record-type populations at once</strong> (Regular Initial Cred <em>OR</em> ReCred-converted). The report is a flat report on <code>IndividualApplication</code> with only three filters.</p>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:34%">Filter / Condition</th>
+          <th class="colflow" style="width:22%">Guided Flow —<br>Regular Initial Cred</th>
+          <th class="colflow2" style="width:22%">Guided Flow —<br>ReCred → Initial Cred</th>
+          <th class="colreport" style="width:22%">Report</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="filter">Record Type = <code>PRM_PractitionerParticipationRequest</code></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell none">— n/a</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+        </tr>
+        <tr class="groupdiff">
+          <td class="filter">Record Type = <code>PRM_ReCredentialing</code> <br><span style="font-weight:400;color:#64748b">AND</span> <code>PRM_CredentialingQC__c = true</code></td>
+          <td><span class="cell none">— n/a</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell missing">✗ Cannot show</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>PRM_Stage__c = 'Committee Review'</code></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>Status ≠ 'Closed'</code></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell missing">✗ Missing</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>Status ≠ 'Additional Review Needed'</code></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell missing">✗ Missing</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>PRM_RoutineCommittee__c = true</code></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell missing">✗ Missing</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>PRM_Decision_Date__c = null</code><br><small style="color:#64748b">(excludes already-decided / denied)</small></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell missing">✗ Missing</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>AccountId ≠ null</code></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell missing">✗ Missing</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>PRM_ProcessingStatus__c ≠ 'In Progress'</code></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell missing">✗ Missing</span></td>
+        </tr>
+        <tr class="groupdiff">
+          <td class="filter"><code>PRM_MedicalDirectorReview__c = 0</code><br><small style="color:#64748b">(report-only filter)</small></td>
+          <td><span class="cell none">— Not used</span></td>
+          <td><span class="cell none">— Not used</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+        </tr>
+        <tr>
+          <td class="filter"><code>LIMIT 500</code><br><small style="color:#64748b">(PRM_CommitteStageLimit__mdt · Default)</small></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell yes">✓ Yes</span></td>
+          <td><span class="cell none">— No limit</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="legend">
+      <span><span class="cell yes">✓ Yes</span> filter applied</span>
+      <span><span class="cell missing">✗ Missing</span> filter absent → lets extra records in</span>
+      <span><span class="cell none">— n/a</span> not applicable / not used</span>
+      <span style="background:#fffbeb;padding:2px 8px;border-radius:6px;">highlighted rows = key divergences</span>
+    </div>
+  </div>
+
+  <!-- FILTERS TO ADD -->
+  <div class="card">
+    <h2>What needs to be ADDED to the report to match the guided flow</h2>
+    <p class="sub">Adding these five predicates converts the report from a raw “at this stage” list into the flow’s actionable “truly ready &amp; not yet decided” work list.</p>
+    <ul class="addlist">
+      <li><span class="badge">ADD</span><div class="txt"><code>PRM_Decision_Date__c</code> equals <em>blank</em>
+        <small>Biggest driver — removes ~43 already-decided files (incl. all 42 denial cases).</small></div></li>
+      <li><span class="badge">ADD</span><div class="txt"><code>PRM_RoutineCommittee__c</code> = <code>true</code>
+        <small>Restricts to routine committee only; excludes non-routine cases.</small></div></li>
+      <li><span class="badge">ADD</span><div class="txt"><code>Status</code> not equal to <code>Closed</code> AND not equal to <code>Additional Review Needed</code>
+        <small>Removes returned / closed files that are no longer committee-ready.</small></div></li>
+      <li><span class="badge">ADD</span><div class="txt"><code>AccountId</code> not equal to <em>blank</em>
+        <small>Drops orphaned case managers with no practitioner account.</small></div></li>
+      <li><span class="badge">ADD</span><div class="txt"><code>PRM_ProcessingStatus__c</code> not equal to <code>In Progress</code>
+        <small>Excludes files still being processed by the async engine.</small></div></li>
+    </ul>
+    <p class="note"><strong>Decision needed:</strong> the report’s existing <code>PRM_MedicalDirectorReview__c = 0</code> filter is <em>not</em> used by the flow. Today it removes 12 records that the flow would also drop for other reasons (0 net difference), but keep or remove it deliberately — it is a semantic divergence from the flow.</p>
+    <p class="note"><strong>Cannot be matched by a report alone:</strong> the ReCred → Initial Cred population (<code>PRM_ReCredentialing</code> + <code>PRM_CredentialingQC__c = true</code>) requires the report’s record-type filter to be widened; a report locked to a single record type can never reproduce the flow’s OR condition. Consider a report type spanning both record types, or a formula/flag field.</p>
+  </div>
+
+  <!-- FINDINGS -->
+  <div class="card">
+    <h2>Requested checks</h2>
+    <div class="finding">
+      <div class="box">
+        <h3>1. Is the report showing denial cases? <span class="pill bad">YES — 42</span></h3>
+        <p style="font-size:13px;color:#334155;margin:6px 0;">The report has <strong>no filter to exclude decided/denied files</strong>, so <strong>42</strong> denial cases appear. <strong>0 of them</strong> would appear in the guided flow (all are already decided → dropped by <code>PRM_Decision_Date__c = null</code>).</p>
+        <div class="barrow"><span class="name">No Response from Provider</span><div class="bar" style="width:120px;"></div><span class="v">20</span></div>
+        <div class="barrow"><span class="name">Duplicate Case</span><div class="bar" style="width:36px;"></div><span class="v">6</span></div>
+        <div class="barrow"><span class="name">Malpractice Coverage Not Met</span><div class="bar" style="width:30px;"></div><span class="v">5</span></div>
+        <div class="barrow"><span class="name">Off-cycle</span><div class="bar" style="width:18px;"></div><span class="v">3</span></div>
+        <div class="barrow"><span class="name">Contract Not Signed</span><div class="bar" style="width:18px;"></div><span class="v">3</span></div>
+        <div class="barrow"><span class="name">Others (5 reasons × 1 each)</span><div class="bar" style="width:30px;background:#94a3b8;"></div><span class="v">5</span></div>
+        <p class="note">Denials are decisions already actioned — they should not appear on a “ready for committee” work list. Adding the Decision Date filter removes all 42.</p>
+      </div>
+      <div class="box">
+        <h3>2. Does the report account for ReCred → Initial Cred? <span class="pill warn">NO</span></h3>
+        <p style="font-size:13px;color:#334155;margin:6px 0;">The report’s record-type filter is locked to <code>PRM_PractitionerParticipationRequest</code>. The guided flow additionally pulls <code>PRM_ReCredentialing</code> records where <code>PRM_CredentialingQC__c = true</code> (recred cases converted into initial-cred credentialing). <strong>The report cannot surface these at all.</strong></p>
+        <ul>
+          <li>Converted records at Committee Review stage today: <strong>1</strong> (<code>IA-0000042798</code>).</li>
+          <li>It’s not in the flow <em>right now</em> only because it is <code>RoutineCommittee = false</code>, <code>Status = In Progress</code>, <code>MedicalDirectorReview = true</code> — but it is structurally the kind of record the flow is designed to include once ready.</li>
+          <li>The report will always show <strong>0</strong> of these regardless of readiness.</li>
+        </ul>
+        <p class="note">To account for them, widen the report’s record-type scope (report type spanning both) rather than a single-record-type report.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECONCILIATION -->
+  <div class="card">
+    <h2>Reconciliation math</h2>
+    <p class="sub">How the 497 base population splits between the two views.</p>
+    <code class="sql">Base: RecordType = PRM_PractitionerParticipationRequest AND Stage = 'Committee Review'      = 497
+
+REPORT  = base − 12 (MedicalDirectorReview = true)                                          = 485
+FLOW    = base − 12 (non-routine) − 46 (decided/denied, no account, etc.) + 0 (recred conv) = 439
+
+Overlap (in both) = 439        Report-only = 46        Flow-only = 0    →  flow ⊂ report
+
+The 46 report-only records = files the committee has effectively already actioned or that
+are not routine/ready:  ~43 already have a Decision Date (incl. all 42 denials), remainder
+are non-routine / Additional Review Needed / no Account.</code>
+    <p class="note">Verified live against org IBXQA on 2026-08-04. Queries archived in <code>requirements/SOQL/2026-08-04_InitialCredCommitteeReportVsGuidedFlow.md</code>. Note the flow’s <code>LIMIT 500</code> is not biting today (base 497) but will silently cap the flow if the backlog grows past 500.</p>
+  </div>
+
+</div>
+</body>
+</html>

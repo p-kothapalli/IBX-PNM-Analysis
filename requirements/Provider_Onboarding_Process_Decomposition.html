@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Process Decomposition — IBX Provider Onboarding</title>
+<style>
+  :root {
+    /* IBX brand tokens (from Mockup_Brand_Style_Guide.md) */
+    --brand:        #007DB6;  /* accessible Process Blue (text/lines) */
+    --brand-pure:   #008CCC;  /* logo-true fills */
+    --brand-dark:   #024D76;  /* navy */
+    --brand-light:  #e6f4fb;
+    --teal:         #00AEC7;
+    --aqua:         #8BD3DA;
+    --green:        #4D8B3F;
+    --orange:       #F16935;
+    --yellow:       #FED962;
+    --red:          #EA1D2C;
+    --purple:       #924799;
+    --magenta:      #B11E58;
+    --slate:        #6b7785;
+    --ink:          #37424A;
+    --text:         #181818;
+    --muted:        #747474;
+    --surface:      #fafaf9;
+    --surface-alt:  #f1f5f8;
+    --border:       #e1e1de;
+    --border-strong:#c9cdd1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--text);
+    background: #eef1f4;
+    line-height: 1.4;
+    padding: 28px;
+  }
+  .poster {
+    max-width: 1500px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(2,77,118,0.10);
+    overflow: hidden;
+  }
+
+  /* ---------- Header ---------- */
+  header.hdr {
+    background: linear-gradient(120deg, var(--brand-dark) 0%, var(--brand) 70%, var(--teal) 130%);
+    color: #fff;
+    padding: 24px 34px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .hdr-left .eyebrow {
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    opacity: 0.85; font-weight: 700;
+  }
+  .hdr-left h1 { font-size: 27px; font-weight: 700; margin: 4px 0 6px; letter-spacing: -0.01em; }
+  .hdr-left p  { font-size: 13px; opacity: 0.92; max-width: 760px; }
+  .hdr-right { text-align: right; font-size: 12px; opacity: 0.95; white-space: nowrap; }
+  .hdr-right .logo {
+    font-weight: 800; font-size: 16px; letter-spacing: 0.04em;
+    display:flex; align-items:center; gap:8px; justify-content:flex-end;
+  }
+  .hdr-right .logo .dot { width:14px;height:14px;border-radius:50%;background:var(--yellow); display:inline-block;}
+  .hdr-right .meta { margin-top: 8px; line-height: 1.7; opacity: 0.85; }
+
+  /* ---------- Legend ---------- */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center;
+    padding: 14px 34px; background: var(--surface);
+    border-bottom: 1px solid var(--border); font-size: 12px;
+  }
+  .legend .grp { display:flex; align-items:center; gap:8px; }
+  .legend .grp b { color: var(--ink); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .swatch { width: 13px; height: 13px; border-radius: 3px; display:inline-block; }
+  .legend .pill {
+    display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:20px;
+    background:#fff; border:1px solid var(--border-strong); font-size:11px;
+  }
+  .cua { font-weight:700; border-radius:3px; padding:0 5px; font-size:10px; color:#fff; }
+  .cua.c { background: var(--brand); }
+  .cua.u { background: var(--teal); }
+  .cua.a { background: var(--green); }
+
+  /* ---------- Stage band ---------- */
+  .section-label {
+    padding: 16px 34px 4px; font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--brand-dark);
+  }
+  .section-label span { color: var(--muted); font-weight:400; letter-spacing: 0; text-transform:none; }
+
+  .flow {
+    display: flex; align-items: stretch; gap: 0;
+    padding: 8px 24px 28px; overflow-x: auto;
+  }
+  .stage { flex: 1 1 0; min-width: 196px; display:flex; flex-direction:column; }
+  .arrow {
+    flex: 0 0 26px; display:flex; align-items:center; justify-content:center;
+    color: var(--border-strong); font-size: 26px; font-weight: 700;
+  }
+  .card {
+    border: 1px solid var(--border); border-top: 4px solid var(--owner, var(--brand));
+    border-radius: 8px; background: #fff; height: 100%;
+    display:flex; flex-direction:column; box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  }
+  .card .top { padding: 12px 13px 10px; border-bottom: 1px dashed var(--border); }
+  .stage-no {
+    font-size: 11px; font-weight: 800; color: var(--owner, var(--brand));
+    letter-spacing: 0.08em;
+  }
+  .stage-name { font-size: 14.5px; font-weight: 700; color: var(--ink); margin: 3px 0 8px; line-height:1.25; }
+  .badges { display:flex; flex-wrap:wrap; gap:5px; }
+  .badge {
+    font-size: 10.5px; padding: 2px 8px; border-radius: 14px; font-weight: 600;
+    display:inline-flex; align-items:center; gap:4px;
+  }
+  .badge.owner { color:#fff; background: var(--owner, var(--brand)); }
+  .badge.dur { color: var(--ink); background: var(--surface-alt); border:1px solid var(--border); }
+
+  .card .steps { padding: 10px 13px; flex:1; }
+  .card .steps li {
+    list-style:none; font-size: 12px; color: var(--text);
+    padding: 4px 0 4px 16px; position: relative; line-height:1.35;
+  }
+  .card .steps li::before {
+    content:""; position:absolute; left:0; top:8px; width:7px; height:7px; border-radius:2px;
+    background: var(--owner, var(--brand)); opacity:0.55;
+  }
+  .records {
+    padding: 9px 11px 12px; background: var(--surface);
+    border-top: 1px solid var(--border); border-radius: 0 0 7px 7px;
+  }
+  .records .rt { font-size: 10px; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color: var(--muted); margin-bottom:6px; }
+  .rec {
+    display:flex; align-items:flex-start; gap:6px; font-size: 11px; color: var(--ink);
+    padding: 3px 0; line-height:1.3;
+  }
+  .rec .tag { flex:0 0 auto; }
+
+  /* decision diamond mini */
+  .decision {
+    margin: 6px 0; align-self:center; text-align:center;
+    background: var(--yellow); color: var(--ink); font-weight:700; font-size:11px;
+    padding: 6px 10px; border-radius: 6px; border:1px solid #e6c14e;
+  }
+
+  /* ---------- Ongoing ring ---------- */
+  .ongoing {
+    margin: 4px 24px 22px; border:1px dashed var(--border-strong); border-radius:10px;
+    background: var(--surface-alt); padding: 14px 16px;
+  }
+  .ongoing h3 { font-size: 13px; color: var(--brand-dark); margin-bottom: 10px; letter-spacing:0.04em; }
+  .ongoing .ring { display:flex; flex-wrap:wrap; gap:10px; align-items:stretch; }
+  .ringcard {
+    flex:1 1 200px; background:#fff; border:1px solid var(--border); border-left:4px solid var(--green);
+    border-radius:7px; padding:10px 12px;
+  }
+  .ringcard b { font-size:12.5px; color:var(--ink); }
+  .ringcard p { font-size:11px; color:var(--muted); margin-top:3px; }
+  .ringcard.recred { border-left-color: var(--purple); }
+  .ringcard.term  { border-left-color: var(--red); }
+  .ringcard.offc  { border-left-color: var(--orange); }
+
+  /* ---------- Integrations strip ---------- */
+  .integrations { padding: 4px 34px 22px; }
+  .integrations h3 { font-size: 12px; color: var(--brand-dark); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:8px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip {
+    font-size: 11px; padding: 5px 11px; border-radius: 18px; background:#fff;
+    border:1px solid var(--border-strong); color: var(--ink);
+  }
+  .chip b { color: var(--brand); }
+
+  /* ---------- Footer ---------- */
+  footer.ftr {
+    background: var(--surface); border-top:1px solid var(--border);
+    padding: 12px 34px; font-size: 11px; color: var(--muted);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  .note-band {
+    margin: 0 24px 16px; background: var(--brand-light); border:1px solid var(--aqua);
+    border-radius:8px; padding: 11px 14px; font-size: 12px; color: var(--brand-dark);
+  }
+  .note-band b { color: var(--brand-dark); }
+
+  @page { size: A3 landscape; margin: 8mm; }
+  @media print {
+    body { background:#fff; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .poster { box-shadow:none; border:none; max-width:none; border-radius:0; }
+    .flow { overflow:visible; }
+    .stage { min-width:0; }
+    .card { box-shadow:none; }
+    header.hdr, .badge.owner, .cua, .swatch, .ringcard, .decision { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+</style>
+</head>
+<body>
+<div class="poster">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="eyebrow">Process Decomposition</div>
+      <h1>IBX Provider Onboarding — Credentialing to Network Activation</h1>
+      <p>Payer-side journey: a provider is enrolled into the IBX network. A single application
+         flows through ten stages across five departments, creating and activating 20+ related records.
+         Companion to <i>Provider_Onboarding_Process_Decomposition.md</i>.</p>
+    </div>
+    <div class="hdr-right">
+      <div class="logo"><span class="dot"></span> IBX&nbsp;·&nbsp;PNM</div>
+      <div class="meta">
+        Provider Network Management<br/>
+        Salesforce Health Cloud<br/>
+        June 2026 · Confidential
+      </div>
+    </div>
+  </header>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="grp"><b>Departments / Personas</b></div>
+    <div class="grp"><span class="swatch" style="background:#6b7785"></span> Provider / Group</div>
+    <div class="grp"><span class="swatch" style="background:#00AEC7"></span> Provider Outreach</div>
+    <div class="grp"><span class="swatch" style="background:#007DB6"></span> Network Case Mgr</div>
+    <div class="grp"><span class="swatch" style="background:#024D76"></span> Credentialing / PSV</div>
+    <div class="grp"><span class="swatch" style="background:#924799"></span> Quality Control</div>
+    <div class="grp"><span class="swatch" style="background:#B11E58"></span> Medical Director</div>
+    <div class="grp"><span class="swatch" style="background:#F16935"></span> HACAC Committee</div>
+    <div class="grp"><span class="swatch" style="background:#4D8B3F"></span> Data / Activation</div>
+    <div class="grp" style="margin-left:auto">
+      <span class="cua c">C</span> created
+      &nbsp;<span class="cua u">U</span> updated
+      &nbsp;<span class="cua a">A</span> activated
+    </div>
+  </div>
+
+  <!-- TERMINOLOGY NOTE -->
+  <div class="note-band" style="margin-top:14px">
+    <b>Term mapping for journey maps:</b> &nbsp;“Opportunity” → the <b>PAR application intake</b> (no literal Opportunity on the payer side) &nbsp;·&nbsp;
+    “Work Item” → <b>Case</b> (routed &amp; round-robin owned) &nbsp;·&nbsp;
+    “Application / Case” → <b>IndividualApplication</b> (the “Case Manager” record). &nbsp;Path shown = full <b>Delegated</b> branch; IBC Professional Staff is a leaner subset.
+  </div>
+
+  <!-- LANE A: ONBOARDING -->
+  <div class="section-label">Lane A — Onboarding (Credentialing) &nbsp; <span>left → right, one Case per application</span></div>
+
+  <div class="flow">
+
+    <!-- S1 -->
+    <div class="stage" style="--owner:#00AEC7">
+      <div class="card">
+        <div class="top">
+          <div class="stage-no">STAGE 1</div>
+          <div class="stage-name">Intake / PAR Application</div>
+          <div class="badges">
+            <span class="badge owner">Provider Outreach</span>
+            <span class="badge dur">~ days</span>
+          </div>
+        </div>
+        <ul class="steps">
+          <li>Provider submits PAR form / CSV</li>
+          <li>CAQH demographic pre-fill</li>
+          <li>Completeness check; chase missing info</li>
+          <li>Case created &amp; round-robin assigned</li>
+        </ul>
+        <div class="records">
+          <div class="rt">Records created</div>
+          <div class="rec"><span class="cua c tag">C</span> Account (practitioner + group)</div>
+          <div class="rec"><span class="cua c tag">C</span> IndividualApplication (Case Manager)</div>
+          <div class="rec"><span class="cua c tag">C</span> Case · CaseDataManager</div>
+          <div class="rec"><span class="cua c tag">C</span> Location · Address · ProviderNpi</div>
+          <div class="rec"><span class="cua c tag">C</span> Facility · PractitionerFacility (PPL)</div>
+          <div class="rec"><span class="cua c tag">C</span> Taxonomy · License · Education</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">›</div>
+
+    <!-- S2 -->
+    <div class="stage" style="--owner:#024D76">
+      <div class="card">
+        <div class="top">
+          <div class="stage-no">STAGE 2</div>
+          <div class="stage-name">Initial Cred Review <br/>(App Review + PSV)</div>
+          <div class="badges">
+            <span class="badge owner">PSV Analyst</span>
+            <span class="badge dur">45–60 days</span>
+          </div>
+        </div>
+        <ul class="steps">
+          <li>Verify identity, taxonomy, education</li>
+          <li>License (SBRD/DEA/CDS), board cert</li>
+          <li>NPDB adverse-action &amp; malpractice</li>
+          <li>Address validation (Precisely)</li>
+          <li>Final Submit (one combined session)</li>
+        </ul>
+        <div class="records">
+          <div class="rt">Records created / updated</div>
+          <div class="rec"><span class="cua c tag">C</span> AdverseActionReview · BoardCertification</div>
+          <div class="rec"><span class="cua c tag">C</span> ContentDocumentLink · Identifier (Medicare)</div>
+          <div class="rec"><span class="cua u tag">U</span> Case · IndividualApplication</div>
+          <div class="rec"><span class="cua u tag">U</span> License · Education · Taxonomy · Address</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">›</div>
+
+    <!-- S3 -->
+    <div class="stage" style="--owner:#007DB6">
+      <div class="card">
+        <div class="top">
+          <div class="stage-no">STAGE 3</div>
+          <div class="stage-name">PDA — Network &amp; Directory Setup</div>
+          <div class="badges">
+            <span class="badge owner">Network Case Mgr</span>
+            <span class="badge dur">variable</span>
+          </div>
+        </div>
+        <ul class="steps">
+          <li>Assign networks per practice location</li>
+          <li>Info codes &amp; directory indicators</li>
+          <li>Capitation site membership</li>
+          <li>Role &amp; contract status</li>
+        </ul>
+        <div class="records">
+          <div class="rt">Records created / updated</div>
+          <div class="rec"><span class="cua c tag">C</span> HealthcareFacilityNetwork</div>
+          <div class="rec"><span class="cua c tag">C</span> PractitionerRole · Contract</div>
+          <div class="rec"><span class="cua c tag">C</span> Capitation site links</div>
+          <div class="rec"><span class="cua u tag">U</span> Directory / info-code assignments</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">›</div>
+
+    <!-- S4 -->
+    <div class="stage" style="--owner:#924799">
+      <div class="card">
+        <div class="top">
+          <div class="stage-no">STAGE 4</div>
+          <div class="stage-name">QC Review</div>
+          <div class="badges">
+            <span class="badge owner">QC Reviewer</span>
+            <span class="badge dur">~ days</span>
+          </div>
+        </div>
+        <ul class="steps">
+          <li>Independent 2nd-pass of PSV + PDA</li>
+          <li>Data Looks Good / Missing Info</li>
+          <li>Return to PSV keeps original owner</li>
+        </ul>
+        <div class="decision">Routine?</div>
+        <div class="records">
+          <div class="rt">Records created / updated</div>
+          <div class="rec"><span class="cua c tag">C</span> VerificationTileStatus · ContentNote</div>
+          <div class="rec"><span class="cua u tag">U</span> Case (QC outcome · owner)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">›</div>
+
+    <!-- S6 committee -->
+    <div class="stage" style="--owner:#F16935">
+      <div class="card">
+        <div class="top">
+          <div class="stage-no">STAGE 5 · non-routine only</div>
+          <div class="stage-name">Medical Director + HACAC Committee</div>
+          <div class="badges">
+            <span class="badge owner" style="background:#B11E58">Medical Director</span>
+            <span class="badge owner">HACAC</span>
+            <span class="badge dur">committee cadence</span>
+          </div>
+        </div>
+        <ul class="steps">
+          <li>Clinical review (MDR step)</li>
+          <li>Committee governance decision</li>
+          <li>Approve / Deny / Appeal / Due Process</li>
+        </ul>
+        <div class="records">
+          <div class="rt">Records created / updated</div>
+          <div class="rec"><span class="cua c tag">C</span> AdverseActionLog · committee outcome</div>
+          <div class="rec"><span class="cua u tag">U</span> Case status · recred due date</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow">›</div>
+
+    <!-- S7 activation -->
+    <div class="stage" style="--owner:#4D8B3F">
+      <div class="card">
+        <div class="top">
+          <div class="stage-no">STAGE 6</div>
+          <div class="stage-name">Activation</div>
+          <div class="badges">
+            <span class="badge owner">Data / Automation</span>
+            <span class="badge dur">async</span>
+          </div>
+        </div>
+        <ul class="steps">
+          <li>Batch activates approved records</li>
+          <li>Cascade across network records</li>
+          <li>Publish to provider directory</li>
+          <li>BCBSA inter-Blue sync</li>
+        </ul>
+        <div class="records">
+          <div class="rt">Records activated</div>
+          <div class="rec"><span class="cua a tag">A</span> PractitionerFacility · Facility</div>
+          <div class="rec"><span class="cua a tag">A</span> HealthcareFacilityNetwork</div>
+          <div class="rec"><span class="cua u tag">U</span> IsActive = true · Pending = false</div>
+          <div class="rec"><span class="cua u tag">U</span> Directory publish · BCBSA sync</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+
+  <!-- LANE B: ONGOING -->
+  <div class="section-label">Lane B — Ongoing (PDM) &nbsp; <span>provider enters the data-management ring after activation</span></div>
+  <div class="ongoing">
+    <div class="ring">
+      <div class="ringcard">
+        <b>Provider Change / PDM Manual Update</b>
+        <p>5 PDM guided flows (demographics, taxonomy, NPI, practice-location, billing/mailing address, networks, capitation) — each with a 5-step QC chain.</p>
+      </div>
+      <div class="ringcard recred">
+        <b>Re-Credentialing — every 2–3 yrs</b>
+        <p>4 scheduled batches (due-date, CAQH access, notification, letter). CAQH re-validation gate; re-enters at PSV with IsRecredentialing = true.</p>
+      </div>
+      <div class="ringcard offc">
+        <b>Off-Cycle Credentialing</b>
+        <p>Event-driven re-verification between cycles — abbreviated PSV + accelerated QC.</p>
+      </div>
+      <div class="ringcard term">
+        <b>Termination / Reinstatement</b>
+        <p>Provider/PL leaves or returns. Reinstatement re-enters the journey at Application Review.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INTEGRATIONS -->
+  <div class="integrations">
+    <h3>External integration touchpoints</h3>
+    <div class="chips">
+      <span class="chip"><b>CAQH</b> · profile + attestation pre-fill, recred gate</span>
+      <span class="chip"><b>NPDB</b> · adverse-action verification (in PSV)</span>
+      <span class="chip"><b>Precisely</b> · address standardization</span>
+      <span class="chip"><b>NPPES / FSMB</b> · license &amp; NPI verification</span>
+      <span class="chip"><b>BCBSA</b> · inter-Blue practitioner / role sync</span>
+      <span class="chip"><b>NCPDP</b> · pharmacy provider data</span>
+      <span class="chip"><b>RCAT</b> · roster compliance feed</span>
+      <span class="chip"><b>UPHS / UPenn</b> · roster reconciliation (batch)</span>
+    </div>
+  </div>
+
+  <!-- HANDOFF NOTE -->
+  <div class="note-band">
+    <b>Handoff chain:</b> Provider → Outreach → <i>Case routed (round-robin)</i> → PSV Analyst → <i>Final Submit</i> →
+    Network Case Manager (PDA) → QC Reviewer → <i>routine</i> → Activation &nbsp;<b>or</b>&nbsp;
+    <i>non-routine</i> → Medical Director → HACAC Committee → Activation → PDM Ops.
+    &nbsp;Returns to a prior stage <b>restore the original owner</b> (no fresh round-robin).
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="ftr">
+    <span>IBX × Salesforce — Provider Network Management — Confidential</span>
+    <span>Grounded in: SVP Cred/PDM deck · PAR record-creation analysis · Cred-flow redesign plan · Case-management user stories · CLAUDE.md</span>
+  </footer>
+
+</div>
+</body>
+</html>

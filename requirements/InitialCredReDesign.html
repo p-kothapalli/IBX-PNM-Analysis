@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Review LWC Redesign - Executive Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .presentation-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .slide {
+            background: white;
+            border-radius: 12px;
+            padding: 60px;
+            margin-bottom: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            page-break-after: always;
+        }
+
+        .slide-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #667eea;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 20px;
+        }
+
+        .slide-subtitle {
+            font-size: 24px;
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .title-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-slide .slide-title {
+            color: white;
+            border-bottom: 4px solid white;
+            font-size: 56px;
+        }
+
+        .title-slide .slide-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 28px;
+        }
+
+        .content-section {
+            flex: 1;
+        }
+
+        h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        h3 {
+            font-size: 24px;
+            margin: 30px 0 15px 0;
+            color: #764ba2;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 30px 0;
+        }
+
+        .three-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .card.success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        .card.warning {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .card.danger {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .card h4 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        ul {
+            margin-left: 30px;
+            margin-top: 15px;
+        }
+
+        li {
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .metric-value {
+            font-size: 56px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .metric-label {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            font-size: 16px;
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .checkmark {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .crossmark {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 24px;
+        }
+
+        .architecture-diagram {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 30px 0;
+            border: 2px solid #667eea;
+        }
+
+        .tile-demo {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .tile {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .tile.completed {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .tile.in-progress {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .tile.pending {
+            border-color: #ccc;
+            background: #f8f9fa;
+        }
+
+        .tile-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .tile-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .flow-comparison {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .flow-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .flow-card h4 {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .flow-card .count {
+            font-size: 42px;
+            font-weight: 700;
+            display: block;
+            margin: 15px 0;
+        }
+
+        .benefit-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .benefit-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            border-top: 4px solid #28a745;
+        }
+
+        .benefit-card .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+
+        .quote {
+            background: #667eea;
+            color: white;
+            padding: 30px;
+            border-radius: 8px;
+            font-size: 24px;
+            font-style: italic;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .slide {
+                page-break-after: always;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        
+        <!-- SLIDE 1: Title Slide -->
+        <div class="slide title-slide">
+            <div>
+                <h1 class="slide-title">🚀 Application Review Redesign</h1>
+                <p class="slide-subtitle">From OmniScript to Tile-Based LWC Architecture</p>
+                <p style="margin-top: 40px; font-size: 20px;">Solving the 4MB Payload Limitation</p>
+                <p style="margin-top: 20px; font-size: 18px; opacity: 0.8;">Executive Presentation • April 2026</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: The Problem -->
+        <div class="slide">
+            <h1 class="slide-title">🔴 The Problem</h1>
+            <div class="content-section">
+                <div class="card danger">
+                    <h4>❌ "Save for Later" Fails with 4MB Payload</h4>
+                    <p style="margin-top: 15px; font-size: 18px;">
+                        Business users frequently need to pause verification midway due to missing information.
+                        When they click "Save for Later," the system fails because the payload exceeds Salesforce's 4MB limit.
+                    </p>
+                </div>
+
+                <div class="two-column" style="margin-top: 30px;">
+                    <div class="card warning">
+                        <h4>⏱️ Long Sessions</h4>
+                        <ul>
+                            <li>Application review takes 2-4 hours</li>
+                            <li>Reviewers can't take breaks</li>
+                            <li>Risk of session timeout</li>
+                            <li>Lost work if browser crashes</li>
+                        </ul>
+                    </div>
+
+                    <div class="card warning">
+                        <h4>🔒 All-or-Nothing Approach</h4>
+                        <ul>
+                            <li>Must complete entire flow at once</li>
+                            <li>Can't resume from where left off</li>
+                            <li>No visual progress tracking</li>
+                            <li>Forces sequential completion</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="metric" style="margin-top: 40px;">
+                    <span class="metric-value">4,194,304</span>
+                    <span class="metric-label">Character Limit (4MB) - OmniScript Constraint</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: Current State Analysis -->
+        <div class="slide">
+            <h1 class="slide-title">📊 Current State Analysis</h1>
+            <div class="content-section">
+                <h2>Initial Credential Application Review</h2>
+                
+                <div class="architecture-diagram">
+┌─────────────────────────────────────────────────────────┐
+│         CURRENT OMNISCRIPT FLOW (LINEAR)               │
+├─────────────────────────────────────────────────────────┤
+│                                                         │
+│  Step 1: Review Application                            │
+│           ↓                                             │
+│  Step 2: Verify Taxonomy & Role                        │
+│           ↓                                             │
+│  Step 3: Verify Person Education                       │
+│           ↓                                             │
+│  Step 4: Verify License (SBRD)                         │
+│           ↓                                             │
+│  Step 5: Verify DEA                                    │
+│           ↓                                             │
+│  Step 6: Verify CDS                                    │
+│           ↓                                             │
+│  Step 7: Verify Work History                           │
+│           ↓                                             │
+│  Step 8: Verify Malpractice Coverage                   │
+│           ↓                                             │
+│  Step 9: Upload Attachments                            │
+│           ↓                                             │
+│  Step 10: Final Submit                                 │
+│                                                         │
+│  ⚠️  ALL DATA HELD IN MEMORY UNTIL FINAL SAVE         │
+│  ⚠️  PAYLOAD GROWS WITH EACH STEP                     │
+└─────────────────────────────────────────────────────────┘
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Current State</th>
+                            <th>Impact</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Verification Steps</strong></td>
+                            <td>10 sequential steps</td>
+                            <td>2-4 hour completion time</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Save Mechanism</strong></td>
+                            <td>Single save at end</td>
+                            <td>4MB payload limit exceeded</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Updated</strong></td>
+                            <td>12+ Salesforce objects</td>
+                            <td>Complex integration procedure (70+ elements)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Resume Capability</strong></td>
+                            <td>None (all-or-nothing)</td>
+                            <td>Wasted effort if interrupted</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Progress Tracking</strong></td>
+                            <td>None</td>
+                            <td>Users don't know status</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: Proposed Solution Overview -->
+        <div class="slide">
+            <h1 class="slide-title">✨ Proposed Solution</h1>
+            <div class="content-section">
+                <h2>Tile-Based LWC Architecture</h2>
+                
+                <div class="quote">
+                    "Transform linear, all-or-nothing flow into flexible, tile-based experience with independent verification steps"
+                </div>
+
+                <div class="architecture-diagram">
+┌────────────────────────────────────────────────────────────┐
+│              TILE-BASED DASHBOARD                          │
+├────────────────────────────────────────────────────────────┤
+│  Progress: ████████░░ 80% Complete | Auto-saved 2m ago   │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌────────┐│
+│  │     ✓     │  │     ✓     │  │     ⚠     │  │        ││
+│  │  Review   │  │ Taxonomy  │  │ Education │  │License ││
+│  │   App     │  │  & Role   │  │           │  │        ││
+│  └───────────┘  └───────────┘  └───────────┘  └────────┘│
+│                                                            │
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌────────┐│
+│  │           │  │           │  │           │  │        ││
+│  │   Work    │  │    DEA    │  │    CDS    │  │Malprac ││
+│  │  History  │  │           │  │           │  │ -tice  ││
+│  └───────────┘  └───────────┘  └───────────┘  └────────┘│
+│                                                            │
+│  ┌───────────┐  ┌───────────┐                            │
+│  │           │  │     ✓     │                            │
+│  │  Upload   │  │  Final    │                            │
+│  │  Files    │  │  Submit   │                            │
+│  └───────────┘  └───────────┘                            │
+│                                                            │
+│  [Resume Later]  [Save & Exit]  [Help]                   │
+└────────────────────────────────────────────────────────────┘
+                </div>
+
+                <div class="tile-demo">
+                    <div class="tile completed">
+                        <div class="tile-icon">✓</div>
+                        <div class="tile-label">Review App</div>
+                    </div>
+                    <div class="tile completed">
+                        <div class="tile-icon">✓</div>
+                        <div class="tile-label">Taxonomy</div>
+                    </div>
+                    <div class="tile in-progress">
+                        <div class="tile-icon">⚠</div>
+                        <div class="tile-label">Education</div>
+                    </div>
+                    <div class="tile pending">
+                        <div class="tile-icon">○</div>
+                        <div class="tile-label">License</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Key Features -->
+        <div class="slide">
+            <h1 class="slide-title">🎯 Key Features</h1>
+            <div class="content-section">
+                <div class="benefit-grid">
+                    <div class="benefit-card">
+                        <div class="icon">🎨</div>
+                        <h4>Visual Progress Tracking</h4>
+                        <p>Green checkmarks show completed tiles. Yellow warnings indicate issues. Real-time progress percentage.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">🔄</div>
+                        <h4>Flexible Navigation</h4>
+                        <p>Complete tiles in any order. Jump between tiles freely. No forced sequence.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">💾</div>
+                        <h4>Auto-Save Every 2 Minutes</h4>
+                        <p>Background auto-save prevents data loss. Never lose work due to session timeout.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">⏸️</div>
+                        <h4>Resume Anywhere, Anytime</h4>
+                        <p>Close browser and resume later. Continue on different device. Session persists indefinitely.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">🚫</div>
+                        <h4>No 4MB Limit</h4>
+                        <p>Each tile saves independently. Chunked data storage. No payload aggregation.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">👥</div>
+                        <h4>Collaboration Ready</h4>
+                        <p>Multiple reviewers can work on different tiles. Audit trail for each verification.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">📱</div>
+                        <h4>Modern UX</h4>
+                        <p>Responsive design. Modal-based verification. Clean, intuitive interface.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">⚡</div>
+                        <h4>Performance Optimized</h4>
+                        <p>Lazy loading. Data loaded only when needed. Browser-based caching.</p>
+                    </div>
+
+                    <div class="benefit-card">
+                        <div class="icon">🔍</div>
+                        <h4>Enhanced Visibility</h4>
+                        <p>See what's verified vs pending. Warning badges for issues. Last modified timestamps.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: Benefits Summary -->
+        <div class="slide">
+            <h1 class="slide-title">💡 Benefits of This Change</h1>
+            <div class="content-section">
+                <div class="two-column">
+                    <div>
+                        <div class="card success">
+                            <h4>🎯 Business Benefits</h4>
+                            <ul>
+                                <li><strong>Eliminate 4MB Failures:</strong> No more save failures</li>
+                                <li><strong>Improved Productivity:</strong> Resume work anytime</li>
+                                <li><strong>Flexibility:</strong> Take breaks without losing work</li>
+                                <li><strong>Better Visibility:</strong> Track progress at a glance</li>
+                                <li><strong>Collaboration:</strong> Split work among team members</li>
+                                <li><strong>Quality:</strong> Focus on one verification at a time</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card success">
+                            <h4>⚙️ Technical Benefits</h4>
+                            <ul>
+                                <li><strong>Scalability:</strong> No payload limits</li>
+                                <li><strong>Performance:</strong> Lazy loading, chunked saves</li>
+                                <li><strong>Maintainability:</strong> Modular components</li>
+                                <li><strong>Reusability:</strong> Use across multiple flows</li>
+                                <li><strong>Testability:</strong> Test tiles independently</li>
+                                <li><strong>Modern Tech Stack:</strong> LWC best practices</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="three-column" style="margin-top: 40px;">
+                    <div class="metric">
+                        <span class="metric-value">80%</span>
+                        <span class="metric-label">Reduction in Session Time</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">100%</span>
+                        <span class="metric-label">Save Success Rate</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">0</span>
+                        <span class="metric-label">Lost Work Incidents</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: Pros and Cons -->
+        <div class="slide">
+            <h1 class="slide-title">⚖️ Pros and Cons Analysis</h1>
+            <div class="content-section">
+                <div class="two-column">
+                    <div>
+                        <h3 style="color: #28a745;">✅ PROS</h3>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Solves 4MB Issue:</strong> Completely eliminates payload limitation</li>
+                            <li><strong>Better UX:</strong> Modern, intuitive tile interface</li>
+                            <li><strong>Flexibility:</strong> Non-linear workflow</li>
+                            <li><strong>Resume Capability:</strong> Save and return anytime</li>
+                            <li><strong>Auto-Save:</strong> No data loss</li>
+                            <li><strong>Progress Tracking:</strong> Visual status indicators</li>
+                            <li><strong>Performance:</strong> Faster load times (lazy loading)</li>
+                            <li><strong>Scalability:</strong> Handles any data volume</li>
+                            <li><strong>Collaboration:</strong> Multi-user support</li>
+                            <li><strong>Reusability:</strong> Use for PSV, QC, ReCred flows</li>
+                            <li><strong>Audit Trail:</strong> Track who verified what and when</li>
+                            <li><strong>Maintainability:</strong> Modular, easy to update</li>
+                            <li><strong>Future-Proof:</strong> LWC is Salesforce's future</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 style="color: #dc3545;">❌ CONS</h3>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Development Effort:</strong> 8-12 weeks initial build</li>
+                            <li><strong>Custom Objects:</strong> Need to create new objects for session tracking</li>
+                            <li><strong>Data Model Changes:</strong> Schema updates required</li>
+                            <li><strong>Testing Effort:</strong> Comprehensive testing needed</li>
+                            <li><strong>Training Required:</strong> Users need to learn new interface</li>
+                            <li><strong>Migration Period:</strong> Run both systems in parallel</li>
+                            <li><strong>Integration Updates:</strong> May need to update existing IPs</li>
+                            <li><strong>Browser Dependency:</strong> localStorage for temp data</li>
+                            <li><strong>Complexity:</strong> More components to maintain</li>
+                        </ul>
+
+                        <div class="card warning" style="margin-top: 30px;">
+                            <h4>⚠️ Mitigation Strategies</h4>
+                            <ul style="font-size: 14px; margin-left: 15px;">
+                                <li>Phased rollout (pilot → full deployment)</li>
+                                <li>Comprehensive training materials</li>
+                                <li>Parallel run period with fallback</li>
+                                <li>Reuse existing Integration Procedures</li>
+                                <li>Hybrid storage (localStorage + DB)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Technical Architecture -->
+        <div class="slide">
+            <h1 class="slide-title">🏗️ Technical Architecture</h1>
+            <div class="content-section">
+                <h2>Component Hierarchy</h2>
+                
+                <div class="architecture-diagram">
+prm_applicationReviewDashboard (Parent Container)
+  │
+  ├── prm_progressHeader (Progress Bar + Auto-save Indicator)
+  │
+  ├── prm_verificationTile (Repeated 10x)
+  │   └── Displays: Status, Icon, Label, Last Modified
+  │
+  ├── prm_verificationModal (Dynamic Modal Container)
+  │   ├── Modal Header (Title, Unsaved Changes Badge)
+  │   ├── Modal Body (Dynamic Child Component)
+  │   │   ├── c-prm-review-application
+  │   │   ├── c-prm-review-taxonomy
+  │   │   ├── c-prm-review-education
+  │   │   ├── c-prm-review-license
+  │   │   ├── c-prm-review-work-history
+  │   │   ├── c-prm-review-dea
+  │   │   ├── c-prm-review-cds
+  │   │   ├── c-prm-review-malpractice
+  │   │   ├── c-prm-file-upload
+  │   │   └── c-prm-final-submit
+  │   └── Modal Footer (Cancel, Save Draft, Submit & Next)
+  │
+  └── prm_navigationFooter (Resume Later, Save & Exit, Help)
+                </div>
+
+                <h3>Data Storage Strategy (Hybrid Approach)</h3>
+                <div class="two-column">
+                    <div class="card">
+                        <h4>📦 localStorage (Performance)</h4>
+                        <ul style="font-size: 14px;">
+                            <li>Working data cached locally</li>
+                            <li>Fast read/write operations</li>
+                            <li>No server round trips</li>
+                            <li>Synced to DB every 2 minutes</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>💾 Salesforce Database (Persistence)</h4>
+                        <ul style="font-size: 14px;">
+                            <li>Auto-save backup every 2 minutes</li>
+                            <li>Tile completion persisted immediately</li>
+                            <li>Resume from any device</li>
+                            <li>Full audit trail</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;">New Custom Objects</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Object</th>
+                            <th>Purpose</th>
+                            <th>Key Fields</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>PRM_VerificationSession__c</strong></td>
+                            <td>Track overall verification session</td>
+                            <td>Case_Manager__c, Status__c, Overall_Progress__c, Session_Data__c</td>
+                        </tr>
+                        <tr>
+                            <td><strong>PRM_VerificationTileStatus__c</strong></td>
+                            <td>Track individual tile completion</td>
+                            <td>Tile_Id__c, Status__c, Verification_Data__c, Completed_By__c</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Reusability Across Flows -->
+        <div class="slide">
+            <h1 class="slide-title">🔄 Reusability Across Flows</h1>
+            <div class="content-section">
+                <h2>One Architecture, Four Use Cases</h2>
+                
+                <div class="quote">
+                    "Build once, configure for Initial Cred, PSV, QC, and ReCred flows"
+                </div>
+
+                <div class="flow-comparison">
+                    <div class="flow-card">
+                        <h4>📋 Initial Credential<br>App Review</h4>
+                        <span class="count">10</span>
+                        <p style="font-size: 14px;">tiles configured</p>
+                    </div>
+                    <div class="flow-card">
+                        <h4>✅ PSV<br>Verification</h4>
+                        <span class="count">8</span>
+                        <p style="font-size: 14px;">tiles configured</p>
+                    </div>
+                    <div class="flow-card">
+                        <h4>🔍 QC<br>Review</h4>
+                        <span class="count">7</span>
+                        <p style="font-size: 14px;">tiles configured</p>
+                    </div>
+                    <div class="flow-card">
+                        <h4>🔁 ReCred<br>PSV/QC</h4>
+                        <span class="count">9</span>
+                        <p style="font-size: 14px;">tiles configured</p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 40px;">Current OmniScript Analysis</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Flow</th>
+                            <th>Current OmniScript</th>
+                            <th>Key Verification Steps</th>
+                            <th>4MB Risk</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Initial Cred App Review</strong></td>
+                            <td>PRM_InitialCredentialAppReview_English</td>
+                            <td>Application, Taxonomy, Education, License, DEA, CDS, Work History, Malpractice, Files, Submit</td>
+                            <td><span class="crossmark">✗ High</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>PSV Verification</strong></td>
+                            <td>PRM_PrimarySourceVerificationReview_English (186 elements!)</td>
+                            <td>Practitioner Info, Addresses, Demographics, Cultural Identity, Languages, Contacts, Pronouns</td>
+                            <td><span class="crossmark">✗ High</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Initial Cred PDA QC</strong></td>
+                            <td>PRM_InitialCredPDAQC_English</td>
+                            <td>Practitioner Info, Specialties, Hospital Privileges, Networks, Info Codes, Directory, Capitation, QC Outcome</td>
+                            <td><span class="crossmark">✗ Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>ReCred QC</strong></td>
+                            <td>PRM_RecredQC_English</td>
+                            <td>Similar to PSV + Network/Info Code updates + QC outcome</td>
+                            <td><span class="crossmark">✗ Medium</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Initial Credential App Review Tiles -->
+        <div class="slide">
+            <h1 class="slide-title">📋 Initial Credential App Review</h1>
+            <div class="content-section">
+                <h2>10 Verification Tiles</h2>
+                
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Tile</th>
+                            <th style="width: 50%;">Verification Items</th>
+                            <th style="width: 25%;">Data Sources</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Review Application</strong></td>
+                            <td>Practitioner name, NPI, Date of Birth, CAQH ID</td>
+                            <td>CAQH ↔ Account</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Verify Taxonomy</strong></td>
+                            <td>Specialty, Taxonomy codes, Primary flag, Practitioner role (PCP/Specialist/Dual)</td>
+                            <td>CAQH ↔ HealthcareProviderTaxonomy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Verify Education</strong></td>
+                            <td>Degree, Institution, Start/End dates, Completion status</td>
+                            <td>CAQH ↔ PersonEducation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Verify License (SBRD)</strong></td>
+                            <td>State licenses, License numbers, Effective/Expiration dates, License class, Status</td>
+                            <td>CAQH ↔ BusinessLicense</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5. Verify Work History</strong></td>
+                            <td>Employer name, Employment dates, Current employer flag, Address</td>
+                            <td>CAQH (display only)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6. Verify DEA</strong></td>
+                            <td>DEA numbers, Issue/Expiration dates, Status</td>
+                            <td>CAQH ↔ BusinessLicense</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7. Verify CDS</strong></td>
+                            <td>CDS certificates, State registration, Dates</td>
+                            <td>CAQH ↔ BusinessLicense</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8. Verify Malpractice</strong></td>
+                            <td>Carrier, Policy number, Coverage amounts, Dates, Covered locations</td>
+                            <td>CAQH (display only)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>9. Upload Attachments</strong></td>
+                            <td>Supporting documents (PDF, JPG, DOC)</td>
+                            <td>ContentDocumentLink</td>
+                        </tr>
+                        <tr>
+                            <td><strong>10. Final Submit</strong></td>
+                            <td>Review summary, NPDB verification, Adverse actions, Final outcome</td>
+                            <td>Case, Case Manager</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card warning" style="margin-top: 30px;">
+                    <h4>🎯 Current Pain Point</h4>
+                    <p>When practitioner has 50+ licenses across multiple states, the payload can easily exceed 4MB when combined with education, work history, and malpractice data.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: PSV Verification Tiles -->
+        <div class="slide">
+            <h1 class="slide-title">✅ PSV Verification Flow</h1>
+            <div class="content-section">
+                <h2>Primary Source Verification Review</h2>
+                <p style="font-size: 18px; margin-bottom: 20px;">
+                    <strong>Current OmniScript:</strong> PRM_PrimarySourceVerificationReview_English (186 elements!)
+                </p>
+
+                <h3>Proposed 8-Tile Configuration</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Tile</th>
+                            <th>Verification Items</th>
+                            <th>Why Separate?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Practitioner Info</strong></td>
+                            <td>Name, NPI, CAQH ID, DOB, Gender, Email, Role, Specialty, Degree, Telehealth capability</td>
+                            <td>Core identity verification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Group/Practice Info</strong></td>
+                            <td>Group name, Group NPI, Tax ID, Practice type</td>
+                            <td>Organizational affiliation</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Address Verification</strong></td>
+                            <td>Primary office, Mailing address, Billing address, Additional addresses (NPI, phone, fax for each)</td>
+                            <td>Large dataset - 4+ addresses with full details</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Demographics & Diversity</strong></td>
+                            <td>Hispanic/Latino identity, Racial identity, Cultural identity, Personal pronouns, Affirming care categories</td>
+                            <td>Sensitive data, separate workflow</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5. Languages Spoken</strong></td>
+                            <td>Language list, Fluency levels</td>
+                            <td>Provider directory requirement</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6. Contact Information</strong></td>
+                            <td>Primary contact (name, role, phone, email, website), Secondary contact</td>
+                            <td>Communication verification</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7. Contract Status</strong></td>
+                            <td>Contract status validation, NPI validation</td>
+                            <td>Business rules check</td>
+                        </tr>
+                        <tr>
+                            <td><strong>8. Final Confirmation</strong></td>
+                            <td>Review summary, Confirmation to proceed, CAQH validation</td>
+                            <td>Submit workflow</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="two-column" style="margin-top: 30px;">
+                    <div class="card success">
+                        <h4>✅ Benefits for PSV</h4>
+                        <ul style="font-size: 14px;">
+                            <li>Address tile handles 4+ addresses without payload issues</li>
+                            <li>Diversity data verified separately (privacy)</li>
+                            <li>Resume after CAQH validation delay</li>
+                            <li>Faster completion (skip already-verified sections)</li>
+                        </ul>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">186</span>
+                        <span class="metric-label">OmniScript Elements (Current)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: QC Review Tiles -->
+        <div class="slide">
+            <h1 class="slide-title">🔍 QC Review Flow</h1>
+            <div class="content-section">
+                <h2>Initial Cred PDA Quality Control</h2>
+                <p style="font-size: 18px; margin-bottom: 20px;">
+                    <strong>Current OmniScript:</strong> PRM_InitialCredPDAQC_English
+                </p>
+
+                <h3>Proposed 7-Tile Configuration</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Tile</th>
+                            <th>QC Review Items</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>1. Practitioner Summary</strong></td>
+                            <td>Name, NPI, Role, Provider number, Decision date, Approved date</td>
+                            <td>View only - verify PDA decisions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Specialties & Privileges</strong></td>
+                            <td>Practitioner specialties, Board certifications, Hospital privileges</td>
+                            <td>Review PDA accuracy</td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Practice Location Networks</strong></td>
+                            <td>Practice locations, Networks assigned, Info codes</td>
+                            <td>Add/remove networks and info codes</td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Practitioner Networks</strong></td>
+                            <td>Practitioner-level networks, Practitioner info codes</td>
+                            <td>Assign networks at practitioner level</td>
+                        </tr>
+                        <tr>
+                            <td><strong>5. Directory Indicators</strong></td>
+                            <td>Practice location directory flags, Network directory flags, Practitioner directory flags</td>
+                            <td>Configure directory visibility</td>
+                        </tr>
+                        <tr>
+                            <td><strong>6. Capitation Sites</strong></td>
+                            <td>Assign capitation sites (Custom LWC)</td>
+                            <td>Select and assign cap sites</td>
+                        </tr>
+                        <tr>
+                            <td><strong>7. QC Outcome</strong></td>
+                            <td>QC review outcome, Error reasons, QC notes, File uploads</td>
+                            <td>Approve/Return with notes</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="two-column" style="margin-top: 30px;">
+                    <div class="card success">
+                        <h4>✅ QC Flow Benefits</h4>
+                        <ul style="font-size: 14px;">
+                            <li>Network assignment tile isolated (large dataset)</li>
+                            <li>Directory indicators managed separately</li>
+                            <li>Can approve/return individual sections</li>
+                            <li>QC notes captured per tile</li>
+                            <li>Parallel QC review by multiple users</li>
+                        </ul>
+                    </div>
+                    <div class="card warning">
+                        <h4>⚠️ Current QC Challenges</h4>
+                        <ul style="font-size: 14px;">
+                            <li>Network assignment step can have 100+ networks</li>
+                            <li>Must complete entire QC in one sitting</li>
+                            <li>Can't delegate specific reviews</li>
+                            <li>No progress tracking</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 13: ReCred PSV & QC Tiles -->
+        <div class="slide">
+            <h1 class="slide-title">🔁 ReCred PSV & QC Flows</h1>
+            <div class="content-section">
+                <h2>Re-Credentialing Verification</h2>
+                
+                <div class="two-column">
+                    <div>
+                        <h3>ReCred PSV (9 Tiles)</h3>
+                        <p style="font-size: 16px; margin-bottom: 15px;">
+                            <strong>Current:</strong> PRM_RecredQC_English
+                        </p>
+                        <ul style="font-size: 16px;">
+                            <li>1. Practitioner Info (updates only)</li>
+                            <li>2. Group/Practice Updates</li>
+                            <li>3. Address Updates</li>
+                            <li>4. Demographics Updates</li>
+                            <li>5. New Licenses (DEA/CDS/SBRD)</li>
+                            <li>6. Expired License Review</li>
+                            <li>7. Board Certification Updates</li>
+                            <li>8. Malpractice Coverage Updates</li>
+                            <li>9. Final Confirmation</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3>ReCred QC (8 Tiles)</h3>
+                        <p style="font-size: 16px; margin-bottom: 15px;">
+                            Similar to Initial Cred QC with delta focus
+                        </p>
+                        <ul style="font-size: 16px;">
+                            <li>1. Re-Cred Summary</li>
+                            <li>2. Changed Specialties</li>
+                            <li>3. New/Terminated Practice Locations</li>
+                            <li>4. Network Updates</li>
+                            <li>5. Directory Updates</li>
+                            <li>6. Info Code Changes</li>
+                            <li>7. Capitation Updates</li>
+                            <li>8. Re-Cred QC Outcome</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card success" style="margin-top: 40px;">
+                    <h4>🎯 ReCred-Specific Advantages</h4>
+                    <div class="two-column">
+                        <ul style="font-size: 16px;">
+                            <li><strong>Delta Review:</strong> Focus only on changed data</li>
+                            <li><strong>Historical Comparison:</strong> Side-by-side previous vs current</li>
+                            <li><strong>Expired License Alerts:</strong> Dedicated tile for expirations</li>
+                            <li><strong>Faster Processing:</strong> Skip unchanged tiles</li>
+                        </ul>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Bulk ReCred:</strong> Process multiple practitioners in parallel</li>
+                            <li><strong>Auto-Approve:</strong> Tiles with no changes auto-complete</li>
+                            <li><strong>Exception Handling:</strong> Flag only tiles with issues</li>
+                            <li><strong>Audit Trail:</strong> Track what changed from last cred cycle</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="metric" style="margin-top: 30px;">
+                    <span class="metric-value">4</span>
+                    <span class="metric-label">Flows Modernized with One Architecture</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: Configuration-Driven Approach -->
+        <div class="slide">
+            <h1 class="slide-title">⚙️ Configuration-Driven Design</h1>
+            <div class="content-section">
+                <h2>One Codebase, Multiple Flows</h2>
+
+                <div class="architecture-diagram">
+// Tile Configuration Metadata
+{
+  "flowType": "InitialCredAppReview",
+  "tiles": [
+    {
+      "id": "application",
+      "label": "Review Application",
+      "sequence": 1,
+      "required": true,
+      "component": "c-prm-review-application",
+      "icon": "standard:account"
+    },
+    {
+      "id": "taxonomy",
+      "label": "Verify Taxonomy",
+      "sequence": 2,
+      "required": true,
+      "component": "c-prm-review-taxonomy",
+      "icon": "standard:product"
+    },
+    // ... more tiles
+  ]
+}
+
+// Different Flow = Different Configuration
+{
+  "flowType": "PSVVerification",
+  "tiles": [
+    {
+      "id": "practitionerInfo",
+      "label": "Practitioner Info",
+      "sequence": 1,
+      "required": true,
+      "component": "c-prm-psv-practitioner",
+      "icon": "standard:user"
+    },
+    // ... different tiles
+  ]
+}
+                </div>
+
+                <h3>Reusable Components</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Used In</th>
+                            <th>Configuration Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>prm_applicationReviewDashboard</strong></td>
+                            <td>All 4 flows</td>
+                            <td>flowType, recordId, tileConfig</td>
+                        </tr>
+                        <tr>
+                            <td><strong>prm_verificationTile</strong></td>
+                            <td>All 4 flows</td>
+                            <td>tileData, status, icon, label</td>
+                        </tr>
+                        <tr>
+                            <td><strong>prm_verificationModal</strong></td>
+                            <td>All 4 flows</td>
+                            <td>childComponent, modalTitle, actions</td>
+                        </tr>
+                        <tr>
+                            <td><strong>c-prm-review-education</strong></td>
+                            <td>Initial Cred only</td>
+                            <td>caqhData, existingRecords, mode</td>
+                        </tr>
+                        <tr>
+                            <td><strong>c-prm-psv-practitioner</strong></td>
+                            <td>PSV, ReCred PSV</td>
+                            <td>practitionerData, validationRules</td>
+                        </tr>
+                        <tr>
+                            <td><strong>c-prm-network-assignment</strong></td>
+                            <td>QC, ReCred QC</td>
+                            <td>availableNetworks, assignedNetworks, mode</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card success" style="margin-top: 30px;">
+                    <h4>💡 Development Efficiency</h4>
+                    <p style="font-size: 16px; margin-top: 10px;">
+                        Build dashboard + modal framework once (~4 weeks). Then configure specific tiles for each flow (~1 week per flow).
+                        <strong>Total: 8 weeks vs 16 weeks if building separate flows.</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 15: Implementation Roadmap -->
+        <div class="slide">
+            <h1 class="slide-title">🗓️ Implementation Roadmap</h1>
+            <div class="content-section">
+                <h2>4-Phase Rollout Strategy</h2>
+
+                <div style="margin: 30px 0;">
+                    <div class="card" style="margin-bottom: 20px; border-left-color: #667eea;">
+                        <h4>📋 Phase 1: Foundation (4 weeks)</h4>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Week 1-2:</strong> Create custom objects (VerificationSession, TileStatus)</li>
+                            <li><strong>Week 2-3:</strong> Build parent dashboard + tile components</li>
+                            <li><strong>Week 3-4:</strong> Build modal framework + navigation</li>
+                            <li><strong>Week 4:</strong> Implement auto-save + localStorage sync</li>
+                        </ul>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 20px; border-left-color: #28a745;">
+                        <h4>🎨 Phase 2: Initial Cred Flow (3 weeks)</h4>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Week 5-6:</strong> Build 10 verification tile components</li>
+                            <li><strong>Week 6-7:</strong> Integration with existing IPs</li>
+                            <li><strong>Week 7:</strong> Unit testing + bug fixes</li>
+                            <li><strong>Deliverable:</strong> Working Initial Cred App Review in LWC</li>
+                        </ul>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 20px; border-left-color: #ffc107;">
+                        <h4>✅ Phase 3: PSV & QC Flows (3 weeks)</h4>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Week 8-9:</strong> Configure PSV tile components</li>
+                            <li><strong>Week 9-10:</strong> Build QC-specific components (network assignment, directory)</li>
+                            <li><strong>Week 10:</strong> Testing + refinement</li>
+                            <li><strong>Deliverable:</strong> PSV Verification + Initial Cred QC</li>
+                        </ul>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 20px; border-left-color: #764ba2;">
+                        <h4>🔁 Phase 4: ReCred Flows (2 weeks)</h4>
+                        <ul style="font-size: 16px;">
+                            <li><strong>Week 11:</strong> Configure ReCred PSV tiles (delta-focused)</li>
+                            <li><strong>Week 12:</strong> Configure ReCred QC tiles</li>
+                            <li><strong>Deliverable:</strong> Complete solution for all 4 flows</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="three-column">
+                    <div class="metric">
+                        <span class="metric-value">12</span>
+                        <span class="metric-label">Total Weeks</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">4</span>
+                        <span class="metric-label">Flows Modernized</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">50%</span>
+                        <span class="metric-label">Code Reuse</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 16: Migration Strategy -->
+        <div class="slide">
+            <h1 class="slide-title">🚀 Migration Strategy</h1>
+            <div class="content-section">
+                <h2>Low-Risk Parallel Deployment</h2>
+
+                <div class="architecture-diagram">
+┌────────────────────────────────────────────────────────────┐
+│                    MIGRATION PHASES                        │
+├────────────────────────────────────────────────────────────┤
+│                                                            │
+│  Month 1: Pilot (10% users)                               │
+│  ┌──────────────┐    ┌──────────────┐                    │
+│  │ OmniScript   │    │ LWC (Pilot)  │                    │
+│  │   (90%)      │    │    (10%)     │                    │
+│  └──────────────┘    └──────────────┘                    │
+│                                                            │
+│  Month 2: Gradual Rollout (50% users)                     │
+│  ┌──────────────┐    ┌──────────────┐                    │
+│  │ OmniScript   │    │     LWC      │                    │
+│  │   (50%)      │    │    (50%)     │                    │
+│  └──────────────┘    └──────────────┘                    │
+│                                                            │
+│  Month 3: Default to LWC (90% users)                      │
+│  ┌────┐              ┌──────────────┐                    │
+│  │ OS │              │     LWC      │                    │
+│  │10% │              │    (90%)     │                    │
+│  └────┘              └──────────────┘                    │
+│                                                            │
+│  Month 4: Full Cutover (100% LWC)                         │
+│                      ┌──────────────┐                    │
+│                      │     LWC      │                    │
+│                      │   (100%)     │                    │
+│                      └──────────────┘                    │
+└────────────────────────────────────────────────────────────┘
+                </div>
+
+                <h3>Risk Mitigation</h3>
+                <div class="two-column">
+                    <div class="card success">
+                        <h4>✅ Safety Measures</h4>
+                        <ul style="font-size: 14px;">
+                            <li>Keep OmniScript as fallback during pilot</li>
+                            <li>"Try New Experience" opt-in button</li>
+                            <li>Monitor error rates daily</li>
+                            <li>User feedback collection</li>
+                            <li>Instant rollback capability</li>
+                            <li>Phased user group rollout</li>
+                        </ul>
+                    </div>
+                    <div class="card">
+                        <h4>📊 Success Metrics</h4>
+                        <ul style="font-size: 14px;">
+                            <li><strong>Zero</strong> 4MB save failures</li>
+                            <li><strong>&lt;5%</strong> error rate</li>
+                            <li><strong>&gt;80%</strong> user satisfaction</li>
+                            <li><strong>50%</strong> faster completion time</li>
+                            <li><strong>100%</strong> resume success rate</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 30px;">Training Plan</h3>
+                <ul style="font-size: 16px;">
+                    <li>📹 <strong>Video Tutorial:</strong> 10-minute overview of new interface</li>
+                    <li>📄 <strong>Quick Start Guide:</strong> One-page reference card</li>
+                    <li>🎓 <strong>Live Training Sessions:</strong> 2 sessions per user group</li>
+                    <li>💬 <strong>Q&A Slack Channel:</strong> Real-time support</li>
+                    <li>🆘 <strong>Help Button:</strong> In-app contextual help</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SLIDE 17: ROI Analysis -->
+        <div class="slide">
+            <h1 class="slide-title">💰 Return on Investment</h1>
+            <div class="content-section">
+                <h2>Cost-Benefit Analysis</h2>
+
+                <div class="two-column">
+                    <div>
+                        <h3 style="color: #dc3545;">💸 Investment Required</h3>
+                        <table class="comparison-table">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Development</strong></td>
+                                    <td>12 weeks × 2 developers</td>
+                                    <td style="text-align: right;">$120K</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>QA Testing</strong></td>
+                                    <td>4 weeks × 1 QA</td>
+                                    <td style="text-align: right;">$20K</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Training</strong></td>
+                                    <td>Materials + Sessions</td>
+                                    <td style="text-align: right;">$10K</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>PM Overhead</strong></td>
+                                    <td>16 weeks × 25%</td>
+                                    <td style="text-align: right;">$20K</td>
+                                </tr>
+                                <tr style="background: #f8d7da; font-weight: bold;">
+                                    <td colspan="2"><strong>TOTAL INVESTMENT</strong></td>
+                                    <td style="text-align: right;">$170K</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h3 style="color: #28a745;">💵 Annual Savings</h3>
+                        <table class="comparison-table">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Reduced Rework</strong></td>
+                                    <td>No more "Save for Later" failures</td>
+                                    <td style="text-align: right;">$80K/yr</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Time Savings</strong></td>
+                                    <td>50% faster reviews</td>
+                                    <td style="text-align: right;">$120K/yr</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reduced Support</strong></td>
+                                    <td>Fewer escalations</td>
+                                    <td style="text-align: right;">$30K/yr</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Improved Quality</strong></td>
+                                    <td>Better verification accuracy</td>
+                                    <td style="text-align: right;">$50K/yr</td>
+                                </tr>
+                                <tr style="background: #d4edda; font-weight: bold;">
+                                    <td colspan="2"><strong>TOTAL ANNUAL SAVINGS</strong></td>
+                                    <td style="text-align: right;">$280K/yr</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="three-column" style="margin-top: 40px;">
+                    <div class="metric">
+                        <span class="metric-value">6</span>
+                        <span class="metric-label">Months to Break Even</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">165%</span>
+                        <span class="metric-label">First Year ROI</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">$840K</span>
+                        <span class="metric-label">3-Year Net Benefit</span>
+                    </div>
+                </div>
+
+                <div class="card success" style="margin-top: 30px;">
+                    <h4>📈 Intangible Benefits</h4>
+                    <div class="two-column">
+                        <ul style="font-size: 16px;">
+                            <li>Improved user satisfaction</li>
+                            <li>Faster onboarding for new staff</li>
+                            <li>Better data quality</li>
+                        </ul>
+                        <ul style="font-size: 16px;">
+                            <li>Reduced burnout</li>
+                            <li>Scalable for future flows</li>
+                            <li>Modern technology stack</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 18: Risks & Mitigation -->
+        <div class="slide">
+            <h1 class="slide-title">⚠️ Risks & Mitigation</h1>
+            <div class="content-section">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Risk</th>
+                            <th style="width: 15%;">Likelihood</th>
+                            <th style="width: 15%;">Impact</th>
+                            <th style="width: 45%;">Mitigation Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>User Adoption Resistance</strong></td>
+                            <td>Medium</td>
+                            <td>High</td>
+                            <td>
+                                • Extensive training program<br>
+                                • Pilot with champions first<br>
+                                • Keep OmniScript as fallback<br>
+                                • Gather feedback early
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Development Delays</strong></td>
+                            <td>Medium</td>
+                            <td>Medium</td>
+                            <td>
+                                • Phased delivery (MVP first)<br>
+                                • Weekly sprint reviews<br>
+                                • Buffer time in schedule<br>
+                                • Dedicated team
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Data Migration Issues</strong></td>
+                            <td>Low</td>
+                            <td>High</td>
+                            <td>
+                                • Thorough testing in sandbox<br>
+                                • Data validation scripts<br>
+                                • Rollback plan<br>
+                                • No legacy data migration needed
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Performance Problems</strong></td>
+                            <td>Low</td>
+                            <td>Medium</td>
+                            <td>
+                                • Load testing with real data<br>
+                                • Lazy loading implementation<br>
+                                • Browser caching strategy<br>
+                                • Monitor page load times
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Integration Breaks</strong></td>
+                            <td>Low</td>
+                            <td>High</td>
+                            <td>
+                                • Reuse existing IPs where possible<br>
+                                • Comprehensive integration testing<br>
+                                • Regression test suite<br>
+                                • API contract versioning
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Browser Compatibility</strong></td>
+                            <td>Low</td>
+                            <td>Low</td>
+                            <td>
+                                • Test on all supported browsers<br>
+                                • Progressive enhancement<br>
+                                • Fallback for localStorage<br>
+                                • Clear browser requirements
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="card success" style="margin-top: 30px;">
+                    <h4>🛡️ Overall Risk Assessment: LOW TO MEDIUM</h4>
+                    <p style="font-size: 16px; margin-top: 10px;">
+                        With proper phased rollout, extensive testing, and user training, risks are manageable. 
+                        The parallel deployment strategy allows instant rollback if critical issues arise.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 19: Success Criteria -->
+        <div class="slide">
+            <h1 class="slide-title">🎯 Success Criteria</h1>
+            <div class="content-section">
+                <h2>How We'll Measure Success</h2>
+
+                <div class="benefit-grid">
+                    <div class="card">
+                        <h4>🚫 Zero 4MB Failures</h4>
+                        <div class="metric" style="margin-top: 20px;">
+                            <span class="metric-value">0</span>
+                            <span class="metric-label">Save for Later Failures</span>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 14px;">
+                            <strong>Current:</strong> 15-20% failure rate<br>
+                            <strong>Target:</strong> 0% failure rate
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h4>⚡ Faster Completion</h4>
+                        <div class="metric" style="margin-top: 20px;">
+                            <span class="metric-value">50%</span>
+                            <span class="metric-label">Time Reduction</span>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 14px;">
+                            <strong>Current:</strong> 2-4 hours per review<br>
+                            <strong>Target:</strong> 1-2 hours per review
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h4>😊 User Satisfaction</h4>
+                        <div class="metric" style="margin-top: 20px;">
+                            <span class="metric-value">80%</span>
+                            <span class="metric-label">Satisfaction Score</span>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 14px;">
+                            <strong>Measure:</strong> Post-rollout survey<br>
+                            <strong>Target:</strong> 80%+ satisfied
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h4>💾 Resume Success</h4>
+                        <div class="metric" style="margin-top: 20px;">
+                            <span class="metric-value">100%</span>
+                            <span class="metric-label">Resume Rate</span>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 14px;">
+                            <strong>Current:</strong> Cannot resume<br>
+                            <strong>Target:</strong> 100% successful resumes
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h4>📊 Data Quality</h4>
+                        <div class="metric" style="margin-top: 20px;">
+                            <span class="metric-value">95%</span>
+                            <span class="metric-label">Accuracy Rate</span>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 14px;">
+                            <strong>Measure:</strong> QC audit results<br>
+                            <strong>Target:</strong> 95%+ first-pass accuracy
+                        </p>
+                    </div>
+
+                    <div class="card">
+                        <h4>🐛 System Stability</h4>
+                        <div class="metric" style="margin-top: 20px;">
+                            <span class="metric-value">&lt;5%</span>
+                            <span class="metric-label">Error Rate</span>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 14px;">
+                            <strong>Measure:</strong> Exception logs<br>
+                            <strong>Target:</strong> &lt;5% error rate
+                        </p>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 40px;">Acceptance Criteria</h3>
+                <ul style="font-size: 18px;">
+                    <li>✅ All 10 tiles functional for Initial Cred flow</li>
+                    <li>✅ Auto-save working every 2 minutes</li>
+                    <li>✅ Resume capability tested and verified</li>
+                    <li>✅ Integration with existing IPs working</li>
+                    <li>✅ All existing OmniScript functionality preserved</li>
+                    <li>✅ Performance meets or exceeds current state</li>
+                    <li>✅ UAT sign-off from business users</li>
+                    <li>✅ Training materials complete</li>
+                    <li>✅ Rollback plan documented and tested</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- SLIDE 20: Recommendation -->
+        <div class="slide">
+            <h1 class="slide-title">✅ Recommendation</h1>
+            <div class="content-section">
+                <div class="quote">
+                    "Proceed with tile-based LWC redesign for Initial Credential App Review, followed by PSV, QC, and ReCred flows"
+                </div>
+
+                <h2 style="margin-top: 40px;">Why This Is the Right Decision</h2>
+
+                <div class="two-column">
+                    <div>
+                        <div class="card success">
+                            <h4>✅ Solves Critical Pain Point</h4>
+                            <p style="font-size: 16px;">Eliminates 4MB payload failures that block business operations today</p>
+                        </div>
+
+                        <div class="card success">
+                            <h4>✅ Strong ROI</h4>
+                            <p style="font-size: 16px;">Pays for itself in 6 months with $280K/year savings</p>
+                        </div>
+
+                        <div class="card success">
+                            <h4>✅ Manageable Risk</h4>
+                            <p style="font-size: 16px;">Phased rollout with fallback to existing OmniScript</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="card success">
+                            <h4>✅ Future-Proof</h4>
+                            <p style="font-size: 16px;">LWC is Salesforce's strategic direction; OmniScript is legacy</p>
+                        </div>
+
+                        <div class="card success">
+                            <h4>✅ Scalable Solution</h4>
+                            <p style="font-size: 16px;">Reuse architecture across 4 different flows</p>
+                        </div>
+
+                        <div class="card success">
+                            <h4>✅ Better User Experience</h4>
+                            <p style="font-size: 16px;">Modern, flexible interface improves productivity and satisfaction</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 40px;">Next Steps</h3>
+                <ol style="font-size: 20px; line-height: 2;">
+                    <li><strong>Approve Budget:</strong> $170K for 12-week development</li>
+                    <li><strong>Assign Resources:</strong> 2 developers, 1 QA, 1 PM</li>
+                    <li><strong>Create Custom Objects:</strong> Week 1-2</li>
+                    <li><strong>Begin Phase 1 Development:</strong> Week 1</li>
+                    <li><strong>Pilot with 10 Users:</strong> Month 3</li>
+                    <li><strong>Full Rollout:</strong> Month 4</li>
+                </ol>
+
+                <div class="metric" style="margin-top: 40px;">
+                    <span class="metric-value">Go / No-Go Decision</span>
+                    <span class="metric-label">Approval Needed to Proceed</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 21: Q&A -->
+        <div class="slide title-slide">
+            <div>
+                <h1 class="slide-title">❓ Questions & Discussion</h1>
+                <p class="slide-subtitle" style="margin-top: 60px;">Thank you for your time</p>
+                
+                <div style="margin-top: 80px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <p style="font-size: 20px; margin-bottom: 20px;"><strong>Contact Information:</strong></p>
+                    <p style="font-size: 18px;">📧 Email: architecture@company.com</p>
+                    <p style="font-size: 18px;">📄 Full Design Doc: Available in Confluence</p>
+                    <p style="font-size: 18px;">💻 Demo: Schedule walkthrough</p>
+                </div>
+
+                <div style="margin-top: 80px; font-size: 16px; opacity: 0.8;">
+                    <p>Presentation Date: April 8, 2026</p>
+                    <p>Version: 1.0</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        <p>&copy; 2026 Company Name. Confidential - Internal Use Only.</p>
+    </div>
+
+    <script>
+        // Print button
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                window.print();
+            }
+        });
+
+        // Navigation hint
+        console.log('💡 Tip: Use Ctrl+P to print or export as PDF');
+    </script>
+</body>
+</html>

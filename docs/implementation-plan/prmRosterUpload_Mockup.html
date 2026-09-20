@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>prmRosterUpload — Practitioner Roster Upload Wizard (SLDS Mockup)</title>
+<style>
+  :root{
+    --brand:#0176d3; --brand-dark:#014486; --brand-100:#eef4ff;
+    --page-bg:#f3f3f3; --card:#fff; --border:#e5e5e5; --border-2:#c9c9c9;
+    --txt:#181818; --txt-2:#5c5c5c; --txt-3:#747474;
+    --green:#2e844a; --green-bg:#d7f1de; --green-bd:#91db8b;
+    --red:#ea001e;   --red-bg:#feded8;  --red-bd:#fe9a91;
+    --orange:#dd7a01;--orange-bg:#fef0e6;--orange-bd:#fec574;
+    --blue:#0176d3;  --blue-bg:#d8edff; --blue-bd:#90d0fe;
+    --radius:.25rem; --shadow:0 2px 2px rgba(0,0,0,.05),0 0 1px rgba(0,0,0,.12);
+    font-family:'Salesforce Sans','Segoe UI',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);color:var(--txt);font-size:13px;line-height:1.4;}
+  .wrap{max-width:1320px;margin:0 auto;padding:1rem;}
+  a{color:var(--brand);text-decoration:none;font-weight:600;} a:hover{text-decoration:underline;}
+  .muted{color:var(--txt-3);} .mono{font-family:'SF Mono',Consolas,monospace;font-size:.74rem;color:var(--txt-2);}
+
+  /* modal shell */
+  .modal{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;}
+  .modal-head{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;border-bottom:1px solid var(--border);}
+  .mh-icon{width:2.2rem;height:2.2rem;border-radius:var(--radius);background:var(--brand);display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto;}
+  .mh-icon svg{width:1.2rem;height:1.2rem;fill:#fff;}
+  .mh-main{flex:1 1 auto;min-width:0;}
+  .mh-eyebrow{font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-3);}
+  .mh-title{font-size:1.05rem;font-weight:700;}
+  .mh-close{border:none;background:none;color:var(--txt-3);font-size:1.3rem;cursor:pointer;line-height:1;}
+
+  /* step path */
+  .path{display:flex;gap:0;padding:.6rem 1.1rem;border-bottom:1px solid var(--border);background:#fafaf9;overflow-x:auto;}
+  .pstep{display:flex;align-items:center;gap:.45rem;padding:.25rem .8rem .25rem .3rem;color:var(--txt-2);font-weight:600;font-size:.8rem;white-space:nowrap;cursor:pointer;border:none;background:none;}
+  .pstep .pnum{width:1.4rem;height:1.4rem;border-radius:50%;border:2px solid var(--border-2);display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--txt-3);background:#fff;}
+  .pstep.done .pnum{background:var(--green);border-color:var(--green);color:#fff;}
+  .pstep.active{color:var(--brand);}
+  .pstep.active .pnum{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .pstep .arrow{color:var(--border-2);margin-left:.4rem;}
+
+  .modal-body{padding:1.1rem;min-height:430px;}
+  .modal-foot{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1.1rem;border-top:1px solid var(--border);background:#fafaf9;}
+
+  /* buttons */
+  .btn{border:1px solid var(--border-2);background:#fff;color:var(--brand);border-radius:var(--radius);padding:.4rem .9rem;font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;}
+  .btn:hover{background:#f3f8ff;}
+  .btn--brand{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .btn--brand:hover{background:var(--brand-dark);}
+  .btn--neutral{color:var(--txt);}
+  .btn svg{width:.9rem;height:.9rem;fill:currentColor;}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+
+  /* badges */
+  .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.12rem .5rem;border-radius:12px;font-size:.72rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .badge .dot{width:.55rem;height:.55rem;border-radius:50%;display:inline-block;}
+  .b-completed,.b-ready{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);} .b-completed .dot,.b-ready .dot{background:var(--green);}
+  .b-failed,.b-error{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);} .b-failed .dot,.b-error .dot{background:var(--red);}
+  .b-queued{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);} .b-queued .dot{background:var(--orange);}
+  .b-warning{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);} .b-warning .dot{background:var(--orange);}
+  .b-running{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);} .b-running .dot{background:var(--blue);animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%{opacity:1;}50%{opacity:.3;}100%{opacity:1;}}
+  /* operation badges */
+  .op{display:inline-flex;align-items:center;gap:.25rem;padding:.1rem .45rem;border-radius:var(--radius);font-size:.7rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .op-create{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);}
+  .op-add{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);}
+  .op-addall{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);}
+  .op-remove{background:var(--red-bg);color:var(--red);border-color:var(--red-bd);}
+  .optabs{display:flex;gap:.25rem;flex-wrap:wrap;margin:-.1rem 0 .5rem;font-size:.74rem;}
+  .optab{padding:.2rem .6rem;border:1px solid var(--border-2);border-radius:12px;color:var(--txt-2);cursor:pointer;font-weight:600;background:#fff;}
+  .optab.active{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .trow.remove{background:#fffafa;}
+
+  /* drop zone */
+  .drop{border:2px dashed var(--border-2);border-radius:.5rem;padding:2.2rem;text-align:center;background:#fbfdff;}
+  .drop svg{width:2.6rem;height:2.6rem;fill:var(--brand);opacity:.8;}
+  .drop h3{margin:.6rem 0 .2rem;font-size:1rem;}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+  .banner{display:flex;align-items:center;gap:.6rem;padding:.6rem .85rem;border-radius:var(--radius);font-size:.82rem;margin-top:1rem;border:1px solid transparent;}
+  .banner.ok{background:var(--green-bg);border-color:var(--green-bd);color:#0a5a2a;}
+  .banner.info{background:var(--blue-bg);border-color:var(--blue-bd);color:#014486;}
+  .banner.warn{background:var(--orange-bg);border-color:var(--orange-bd);color:#8a4b00;}
+
+  /* generic tables */
+  table{width:100%;border-collapse:collapse;font-size:.8rem;}
+  thead th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);font-weight:600;padding:.5rem .7rem;border-bottom:1px solid var(--border);background:#fafaf9;white-space:nowrap;}
+  tbody td{padding:.5rem .7rem;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+  tbody tr:hover{background:#f8fbff;}
+  .preview td,.preview th{font-size:.74rem;padding:.35rem .5rem;}
+
+  /* mapper */
+  .map-row{display:grid;grid-template-columns:1fr 2rem 1.4fr;align-items:center;gap:.5rem;padding:.4rem .2rem;border-bottom:1px solid #f0f0f0;}
+  .map-vendor{font-weight:600;}
+  .map-arrow{color:var(--brand);text-align:center;font-weight:700;}
+  .sel{width:100%;border:1px solid var(--border-2);border-radius:var(--radius);padding:.35rem .5rem;font-size:.8rem;background:#fff;}
+  .sel.bad{border-color:var(--red);background:#fff7f6;}
+  .pill{background:#eef0f2;color:var(--txt-2);border-radius:10px;padding:0 .45rem;font-size:.68rem;font-weight:700;}
+
+  /* tabs */
+  .tabs{display:flex;gap:.25rem;border-bottom:1px solid var(--border-2);margin-bottom:.5rem;flex-wrap:wrap;}
+  .tab{padding:.45rem .8rem;font-size:.8rem;font-weight:600;color:var(--txt-2);cursor:pointer;border-bottom:3px solid transparent;display:flex;align-items:center;gap:.4rem;}
+  .tab .pill{background:#eef0f2;}
+  .tab.active{color:var(--brand);border-bottom-color:var(--brand);}
+  .tab.active .pill{background:var(--brand);color:#fff;}
+
+  /* drawer */
+  .triage-wrap{display:grid;grid-template-columns:1fr;gap:0;}
+  .triage-wrap.open{grid-template-columns:1.35fr 1fr;}
+  .drawer{border-left:1px solid var(--border);padding-left:1rem;display:none;max-height:520px;overflow:auto;}
+  .triage-wrap.open .drawer{display:block;}
+  .drawer-head{position:sticky;top:0;background:#fff;padding-bottom:.5rem;border-bottom:1px solid var(--border);margin-bottom:.5rem;z-index:2;}
+  .acc{border:1px solid var(--border);border-radius:var(--radius);margin-bottom:.5rem;overflow:hidden;}
+  .acc-head{display:flex;align-items:center;justify-content:space-between;padding:.5rem .7rem;background:#fafaf9;cursor:pointer;font-weight:700;font-size:.82rem;}
+  .acc-head .left{display:flex;align-items:center;gap:.45rem;}
+  .acc-body{padding:.6rem .7rem;display:none;}
+  .acc.open .acc-body{display:block;}
+  .acc.open .chev{transform:rotate(90deg);}
+  .chev{transition:transform .12s;color:var(--txt-3);}
+  .fld{display:grid;grid-template-columns:9rem 1fr;gap:.4rem;padding:.25rem 0;align-items:center;}
+  .fld label{color:var(--txt-3);font-size:.74rem;text-transform:uppercase;letter-spacing:.02em;}
+  .fld .val{border:1px solid var(--border-2);border-radius:var(--radius);padding:.3rem .5rem;font-size:.8rem;background:#fff;}
+  .fld .val.missing{border-color:var(--red);background:#fff7f6;color:var(--red);}
+  .fld .val.sys{background:#f3f3f3;color:var(--txt-2);}
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem;gap:.5rem;flex-wrap:wrap;}
+  .search{border:1px solid var(--border-2);border-radius:var(--radius);padding:.35rem .6rem;font-size:.8rem;min-width:200px;}
+  .selbar{display:flex;align-items:center;gap:.5rem;font-size:.8rem;background:var(--brand-100);border:1px solid var(--blue-bd);border-radius:var(--radius);padding:.35rem .6rem;}
+
+  /* submit/monitor */
+  .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:.6rem;margin:.5rem 0 1rem;}
+  .stat{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.6rem .75rem;position:relative;overflow:hidden;}
+  .stat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--brand);}
+  .stat.completed::before{background:var(--green);} .stat.failed::before{background:var(--red);}
+  .stat.queued::before{background:var(--orange);} .stat.running::before{background:var(--blue);}
+  .stat-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);}
+  .stat-num{font-size:1.5rem;font-weight:700;margin-top:.1rem;}
+  .stat.completed .stat-num{color:var(--green);} .stat.failed .stat-num{color:var(--red);}
+  .stat.queued .stat-num{color:var(--orange);} .stat.running .stat-num{color:var(--blue);}
+  .bar{height:.6rem;border-radius:.4rem;background:#eef0f2;overflow:hidden;display:flex;margin:.4rem 0 1rem;}
+  .bar > span{display:block;height:100%;}
+  .b-done{background:var(--green);} .b-run{background:var(--blue);} .b-fail{background:var(--red);} .b-queue{background:var(--orange);}
+  .success-hero{display:flex;gap:.75rem;align-items:flex-start;background:var(--green-bg);border:1px solid var(--green-bd);border-radius:var(--radius);padding:.85rem 1rem;margin-bottom:1rem;}
+  .success-hero svg{width:1.8rem;height:1.8rem;fill:var(--green);flex:0 0 auto;}
+
+  .legend{margin-top:1rem;font-size:.74rem;color:var(--txt-3);background:#fbfbfa;border:1px dashed var(--border-2);border-radius:var(--radius);padding:.75rem .9rem;}
+  .legend b{color:var(--txt-2);} .legend code{background:#eef0f2;border-radius:3px;padding:0 .25rem;font-size:.72rem;}
+  .screen{display:none;} .screen.active{display:block;}
+  @media (max-width:1024px){ .stats{grid-template-columns:repeat(3,1fr);} .row-2{grid-template-columns:1fr;} .triage-wrap.open{grid-template-columns:1fr;} .drawer{border-left:none;padding-left:0;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="modal">
+
+    <!-- ===== HEAD ===== -->
+    <div class="modal-head">
+      <div class="mh-icon"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6z"/></svg></div>
+      <div class="mh-main">
+        <div class="mh-eyebrow">Provider Network Management &middot; Delegated Credentialing</div>
+        <div class="mh-title">Upload Practitioner Roster</div>
+      </div>
+      <button class="mh-close" title="Close">&times;</button>
+    </div>
+
+    <!-- ===== STEP PATH ===== -->
+    <div class="path">
+      <button class="pstep done" onclick="go(1)"><span class="pnum">1</span> Upload <span class="arrow">&rsaquo;</span></button>
+      <button class="pstep done" onclick="go(2)"><span class="pnum">2</span> Map Columns <span class="arrow">&rsaquo;</span></button>
+      <button class="pstep done" onclick="go(3)"><span class="pnum">3</span> Validate <span class="arrow">&rsaquo;</span></button>
+      <button class="pstep active" onclick="go(4)"><span class="pnum">4</span> Review &amp; Triage <span class="arrow">&rsaquo;</span></button>
+      <button class="pstep" onclick="go(5)"><span class="pnum">5</span> Apply Networks <span class="arrow">&rsaquo;</span></button>
+      <button class="pstep" onclick="go(6)"><span class="pnum">6</span> Submit &amp; Monitor</button>
+    </div>
+
+    <!-- ===== BODY ===== -->
+    <div class="modal-body">
+
+      <!-- ---------- STEP 1: UPLOAD ---------- -->
+      <div class="screen" id="s1">
+        <div class="drop">
+          <svg viewBox="0 0 24 24"><path d="M19.35 10.04A7.49 7.49 0 0012 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 000 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg>
+          <h3>Drag &amp; drop a roster file, or <a href="#">browse</a></h3>
+          <div class="muted">Accepted: .csv, .xlsx, .xls &middot; max 200 practitioners &middot; 5 MB &middot; first sheet only</div>
+          <div style="margin-top:.8rem;display:flex;gap:.5rem;justify-content:center;">
+            <button class="btn"><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>Download IBX Template (CSV)</button>
+            <button class="btn"><svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/></svg>Template (XLSX)</button>
+          </div>
+        </div>
+        <div class="banner ok"><span class="badge b-ready"><span class="dot"></span>Parsed</span> <b>JUP.MAHC.vRad 9.11.25 Proxy.xlsx</b> &mdash; 97 columns &middot; 64 rows &middot; <b>17 distinct practitioners</b> (grouped by NPI).</div>
+        <div class="banner info"><svg width="16" height="16" viewBox="0 0 24 24" style="fill:#014486"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg> Recognized vendor layout: <b>Jeffcare / JUP.MAHC.vRad</b> &mdash; saved mapping profile will auto-apply in the next step.</div>
+        <div style="margin-top:1rem;">
+          <div class="muted" style="margin-bottom:.3rem;font-weight:600;">Preview (first 4 source rows)</div>
+          <div style="overflow:auto;border:1px solid var(--border);border-radius:var(--radius);">
+          <table class="preview">
+            <thead><tr><th>Comments</th><th>Eff Date</th><th>Specialty</th><th>Provider NPI #</th><th>Last</th><th>First</th><th>Gender</th><th>DOB</th><th>City</th><th>State</th></tr></thead>
+            <tbody>
+              <tr><td>Create new provider and link to group location #3</td><td>2025-09-12</td><td>Otolaryngology - Head &amp; Neck Surgery</td><td>1144883521</td><td>Agarwal</td><td>Aarti</td><td>F</td><td>1991-09-24</td><td>Cherry Hill</td><td>NJ</td></tr>
+              <tr><td>Create new provider and link to group location #1</td><td>2025-09-12</td><td>Otolaryngology - Head &amp; Neck Surgery</td><td>1144883521</td><td>Agarwal</td><td>Aarti</td><td>F</td><td>1991-09-24</td><td>Philadelphia</td><td>PA</td></tr>
+              <tr><td>Link provider to group location #1</td><td>2025-09-12</td><td>Radiology, Diagnostic</td><td>1932518123</td><td>Anwarulislam</td><td>Syed</td><td>M</td><td>1973-03-14</td><td>Cherry Hill</td><td>NJ</td></tr>
+              <tr><td>Add new address and Link provider</td><td>2025-09-12</td><td>Physical Medicine &amp; Rehabilitation</td><td>1538326145</td><td>Berk</td><td>Jason</td><td>M</td><td>1979-10-05</td><td>Elkins Park</td><td>PA</td></tr>
+            </tbody>
+          </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- STEP 2: MAP ---------- -->
+      <div class="screen" id="s2">
+        <div class="banner ok" style="margin-top:0;"><span class="badge b-ready"><span class="dot"></span>Profile applied</span> <b>18 of 18</b> required columns mapped from the saved <b>Jeffcare / JUP.MAHC.vRad</b> profile. Review or continue.</div>
+        <div class="toolbar" style="margin-top:1rem;">
+          <div style="font-weight:700;">Column mapping <span class="muted" style="font-weight:400;">vendor header &rarr; canonical field</span></div>
+          <div style="display:flex;gap:.5rem;">
+            <button class="btn"><svg viewBox="0 0 24 24"><path d="M17 3H5a2 2 0 00-2 2v14l4-4h10a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>Edit value rules</button>
+            <button class="btn btn--brand"><svg viewBox="0 0 24 24"><path d="M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16a3 3 0 110-6 3 3 0 010 6zm3-10H5V5h10v4z"/></svg>Save mapping profile</button>
+          </div>
+        </div>
+        <div style="max-height:340px;overflow:auto;border:1px solid var(--border);border-radius:var(--radius);padding:.4rem .7rem;">
+          <div class="map-row"><div class="map-vendor">Comments <span class="pill">structure</span></div><div class="map-arrow">&rarr;</div><select class="sel"><option>Locations ▸ Action directive (Create / Link / Add address)</option></select></div>
+          <div class="map-row"><div class="map-vendor">Provider NPI #</div><div class="map-arrow">&rarr;</div><select class="sel"><option>NPI ▸ Individual NPI (grouping key)</option></select></div>
+          <div class="map-row"><div class="map-vendor">Last Name</div><div class="map-arrow">&rarr;</div><select class="sel"><option>Practitioner ▸ Last Name</option></select></div>
+          <div class="map-row"><div class="map-vendor">First Name</div><div class="map-arrow">&rarr;</div><select class="sel"><option>Practitioner ▸ First Name</option></select></div>
+          <div class="map-row"><div class="map-vendor">Gender</div><div class="map-arrow">&rarr;</div><select class="sel"><option>Practitioner ▸ Gender Identity (M→Male / F→Female)</option></select></div>
+          <div class="map-row"><div class="map-vendor">Specialty</div><div class="map-arrow">&rarr;</div><select class="sel"><option>Taxonomy ▸ Primary Specialty (lookup CareTaxonomy)</option></select></div>
+          <div class="map-row"><div class="map-vendor">PA Medical License #</div><div class="map-arrow">&rarr;</div><select class="sel"><option>Licenses ▸ License # (State=PA, Type=Medical)</option></select></div>
+          <div class="map-row"><div class="map-vendor">NJ CDS #</div><div class="map-arrow">&rarr;</div><select class="sel"><option>DEA/CDS ▸ Registration # (State=NJ, Type=CDS)</option></select></div>
+          <div class="map-row"><div class="map-vendor">Group NPI #</div><div class="map-arrow">&rarr;</div><select class="sel"><option>Group / Vendor ▸ Group NPI</option></select></div>
+          <div class="map-row"><div class="map-vendor">Tax ID #</div><div class="map-arrow">&rarr;</div><select class="sel"><option>Group / Vendor ▸ Tax ID</option></select></div>
+          <div class="map-row"><div class="map-vendor">Jeff Plus Loaded</div><div class="map-arrow">&rarr;</div><select class="sel"><option>— Do not import —</option></select></div>
+        </div>
+        <div class="banner info">Structure rule: <b>ONE_ROW_PER_LOCATION</b> &mdash; rows grouped by Individual NPI; each row's "Comments" sets the per-location action.</div>
+      </div>
+
+      <!-- ---------- STEP 3: VALIDATE ---------- -->
+      <div class="screen" id="s3">
+        <div style="text-align:center;padding:1.8rem 1rem 1rem;">
+          <div class="badge b-running" style="font-size:.9rem;padding:.3rem .8rem;"><span class="dot"></span>&#10227; Validating</div>
+          <h3 style="margin:.8rem 0 .2rem;">Building canonical envelopes, resolving operations &amp; running checks…</h3>
+          <div class="muted">Grouping 64 rows &rarr; 17 practitioners &middot; resolving operation (create/add/remove) &middot; taxonomies &amp; vendor &middot; dedup</div>
+          <div class="bar" style="max-width:480px;margin:1.2rem auto;"><span class="b-done" style="width:72%"></span><span class="b-run" style="width:18%"></span></div>
+          <div class="muted">13 of 17 validated</div>
+        </div>
+        <div class="row-2" style="margin-top:.5rem;">
+          <div class="banner info" style="margin-top:0;align-items:flex-start;">
+            <svg width="16" height="16" viewBox="0 0 24 24" style="fill:#014486;flex:0 0 auto"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1112 6a2.5 2.5 0 010 5.5z"/></svg>
+            <div><b>Address standardization (server)</b> &mdash; Precisely via <code>PRM_AddressValidationService</code>; each location matched to existing <code>HealthcareFacility</code>: <b>41 Matched</b> &middot; <b>20 New address</b> &middot; <b>3 Ambiguous</b>.</div>
+          </div>
+          <div class="banner warn" style="margin-top:0;align-items:flex-start;">
+            <svg width="16" height="16" viewBox="0 0 24 24" style="fill:#8a4b00;flex:0 0 auto"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+            <div><b>Add-to-all-locations volume</b> &mdash; resolved server-side via SOQL on <code>HealthcareFacility WHERE PRM_NpiId__r.Npi=:groupNpi</code>. NovaCare-style groups can fan out to <b>N</b> facilities per practitioner; review before submit.</div>
+          </div>
+        </div>
+        <div class="legend">
+          <b>Validation tiers:</b> &bull; <b>Client</b> (instant): required present, NPI 10-digit, dates parseable, gender in set, tax-ID format, in-file duplicate NPI, directive&rarr;operation resolvable.
+          &bull; <b>Server</b> (<code>PRM_RosterValidator</code>): existing-account dedup (<code>PRM_ExistingAccountService</code>), taxonomy resolves (<code>CareTaxonomy</code>), vendor/group resolves (<code>PRM_IPUtility</code>), effective-date rules, <b>address standardization + facility match</b>, <b>add-to-all volume</b>, and (for remove/term) confirm the target affiliation exists.
+        </div>
+      </div>
+
+      <!-- ---------- STEP 4: TRIAGE ---------- -->
+      <div class="screen active" id="s4">
+        <div class="tabs">
+          <div class="tab active" onclick="filterTriage(this,'all')">All <span class="pill">17</span></div>
+          <div class="tab" onclick="filterTriage(this,'error')">Errors <span class="pill">3</span></div>
+          <div class="tab" onclick="filterTriage(this,'warning')">Warnings <span class="pill">5</span></div>
+          <div class="tab" onclick="filterTriage(this,'ready')">Ready <span class="pill">9</span></div>
+        </div>
+        <div class="optabs">
+          <span class="muted" style="align-self:center;margin-right:.2rem;">Operation:</span>
+          <span class="optab active" onclick="filterOp(this,'allop')">All</span>
+          <span class="optab" onclick="filterOp(this,'create')">&#65291; Create <span class="pill">11</span></span>
+          <span class="optab" onclick="filterOp(this,'add')">&#8644; Add <span class="pill">4</span></span>
+          <span class="optab" onclick="filterOp(this,'addall')">&#8646; Add-to-all <span class="pill">0</span></span>
+          <span class="optab" onclick="filterOp(this,'remove')">&#10006; Remove/Term <span class="pill">2</span></span>
+        </div>
+        <div class="toolbar">
+          <div class="selbar"><b>14 selected</b> (errors excluded) <button class="btn" style="padding:.2rem .55rem;">Apply defaults to selected</button></div>
+          <input class="search" placeholder="Search name or NPI…" />
+        </div>
+        <div class="triage-wrap" id="tw">
+          <div>
+            <div style="overflow:auto;max-height:430px;border:1px solid var(--border);border-radius:var(--radius);">
+            <table>
+              <thead><tr><th style="width:1.4rem;"><input type="checkbox" checked></th><th>Status</th><th>Operation</th><th>Practitioner</th><th>Individual NPI</th><th>Specialty</th><th>Locs</th><th>Iss.</th><th></th></tr></thead>
+              <tbody>
+                <tr class="trow error create"><td><input type="checkbox"></td><td><span class="badge b-error"><span class="dot"></span>Error</span></td><td><span class="op op-create">&#65291; Create</span></td><td><b>Aarti Agarwal</b></td><td class="mono">1144883521</td><td>Otolaryngology</td><td>3</td><td>2</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+                <tr class="trow warning create"><td><input type="checkbox" checked></td><td><span class="badge b-warning"><span class="dot"></span>Warning</span></td><td><span class="op op-create">&#65291; Create</span></td><td><b>Jessica De Sabato</b></td><td class="mono">1639675168</td><td>Radiology, Diagnostic</td><td><b>24</b></td><td>1</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+                <tr class="trow ready create"><td><input type="checkbox" checked></td><td><span class="badge b-ready"><span class="dot"></span>Ready</span></td><td><span class="op op-create">&#65291; Create</span></td><td><b>Som Biswas</b></td><td class="mono">1558937722</td><td>Radiology, Diagnostic</td><td>5</td><td>0</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+                <tr class="trow ready add"><td><input type="checkbox" checked></td><td><span class="badge b-ready"><span class="dot"></span>Ready</span></td><td><span class="op op-add">&#8644; Add</span></td><td><b>Michael Kimball</b> <span class="muted mono">(PIE 10000141396)</span></td><td class="mono">1306160338</td><td>Surgery</td><td>1</td><td>0</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+                <tr class="trow warning create"><td><input type="checkbox" checked></td><td><span class="badge b-warning"><span class="dot"></span>Warning</span></td><td><span class="op op-create">&#65291; Create</span></td><td><b>Syed Anwarulislam</b></td><td class="mono">1932518123</td><td>Radiology, Diagnostic</td><td>3</td><td>1</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+                <tr class="trow ready remove"><td><input type="checkbox" checked></td><td><span class="badge b-ready"><span class="dot"></span>Ready</span></td><td><span class="op op-remove">&#10006; Remove/Term</span></td><td><b>Thomas Grookett</b> <span class="muted mono">(loc 30000122556)</span></td><td class="mono">1033356027</td><td>Internal Medicine</td><td>2</td><td>0</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+                <tr class="trow ready add"><td><input type="checkbox" checked></td><td><span class="badge b-ready"><span class="dot"></span>Ready</span></td><td><span class="op op-add">&#8644; Add</span></td><td><b>Kirby Giacomucci</b></td><td class="mono">1497391874</td><td>Surgery</td><td>1</td><td>0</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+                <tr class="trow error remove"><td><input type="checkbox"></td><td><span class="badge b-error"><span class="dot"></span>Error</span></td><td><span class="op op-remove">&#10006; Remove/Term</span></td><td><b>Corey Taylor</b></td><td class="mono">1326400789</td><td>Oral &amp; Maxillofacial</td><td>1</td><td>1</td><td><button class="btn" style="padding:.2rem .55rem;" onclick="openDrawer()">Review &rsaquo;</button></td></tr>
+              </tbody>
+            </table>
+            </div>
+            <div class="muted" style="margin-top:.4rem;">Showing 1&ndash;8 of 17 &middot; one row per practitioner (64 source rows collapsed) &middot; mixed add/remove supported in one file (Cooper)</div>
+          </div>
+
+          <!-- DRAWER -->
+          <div class="drawer" id="drawer">
+            <div class="drawer-head">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div><b style="font-size:.95rem;">Aarti Agarwal</b> &middot; <span class="mono">NPI 1144883521</span></div>
+                <button class="btn" style="padding:.15rem .5rem;" onclick="closeDrawer()">&times; Close</button>
+              </div>
+              <div style="margin-top:.35rem;display:flex;gap:.5rem;align-items:center;">
+                <span class="badge b-error"><span class="dot"></span>Error</span>
+                <span class="muted">Issues (2): <a href="#">Taxonomy unresolved</a> &middot; <a href="#">Corporate Receipt Date missing</a></span>
+              </div>
+              <label style="display:flex;align-items:center;gap:.35rem;margin-top:.4rem;font-size:.78rem;color:var(--txt-2);"><input type="checkbox"> Show all fields (incl. empty optional)</label>
+            </div>
+
+            <!-- FS1 identity -->
+            <div class="acc open"><div class="acc-head" onclick="acc(this)"><span class="left"><span class="chev">&rsaquo;</span> 1 &middot; Practitioner Identity</span><span class="badge b-ready"><span class="dot"></span>OK</span></div>
+              <div class="acc-body">
+                <div class="fld"><label>First Name</label><div class="val">Aarti</div></div>
+                <div class="fld"><label>Middle</label><div class="val">M.</div></div>
+                <div class="fld"><label>Last Name</label><div class="val">Agarwal</div></div>
+                <div class="fld"><label>DOB</label><div class="val">1991-09-24</div></div>
+                <div class="fld"><label>Gender Identity</label><div class="val">Female</div></div>
+                <div class="fld"><label>Provider Role</label><div class="val">Specialist</div></div>
+              </div>
+            </div>
+
+            <!-- FS2 NPI/taxonomy -->
+            <div class="acc open"><div class="acc-head" onclick="acc(this)"><span class="left"><span class="chev">&rsaquo;</span> 2 &middot; NPI, Specialties &amp; Taxonomy</span><span class="badge b-error"><span class="dot"></span>Error</span></div>
+              <div class="acc-body">
+                <div class="fld"><label>Individual NPI</label><div class="val">1144883521</div></div>
+                <div class="fld"><label>Primary Taxonomy</label><div class="val missing">Otolaryngology &mdash; code not resolved to CareTaxonomy</div></div>
+                <div class="fld"><label>Provider Type</label><div class="val">MD</div></div>
+              </div>
+            </div>
+
+            <!-- FS3 licenses -->
+            <div class="acc"><div class="acc-head" onclick="acc(this)"><span class="left"><span class="chev">&rsaquo;</span> 3 &middot; Licenses &amp; DEA/CDS</span><span class="pill">2</span></div>
+              <div class="acc-body">
+                <table><thead><tr><th>State</th><th>Type</th><th>Number</th><th>Exp</th></tr></thead>
+                <tbody><tr><td>PA</td><td>Medical</td><td class="mono">MD###### </td><td>2026-12-31</td></tr><tr><td>NJ</td><td>Medical</td><td class="mono">25MA######</td><td>2026-06-30</td></tr></tbody></table>
+              </div>
+            </div>
+
+            <!-- FS4 board -->
+            <div class="acc"><div class="acc-head" onclick="acc(this)"><span class="left"><span class="chev">&rsaquo;</span> 4 &middot; Board Certifications</span><span class="pill">1</span></div>
+              <div class="acc-body"><table><thead><tr><th>Cert</th><th>Specialty</th><th>Issue</th><th>Exp</th></tr></thead><tbody><tr><td>ABOto</td><td>Otolaryngology</td><td>2020-08</td><td>2030-08</td></tr></tbody></table></div>
+            </div>
+
+            <!-- FS9 locations -->
+            <div class="acc open"><div class="acc-head" onclick="acc(this)"><span class="left"><span class="chev">&rsaquo;</span> 9 &middot; Locations</span><span class="pill">3</span></div>
+              <div class="acc-body">
+                <table><thead><tr><th>Operation</th><th>Address match</th><th>Address</th><th>City/State</th><th>Phone</th></tr></thead>
+                <tbody>
+                  <tr><td><span class="op op-create">&#65291; Create+link grp #3</span></td><td><span class="badge b-completed" style="font-size:.65rem;"><span class="dot"></span>Matched</span></td><td>2211 Chapel Ave W, Ste 403</td><td>Cherry Hill, NJ</td><td>(856) 922-5030</td></tr>
+                  <tr><td><span class="op op-create">&#65291; Create+link grp #1</span></td><td><span class="badge b-completed" style="font-size:.65rem;"><span class="dot"></span>Matched</span></td><td>925 Chestnut St, 6th Fl</td><td>Philadelphia, PA</td><td>(215) 955-6760</td></tr>
+                  <tr><td><span class="op op-add">&#8644; Add address+link</span></td><td><span class="badge b-queued" style="font-size:.65rem;"><span class="dot"></span>New address</span></td><td>3998 Red Lion Rd, Ste 203</td><td>Philadelphia, PA</td><td>(215) 612-5390</td></tr>
+                </tbody></table>
+                <div class="muted" style="margin-top:.3rem;font-size:.72rem;">Address match resolved server-side (Precisely + existing-<code>HealthcareFacility</code> lookup); display-only here.</div>
+              </div>
+            </div>
+
+            <!-- FS10 system -->
+            <div class="acc"><div class="acc-head" onclick="acc(this)"><span class="left"><span class="chev">&rsaquo;</span> 10 &middot; Application / Case (system)</span><span class="badge b-error"><span class="dot"></span>Error</span></div>
+              <div class="acc-body">
+                <div class="fld"><label>Corp Receipt Date</label><div class="val missing">Required &mdash; missing</div></div>
+                <div class="fld"><label>Effective From</label><div class="val">2025-09-12</div></div>
+                <div class="fld"><label>Form Type</label><div class="val sys">Delegated Practitioner (default)</div></div>
+                <div class="fld"><label>Cred Status</label><div class="val sys">Credentialed (system-set)</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ---------- STEP 5: APPLY NETWORKS ---------- -->
+      <div class="screen" id="s5net">
+        <div class="banner info" style="margin-top:0;"><svg width="16" height="16" viewBox="0 0 24 24" style="fill:#014486"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg> Pick networks <b>once</b> and apply to <b>all</b> submitting practitioners. This is global &mdash; not per practitioner. Selection creates one <code>HealthcareFacilityNetwork</code> per practitioner &times; facility &times; network.</div>
+        <div style="font-weight:700;margin:.8rem 0 .3rem;">Select networks <span class="muted" style="font-weight:400;">from catalog (HealthcarePayerNetwork &middot; 136 available)</span></div>
+        <div class="row-2" style="align-items:stretch;">
+          <div style="border:1px solid var(--border);border-radius:var(--radius);">
+            <div class="card-head" style="padding:.5rem .7rem;border-bottom:1px solid var(--border);"><b>Available (136)</b><input class="search" placeholder="Search networks…" style="min-width:140px;"/></div>
+            <div style="max-height:240px;overflow:auto;padding:.3rem .5rem;">
+              <label style="display:flex;gap:.45rem;padding:.25rem 0;align-items:center;"><input type="checkbox"> Independence HMO Medicare</label>
+              <label style="display:flex;gap:.45rem;padding:.25rem 0;align-items:center;"><input type="checkbox"> Independence PPO Limited</label>
+              <label style="display:flex;gap:.45rem;padding:.25rem 0;align-items:center;"><input type="checkbox"> Independence Behavioral Health HMO Focus Medicare</label>
+              <label style="display:flex;gap:.45rem;padding:.25rem 0;align-items:center;"><input type="checkbox"> Lyra</label>
+              <label style="display:flex;gap:.45rem;padding:.25rem 0;align-items:center;"><input type="checkbox"> Ginger IO of California Medical PC</label>
+              <label style="display:flex;gap:.45rem;padding:.25rem 0;align-items:center;color:var(--txt-3);">…122 more</label>
+            </div>
+          </div>
+          <div style="border:1px solid var(--blue-bd);border-radius:var(--radius);background:#fbfdff;">
+            <div class="card-head" style="padding:.5rem .7rem;border-bottom:1px solid var(--border);"><b style="color:var(--brand);">Selected (10)</b><button class="btn" style="padding:.15rem .5rem;">Save as preset</button></div>
+            <div style="max-height:240px;overflow:auto;padding:.4rem .5rem;display:flex;flex-wrap:wrap;gap:.35rem;">
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>AmeriHealth HMO &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>Amerihealth PPO &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>Independence PPO Medicare &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>Independence HMO Medicare &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>Keystone HMO &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>Keystone POS &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>AmeriHealth PA HMO &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>AmeriHealth NJ PPO &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>Personal Choice PPO &times;</span>
+              <span class="badge b-running" style="background:var(--blue-bg);"><span class="dot" style="animation:none;"></span>DirectPOS &times;</span>
+            </div>
+          </div>
+        </div>
+        <div class="banner warn"><svg width="16" height="16" viewBox="0 0 24 24" style="fill:#8a4b00;flex:0 0 auto"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg> <b>10 networks</b> &times; <b>12 practitioners</b> (CREATE + ADD) &times; their facilities &asymp; <b>~430 HealthcareFacilityNetwork</b> records. <b>2 Remove/Term</b> rows are excluded (they end existing memberships).</div>
+        <div class="legend">
+          <b>Schema:</b> picker source = <code>HealthcarePayerNetwork</code>; output = <code>HealthcareFacilityNetwork</code> (<code>PayerNetworkId</code> = each selected network, <code>PractitionerFacilityId</code> = the created/affiliated HCPF). Built by <code>PLRelatedBatch</code> (E17/E18). Networks apply to CREATE/ADD only; Remove/Term ignore them.
+        </div>
+      </div>
+
+      <!-- ---------- STEP 6: SUBMIT/MONITOR ---------- -->
+      <div class="screen" id="s6">
+        <div class="success-hero">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17l-3.88-3.88L4 13.41 9 18.41l11-11L18.59 6z"/></svg>
+          <div>
+            <div style="font-weight:700;font-size:.95rem;">Roster submitted &mdash; 14 practitioners queued (11 Create &middot; 1 Add &middot; 2 Remove/Term)</div>
+            <div class="muted">Async Job <a href="#">AJ-0004821</a> created &middot; one Case Manager per Create/Add &middot; <b>10 networks</b> applied to all &middot; processing runs in the background. You can close this window.</div>
+          </div>
+        </div>
+
+        <div style="font-weight:700;margin-bottom:.3rem;">Batch-step progress <span class="muted" style="font-weight:400;">(PRM_AsyncJobDetails__c)</span></div>
+        <div class="stats">
+          <div class="stat"><div class="stat-label">Total Steps</div><div class="stat-num">5</div></div>
+          <div class="stat completed"><div class="stat-label">&#10003; Completed</div><div class="stat-num">2</div></div>
+          <div class="stat running"><div class="stat-label">&#10227; Running</div><div class="stat-num">1</div></div>
+          <div class="stat queued"><div class="stat-label">&#9203; Queued</div><div class="stat-num">2</div></div>
+          <div class="stat failed"><div class="stat-label">&#10007; Failed</div><div class="stat-num">0</div></div>
+        </div>
+        <div class="bar"><span class="b-done" style="width:40%"></span><span class="b-run" style="width:20%"></span><span class="b-queue" style="width:40%"></span></div>
+
+        <div class="toolbar">
+          <div class="muted">&#8635; Last refreshed: Jun 25, 2:46 PM &middot; finish alert via notification bell</div>
+          <div style="display:flex;gap:.5rem;"><button class="btn"><svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6a6 6 0 11-6 6H4a8 8 0 108-8z"/></svg>Refresh</button></div>
+        </div>
+        <div style="overflow:auto;border:1px solid var(--border);border-radius:var(--radius);">
+        <table>
+          <thead><tr><th>Seq</th><th>Batch Step</th><th>Mode</th><th>Status</th><th>Records</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><b>PractitionerBatch</b></td><td>Batch</td><td><span class="badge b-completed"><span class="dot"></span>Completed</span></td><td>14</td><td class="muted">&mdash;</td></tr>
+            <tr><td>2</td><td><b>PracticeLocationAndGroupBatch</b></td><td>Batch</td><td><span class="badge b-completed"><span class="dot"></span>Completed</span></td><td>61</td><td class="muted">&mdash;</td></tr>
+            <tr><td>3</td><td><b>GroupRelatedBatch</b></td><td>Batch</td><td><span class="badge b-running"><span class="dot"></span>&#10227; Running</span></td><td>—</td><td class="muted">&mdash;</td></tr>
+            <tr><td>4</td><td><b>PLRelatedBatch</b></td><td>Batch</td><td><span class="badge b-queued"><span class="dot"></span>Queued</span></td><td>—</td><td class="muted">&mdash;</td></tr>
+            <tr><td>5</td><td><b>Level4RecordCreationBatch</b></td><td>Batch</td><td><span class="badge b-queued"><span class="dot"></span>Queued</span></td><td>—</td><td class="muted">&mdash;</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="legend">
+          <b>On failure:</b> the chain halts; failed step &rarr; <code>PRM_FailedRecordStaging__c</code> (DLQ) + <code>PRM_ExceptionLog__c</code>; <b>Retry</b> &rarr; <code>PRM_AsyncOrchestrator.retry(detailIds)</code> (manual, uncapped, resumes from the failed step). Per-practitioner status also visible on each <b>IndividualApplication</b> via <code>prmAsyncJobProgress</code>.<br>
+          <b style="color:#dd7a01;">Backend addition needed:</b> this in-wizard panel keys on the whole submission, so add <code>PRM_AsyncJobProgressController.getProgressByJob(Id asyncJobId)</code> (existing <code>getProgress</code> is keyed by <code>caseManagerId</code>).
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ===== FOOT ===== -->
+    <div class="modal-foot">
+      <button class="btn btn--neutral" id="backBtn" onclick="prev()">&lsaquo; Back</button>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <button class="btn btn--neutral">Cancel</button>
+        <button class="btn btn--brand" id="nextBtn" onclick="next()">Submit 14 Practitioners</button>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="muted" style="text-align:center;margin-top:1rem;font-size:.75rem;">SLDS reference mockup for <b>prmRosterUpload</b> &mdash; click the step path (top) or Back/Next to move between screens; click <b>Review</b> in the triage grid to open the detail drawer.</p>
+</div>
+
+<script>
+  const ids = {1:'s1',2:'s2',3:'s3',4:'s4',5:'s5net',6:'s6'};
+  const labels = {1:'Next: Map Columns',2:'Next: Validate',3:'Reviewing…',4:'Apply Networks',5:'Submit 14 Practitioners',6:'Done'};
+  let step = 4; // start on triage to showcase the core screen
+  function render(){
+    for(const n in ids){ document.getElementById(ids[n]).classList.toggle('active', Number(n)===step); }
+    document.querySelectorAll('.pstep').forEach((el,idx)=>{
+      const n=idx+1; el.classList.toggle('active', n===step); el.classList.toggle('done', n<step);
+    });
+    document.getElementById('backBtn').style.visibility = step===1?'hidden':'visible';
+    document.getElementById('nextBtn').textContent = labels[step];
+    document.getElementById('nextBtn').style.visibility = step===6?'hidden':'visible';
+  }
+  function go(n){ step=n; render(); }
+  function next(){ if(step<6){step++;render();} }
+  function prev(){ if(step>1){step--;render();} }
+  function acc(h){ h.parentElement.classList.toggle('open'); }
+  function openDrawer(){ document.getElementById('tw').classList.add('open'); }
+  function closeDrawer(){ document.getElementById('tw').classList.remove('open'); }
+  let statusFilter='all', opFilter='allop';
+  function applyTriageFilter(){
+    document.querySelectorAll('.trow').forEach(r=>{
+      const okStatus = (statusFilter==='all'||r.classList.contains(statusFilter));
+      const okOp = (opFilter==='allop'||r.classList.contains(opFilter));
+      r.style.display = (okStatus&&okOp)?'':'none';
+    });
+  }
+  function filterTriage(el,kind){
+    document.querySelectorAll('#s4 .tabs .tab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+    statusFilter=kind; applyTriageFilter();
+  }
+  function filterOp(el,kind){
+    document.querySelectorAll('#s4 .optabs .optab').forEach(t=>t.classList.remove('active')); el.classList.add('active');
+    opFilter=kind; applyTriageFilter();
+  }
+  render();
+</script>
+</body>
+</html>

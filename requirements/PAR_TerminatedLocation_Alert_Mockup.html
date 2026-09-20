@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PAR Terminated Location Alert — Business Presentation</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Salesforce Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f3f2f2;color:#080707;font-size:14px}
+.deck-nav{position:fixed;top:0;left:0;right:0;z-index:999;background:#16325c;display:flex;align-items:center;gap:4px;padding:8px 16px;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.deck-nav a{color:#aac9e8;font-size:12px;text-decoration:none;padding:5px 10px;border-radius:4px;white-space:nowrap;transition:background .15s}
+.deck-nav a:hover,.deck-nav a.active{background:#0070d2;color:#fff}
+.deck-nav .logo{color:#fff;font-weight:700;font-size:13px;margin-right:12px;letter-spacing:.5px;border-right:1px solid #2e4f7a;padding-right:14px}
+.section{padding:88px 40px 56px;max-width:1100px;margin:0 auto}
+.section-title{font-size:22px;font-weight:700;color:#16325c;border-left:5px solid #0070d2;padding-left:14px;margin-bottom:8px}
+.section-subtitle{font-size:13px;color:#54698d;margin-bottom:28px;padding-left:19px}
+#cover{background:linear-gradient(135deg,#16325c 0%,#0070d2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 40px 40px}
+.cover-inner{max-width:800px;text-align:center}
+.cover-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;padding:4px 14px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:.5px;margin-bottom:20px}
+.cover-title{font-size:38px;font-weight:800;color:#fff;line-height:1.2;margin-bottom:16px}
+.cover-subtitle{font-size:17px;color:rgba(255,255,255,.8);margin-bottom:36px}
+.cover-pills{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.cover-pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:600}
+.cover-pill.red{background:rgba(194,57,52,.4);border-color:#e74c3c}
+.cover-pill.green{background:rgba(45,162,92,.35);border-color:#2ecc71}
+.cover-meta{color:rgba(255,255,255,.55);font-size:12px}
+.section-divider{height:4px;background:linear-gradient(90deg,#0070d2,#16325c,#2d7a4f)}
+.info-row{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.info-chip{background:#fff;border:1px solid #dddbda;border-radius:6px;padding:10px 16px;font-size:12px;color:#16325c;display:flex;flex-direction:column;gap:2px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.info-chip strong{font-size:20px;font-weight:800;color:#0070d2}
+.info-chip.red strong{color:#c23534}
+.info-chip.green strong{color:#2d7a4f}
+.problem-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.problem-card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.12);overflow:hidden}
+.problem-card-head{padding:12px 18px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:8px}
+.problem-card-head.red{background:#fce9e9;color:#c23534;border-bottom:2px solid #c23534}
+.problem-card-head.blue{background:#e8f4fb;color:#0070d2;border-bottom:2px solid #0070d2}
+.problem-card-body{padding:18px}
+.flow-steps{display:flex;flex-direction:column;gap:0}
+.flow-step{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f3f2f2}
+.flow-step:last-child{border-bottom:none}
+.step-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px}
+.step-num.grey{background:#ecebea;color:#54698d}
+.step-num.red{background:#fce9e9;color:#c23534}
+.step-label{font-size:13px;line-height:1.45}
+.step-label strong{display:block;font-weight:700;color:#16325c;margin-bottom:2px}
+.step-label span{color:#54698d;font-size:12px}
+.error-tag{display:inline-block;background:#c23534;color:#fff;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:600;margin-top:4px}
+.callout-box{background:#fff3cd;border:1px solid #f0ad4e;border-radius:6px;padding:14px 16px;margin-top:20px;font-size:13px;color:#7a5700;grid-column:1/-1}
+.callout-box strong{display:block;margin-bottom:4px;color:#5a3e00}
+.sf-shell{background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.15);overflow:hidden}
+.sf-global-nav{background:#16325c;height:48px;display:flex;align-items:center;padding:0 16px;gap:12px}
+.sf-logo{width:32px;height:32px;background:#0070d2;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:16px}
+.nav-items{display:flex;gap:2px}
+.nav-item{color:#aac9e8;font-size:12px;padding:6px 12px;border-radius:4px;cursor:default}
+.nav-item.active{background:rgba(255,255,255,.12);color:#fff}
+.nav-dots{margin-left:auto;color:#7bafd4;font-size:18px}
+.sf-tabs{background:#f3f2f2;display:flex;gap:0;border-bottom:1px solid #dddbda;padding:0 16px}
+.sf-tab{font-size:13px;padding:10px 18px;color:#54698d;cursor:default;border-bottom:3px solid transparent;white-space:nowrap}
+.sf-tab.active{color:#0070d2;border-bottom-color:#0070d2;font-weight:600}
+.sf-record-header{background:#fff;padding:14px 20px 0;border-bottom:1px solid #dddbda}
+.sf-record-crumb{font-size:11px;color:#0070d2;margin-bottom:4px}
+.sf-record-title-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.sf-record-icon{width:40px;height:40px;border-radius:4px;background:#e8830a;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;flex-shrink:0}
+.sf-record-title{font-size:20px;font-weight:700;color:#16325c}
+.sf-record-type{font-size:12px;color:#54698d}
+.sf-highlights{display:flex;gap:0;padding:0}
+.sf-highlight-item{flex:1;padding:10px 16px 14px;border-right:1px solid #f3f2f2}
+.sf-highlight-item:last-child{border-right:none}
+.sf-highlight-label{font-size:11px;color:#54698d;margin-bottom:3px}
+.sf-highlight-value{font-size:13px;font-weight:600;color:#16325c}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700}
+.badge-orange{background:#feede3;color:#a8490e}
+.badge-blue{background:#e8f4fb;color:#0070d2}
+.sf-path{background:#f3f2f2;padding:10px 20px;border-bottom:1px solid #dddbda;display:flex;gap:0;overflow-x:auto}
+.sf-path-step{font-size:11px;padding:6px 24px 6px 30px;background:#ecebea;color:#54698d;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%,14px 50%);white-space:nowrap;margin-left:-12px;font-weight:600}
+.sf-path-step:first-child{clip-path:polygon(0 0,calc(100% - 14px) 0,100% 50%,calc(100% - 14px) 100%,0 100%);margin-left:0}
+.sf-path-step.done{background:#2d7a4f;color:#fff}
+.sf-path-step.active{background:#0070d2;color:#fff}
+.alert-wrap{position:relative}
+.new-tag{position:absolute;top:-10px;right:16px;background:#0070d2;color:#fff;font-size:10px;font-weight:800;padding:2px 10px;border-radius:10px;letter-spacing:.5px;box-shadow:0 2px 6px rgba(0,112,210,.5);z-index:10}
+.sf-alert{margin:0;padding:16px 20px;border-left:6px solid #c23534;background:linear-gradient(135deg,#fff5f5 0%,#fff9f9 100%);border-bottom:1px solid #f5c6c6}
+.sf-alert-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sf-alert-icon{width:32px;height:32px;background:#c23534;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0}
+.sf-alert-title{font-size:15px;font-weight:700;color:#c23534}
+.sf-alert-body{font-size:13px;color:#3e3e3c;margin-bottom:14px;line-height:1.5}
+.sf-alert-table{width:100%;border-collapse:collapse;background:#fff;border-radius:6px;overflow:hidden;border:1px solid #f5c6c6;font-size:13px}
+.sf-alert-table th{background:#fce9e9;color:#7a1515;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:8px 14px;text-align:left;border-bottom:1px solid #f5c6c6}
+.sf-alert-table td{padding:10px 14px;border-bottom:1px solid #fce9e9;vertical-align:top}
+.sf-alert-table tr:last-child td{border-bottom:none}
+.loc-name{font-weight:700;color:#16325c}
+.loc-address{color:#54698d;font-size:12px;margin-top:2px}
+.loc-group{color:#54698d;font-size:11px;margin-top:2px}
+.term-date{color:#c23534;font-weight:600}
+.sf-alert-footer{font-size:12px;color:#7a1515;margin-top:12px;padding:10px 14px;background:#fce9e9;border-radius:4px;display:flex;align-items:flex-start;gap:8px}
+.sf-content-area{display:grid;grid-template-columns:2fr 1fr;gap:0;border-top:1px solid #dddbda;min-height:260px}
+.sf-main-col{padding:20px;border-right:1px solid #dddbda}
+.sf-side-col{padding:16px}
+.sf-field-group{margin-bottom:20px}
+.sf-field-group-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#54698d;margin-bottom:12px;padding-bottom:6px;border-bottom:1px solid #dddbda}
+.sf-fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.sf-field-label{font-size:11px;color:#54698d;margin-bottom:2px}
+.sf-field-value{font-size:13px;color:#16325c}
+.sf-field-value.link{color:#0070d2}
+.side-section{margin-bottom:16px}
+.side-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#54698d;margin-bottom:8px}
+.side-activity{font-size:12px;color:#54698d;padding:6px 0;border-bottom:1px solid #f3f2f2;display:flex;gap:8px;align-items:flex-start}
+.side-activity:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;margin-top:3px;flex-shrink:0}
+.ba-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.ba-card{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.12);overflow:hidden}
+.ba-card-head{padding:12px 18px;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+.ba-card-head.before{background:#fce9e9;color:#c23534}
+.ba-card-head.after{background:#ebf7ee;color:#2d7a4f}
+.ba-card-body{padding:18px}
+.ba-mini-sf{border:1px solid #dddbda;border-radius:6px;overflow:hidden;font-size:12px}
+.ba-sf-top{background:#16325c;height:28px;display:flex;align-items:center;padding:0 10px;gap:6px}
+.ba-sf-top span{width:8px;height:8px;border-radius:50%}
+.ba-sf-content{padding:10px}
+.ba-mini-alert{background:#fce9e9;border-left:4px solid #c23534;border-radius:4px;padding:8px 10px;font-size:11px;color:#c23534;margin-bottom:8px;font-weight:600}
+.ba-error-screen{background:#1e1e1e;border-radius:4px;padding:10px;font-family:monospace;font-size:11px;color:#e74c3c;margin-top:8px}
+.ba-error-screen .err-line{margin-bottom:3px}
+.ba-steps{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+.ba-step{display:flex;gap:10px;align-items:flex-start}
+.ba-step-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-top:1px}
+.ba-step-dot.red{background:#c23534}
+.ba-step-dot.green{background:#2d7a4f}
+.ba-step-text{font-size:12px;color:#3e3e3c;line-height:1.4}
+.ba-step-text strong{color:#16325c}
+.states-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:24px}
+.state-card{background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+.state-head{padding:10px 14px;font-weight:700;font-size:13px;border-bottom:2px solid}
+.state-body{padding:16px;font-size:12px;color:#54698d}
+.arch-diagram{background:#fff;border-radius:8px;box-shadow:0 1px 4px rgba(0,0,0,.12);padding:28px}
+.arch-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.arch-node{border-radius:8px;padding:10px 16px;font-size:12px;font-weight:600;text-align:center;min-width:130px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.arch-node .node-label{font-size:10px;font-weight:400;margin-top:2px;opacity:.8}
+.an-blue{background:#e8f4fb;color:#0070d2;border:1.5px solid #abd0e8}
+.an-orange{background:#feede3;color:#a8490e;border:1.5px solid #f4b77d}
+.an-green{background:#ebf7ee;color:#2d7a4f;border:1.5px solid #8dc9a4}
+.an-grey{background:#ecebea;color:#54698d;border:1.5px solid #c9c7c5}
+.an-red{background:#fce9e9;color:#c23534;border:1.5px solid #f5c6c6}
+.an-new{background:#0070d2;color:#fff;border:2px solid #005fb2;box-shadow:0 2px 8px rgba(0,112,210,.4);position:relative}
+.an-new::before{content:'NEW';position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:#0070d2;color:#fff;font-size:8px;font-weight:800;padding:1px 6px;border-radius:8px;letter-spacing:.5px;border:1.5px solid #fff}
+.arch-arrow{font-size:18px;color:#54698d;flex-shrink:0}
+.arch-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding-top:16px;border-top:1px solid #f3f2f2;font-size:12px;color:#54698d}
+.arch-legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.sprint-table{width:100%;border-collapse:collapse;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.sprint-table th{background:#16325c;color:#fff;padding:12px 16px;text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.sprint-table td{padding:12px 16px;border-bottom:1px solid #f3f2f2;font-size:13px;vertical-align:top}
+.sprint-table tr:last-child td{border-bottom:none}
+.sprint-table tr:nth-child(even) td{background:#fafaf9}
+.sprint-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap}
+.sp-p0{background:#fce9e9;color:#c23534}
+.sp-p1{background:#feede3;color:#a8490e}
+.sp-this{background:#e8f4fb;color:#0070d2}
+.sp-next{background:#f3f2f2;color:#54698d}
+.sprint-row-head td{background:#f3f2f2;font-weight:700;color:#16325c;font-size:12px;text-transform:uppercase;letter-spacing:.3px}
+.comp-pill{background:#e8f4fb;color:#0070d2;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600;display:inline-block;margin:2px}
+.comp-pill.apex{background:#ebf7ee;color:#2d7a4f}
+.comp-pill.ip{background:#f3eefb;color:#6b37bf}
+.comp-pill.os{background:#feede3;color:#a8490e}
+.tag-new{display:inline-block;background:#0070d2;color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:800;letter-spacing:.5px;vertical-align:middle;margin-left:6px}
+.mt-16{margin-top:16px}
+.mt-24{margin-top:24px}
+.no-touch-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;font-size:12px}
+.no-touch-item{display:flex;gap:8px;align-items:flex-start}
+.timeline-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0}
+@media(max-width:768px){.problem-grid,.ba-grid,.states-grid,.no-touch-grid,.timeline-grid{grid-template-columns:1fr}.sf-content-area{grid-template-columns:1fr}.deck-nav{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<nav class="deck-nav">
+  <span class="logo">IBX PAR</span>
+  <a href="#cover" class="active">Overview</a>
+  <a href="#problem">Problem</a>
+  <a href="#mockup">Mockup</a>
+  <a href="#beforeafter">Before / After</a>
+  <a href="#architecture">Architecture</a>
+  <a href="#sprintplan">Sprint Plan</a>
+</nav>
+
+<!-- COVER -->
+<div id="cover">
+  <div class="cover-inner">
+    <div class="cover-badge">IBX Provider Network Management · PAR Credentialing</div>
+    <div class="cover-title">Terminated Practice Location<br>Alert — Case Manager Page</div>
+    <div class="cover-subtitle">Early-warning component to protect Credentialing Specialists from entering review flows that will fail at submit due to terminated practice locations.</div>
+    <div class="cover-pills">
+      <span class="cover-pill red">🚨 Production Bug · IA-0000096229</span>
+      <span class="cover-pill">Story: US-ALERT-01</span>
+      <span class="cover-pill">Priority: P0</span>
+      <span class="cover-pill green">⚡ Sprint 1 · 2–3 Days</span>
+    </div>
+    <div class="cover-meta">April 2026 · IBX Provider Network Credentialing · Independence Blue Cross</div>
+  </div>
+</div>
+<div class="section-divider"></div>
+
+<!-- PROBLEM -->
+<div id="problem" class="section">
+  <div class="section-title">The Problem</div>
+  <div class="section-subtitle">What is happening in production today</div>
+  <div class="info-row">
+    <div class="info-chip red"><strong>5</strong>Review flows affected<br><span style="color:#54698d;font-size:11px">App Review · PSV · QC · PDA · NMQC</span></div>
+    <div class="info-chip red"><strong>0</strong>Warnings shown today<br><span style="color:#54698d;font-size:11px">No early indication before error</span></div>
+    <div class="info-chip"><strong>2–3</strong>Workflows competing<br><span style="color:#54698d;font-size:11px">PAR · PDM · Provider Change all write to HCPF</span></div>
+    <div class="info-chip green"><strong>S</strong>Fix complexity<br><span style="color:#54698d;font-size:11px">2–3 days · Zero OmniScript changes</span></div>
+  </div>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-card-head red"><span>🔴</span> Current State — What Goes Wrong</div>
+      <div class="problem-card-body">
+        <div class="flow-steps">
+          <div class="flow-step"><div class="step-num grey">1</div><div class="step-label"><strong>PAR Form Submitted</strong><span>Practitioner selects Regional Women's Health Group LLC. HCPF created: PRM_CaseManager__c = IA-PAR-001</span></div></div>
+          <div class="flow-step"><div class="step-num grey">2</div><div class="step-label"><strong>PDM Terminates the Location</strong><span>Provider Change Request IA-0000093618 runs. PDM overwrites HCPF.PRM_CaseManager__c = IA-PDM-002. PAR link is now broken.</span></div></div>
+          <div class="flow-step"><div class="step-num grey">3</div><div class="step-label"><strong>Daily Script Runs (Bug 1331370)</strong><span>Nightly script re-stamps HCPF but does not check HealthcareFacility.PRM_Active__c before stamping.</span></div></div>
+          <div class="flow-step"><div class="step-num grey">4</div><div class="step-label"><strong>Specialist Opens App Review</strong><span>Opens IA-0000096229. No warning. Review appears to load normally.</span></div></div>
+          <div class="flow-step"><div class="step-num red">5</div><div class="step-label"><strong>Specialist Clicks Submit</strong><span>HCPF query returns 0 rows. EligibleForUpdate COUNTQUERY fires false positive. PRMDRPPractitionerDataUpdate fires with Error = true.</span><div class="error-tag">💥 Required Fields Missing</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-card-head blue"><span>🔍</span> Root Cause</div>
+      <div class="problem-card-body">
+        <div class="flow-steps">
+          <div class="flow-step"><div class="step-num grey">A</div><div class="step-label"><strong>HCPF.PRM_CaseManager__c is mutable</strong><span>PAR stamps PAR case ID. PDM termination and Provider Change batch OVERWRITE it. The PAR link is lost.</span></div></div>
+          <div class="flow-step"><div class="step-num grey">B</div><div class="step-label"><strong>All review flows filter by PRM_CaseManager__c</strong><span>PRMDRGetPractionerPracticeLocation and PRMExtractPracticeLocationToPractitionerFacility query WHERE PRM_CaseManager__c = PAR CaseManagerId — returns ZERO rows after PDM overwrote it.</span></div></div>
+          <div class="flow-step"><div class="step-num grey">C</div><div class="step-label"><strong>False-positive error triggered</strong><span>EligibleForUpdate COUNTQUERY sees PRM_Pending__c = true AND PRM_Active__c = false → assumes specialist deleted location → fires with Error = true.</span></div></div>
+          <div class="flow-step"><div class="step-num red">D</div><div class="step-label"><strong>Zero guard exists</strong><span>No check at any point validates whether the practice location is still active before the specialist reaches the submit step.</span><div class="error-tag">Gap: No early warning</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="callout-box">
+      <strong>📌 Affected Production Case: IA-0000096229 (Regional Women's Health Group LLC)</strong>
+      Practice location 247 Hurffville Crosskeys Rd Ste C3-8017 was terminated via IA-0000093618. Specialist Heather attempted App Review and received "Required Fields Missing" with no actionable guidance. This scenario affects any PAR case where the practice location is terminated between submission and review completion.
+    </div>
+  </div>
+</div>
+<div class="section-divider"></div>
+
+<!-- MOCKUP -->
+<div id="mockup" class="section">
+  <div class="section-title">Proposed Solution — Case Manager Alert <span class="tag-new">NEW</span></div>
+  <div class="section-subtitle">New LWC <code>prmTerminatedLocationAlert</code> placed at the very top of the IndividualApplication record page</div>
+  <div class="sf-shell">
+    <div class="sf-global-nav">
+      <div class="sf-logo">SF</div>
+      <div class="nav-items">
+        <div class="nav-item">Home</div>
+        <div class="nav-item active">Cases</div>
+        <div class="nav-item">Practitioners</div>
+        <div class="nav-item">PAR Review</div>
+      </div>
+      <div class="nav-dots">⋯</div>
+    </div>
+    <div class="sf-tabs">
+      <div class="sf-tab">Cases</div>
+      <div class="sf-tab active">IA-0000096229</div>
+      <div class="sf-tab">Regional Women's Health</div>
+    </div>
+    <div class="sf-record-header">
+      <div class="sf-record-crumb">Cases › IndividualApplication</div>
+      <div class="sf-record-title-row">
+        <div class="sf-record-icon">📋</div>
+        <div>
+          <div class="sf-record-title">IA-0000096229</div>
+          <div class="sf-record-type">PAR · Practitioner Participation Request</div>
+        </div>
+      </div>
+      <div class="sf-highlights">
+        <div class="sf-highlight-item"><div class="sf-highlight-label">Status</div><div class="sf-highlight-value"><span class="badge badge-orange">App Review</span></div></div>
+        <div class="sf-highlight-item"><div class="sf-highlight-label">Stage</div><div class="sf-highlight-value"><span class="badge badge-blue">Application Review</span></div></div>
+        <div class="sf-highlight-item"><div class="sf-highlight-label">Practitioner</div><div class="sf-highlight-value" style="color:#0070d2">Dr. Jane A. Smith, MD</div></div>
+        <div class="sf-highlight-item"><div class="sf-highlight-label">Submitted Date</div><div class="sf-highlight-value">03/14/2025</div></div>
+        <div class="sf-highlight-item"><div class="sf-highlight-label">Assigned To</div><div class="sf-highlight-value">Heather Johnson</div></div>
+      </div>
+    </div>
+    <div class="sf-path">
+      <div class="sf-path-step done">PAR Submitted</div>
+      <div class="sf-path-step done">PSV</div>
+      <div class="sf-path-step active">App Review</div>
+      <div class="sf-path-step">QC Review</div>
+      <div class="sf-path-step">PDA Review</div>
+      <div class="sf-path-step">Network Mgmt QC</div>
+      <div class="sf-path-step">Complete</div>
+    </div>
+
+    <!-- ALERT -->
+    <div class="alert-wrap">
+      <div class="new-tag">✨ NEW COMPONENT</div>
+      <div class="sf-alert">
+        <div class="sf-alert-header">
+          <div class="sf-alert-icon">⛔</div>
+          <div class="sf-alert-title">Terminated Practice Location(s) — Review Required</div>
+        </div>
+        <div class="sf-alert-body">
+          <strong>1 practice location on this application has been terminated via a Provider Change Request.</strong>
+          Opening any review flow (App Review, PSV, QC, PDA Review) will result in an error at the submit step.
+          Please take action before proceeding with the review.
+        </div>
+        <table class="sf-alert-table">
+          <thead>
+            <tr><th>Practice Location</th><th>Termination Date</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="loc-name">Regional Women's Health Group LLC</div>
+                <div class="loc-address">247 Hurffville Crosskeys Rd Ste C3-8017</div>
+                <div class="loc-address">Sewell, NJ 08080</div>
+                <div class="loc-group">Group: Regional Women's Health Group LLC</div>
+              </td>
+              <td><span class="term-date">12/15/2025</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="sf-alert-footer">
+          <span>ℹ️</span>
+          <span>Contact your credentialing supervisor to determine the correct action: update the practice location selection or close this case.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sf-content-area">
+      <div class="sf-main-col">
+        <div class="sf-field-group">
+          <div class="sf-field-group-title">Application Details</div>
+          <div class="sf-fields-grid">
+            <div><div class="sf-field-label">Application Type</div><div class="sf-field-value">Initial Credentialing</div></div>
+            <div><div class="sf-field-label">Request Type</div><div class="sf-field-value">Practitioner Participation</div></div>
+            <div><div class="sf-field-label">NPI</div><div class="sf-field-value">1234567890</div></div>
+            <div><div class="sf-field-label">Tax ID</div><div class="sf-field-value">23-9876543</div></div>
+            <div><div class="sf-field-label">Case Owner</div><div class="sf-field-value link">Heather Johnson</div></div>
+            <div><div class="sf-field-label">Related Case</div><div class="sf-field-value link">C-0000012345</div></div>
+          </div>
+        </div>
+        <div class="sf-field-group">
+          <div class="sf-field-group-title">Practitioner</div>
+          <div class="sf-fields-grid">
+            <div><div class="sf-field-label">Name</div><div class="sf-field-value link">Dr. Jane A. Smith, MD</div></div>
+            <div><div class="sf-field-label">Specialty</div><div class="sf-field-value">OB/GYN</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="sf-side-col">
+        <div class="side-section">
+          <div class="side-section-title">Activity</div>
+          <div class="side-activity"><div class="activity-dot" style="background:#c23534"></div><span><strong>Location terminated</strong> via IA-0000093618 · Dec 15 2025</span></div>
+          <div class="side-activity"><div class="activity-dot" style="background:#0070d2"></div><span>App Review assigned to Heather Johnson · Jan 8 2026</span></div>
+          <div class="side-activity"><div class="activity-dot" style="background:#ecebea"></div><span>PAR submitted · Mar 14 2025</span></div>
+        </div>
+        <div class="side-section">
+          <div class="side-section-title">Related</div>
+          <div style="font-size:12px;color:#54698d;padding:4px 0">📎 PSV Review · Completed</div>
+          <div style="font-size:12px;color:#54698d;padding:4px 0">📋 App Review · In Progress</div>
+          <div style="font-size:12px;color:#0070d2;padding:4px 0;cursor:pointer">+ View all related records</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Query anchor chips -->
+  <div class="mt-24" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+    <div style="background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.1);border-left:4px solid #0070d2">
+      <div style="font-size:11px;color:#54698d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Query Anchor</div>
+      <div style="font-size:13px;color:#16325c;font-weight:600">PractitionerId (AccountId)</div>
+      <div style="font-size:12px;color:#54698d;margin-top:4px">Never overwritten by PDM. IndividualApplication.AccountId passed as PractitionerId to the DataRaptor.</div>
+    </div>
+    <div style="background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.1);border-left:4px solid #2d7a4f">
+      <div style="font-size:11px;color:#54698d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Termination Signal</div>
+      <div style="font-size:13px;color:#16325c;font-weight:600">HealthcareFacility.PRM_EffectiveTo__c != null</div>
+      <div style="font-size:12px;color:#54698d;margin-top:4px">Stamped only by formal termination flows (PDM, Provider Change, Account Term). Error records get EffectiveTo = null. Not affected by PDM CaseManager overwrite.</div>
+    </div>
+    <div style="background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.1);border-left:4px solid #c23534">
+      <div style="font-size:11px;color:#54698d;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Component Classification</div>
+      <div style="font-size:13px;color:#16325c;font-weight:600">EffectiveTo != null AND PRM_Active = false</div>
+      <div style="font-size:12px;color:#54698d;margin-top:4px">DR returns ALL HCPF rows. Component JS classifies: EffectiveTo stamped + Active = false = Terminated. De-duplicates by FacilityId before rendering.</div>
+    </div>
+  </div>
+</div>
+<div class="section-divider"></div>
+
+<!-- BEFORE / AFTER -->
+<div id="beforeafter" class="section">
+  <div class="section-title">Before vs. After</div>
+  <div class="section-subtitle">Specialist experience with and without US-ALERT-01</div>
+  <div class="ba-grid">
+    <div class="ba-card">
+      <div class="ba-card-head before">🔴 Before — Current State</div>
+      <div class="ba-card-body">
+        <div class="ba-mini-sf">
+          <div class="ba-sf-top"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span><span style="font-size:11px;color:#aaa;margin-left:8px">IA-0000096229 · App Review</span></div>
+          <div class="ba-sf-content">
+            <div style="background:#f3f2f2;height:28px;border-radius:4px;margin-bottom:8px;display:flex;align-items:center;padding:0 10px;font-size:11px;color:#54698d">🏥 Highlights Panel — Status: App Review · Practitioner: Dr. Jane Smith</div>
+            <div style="background:#e8f4fb;height:18px;border-radius:4px;margin-bottom:8px;font-size:11px;color:#0070d2;display:flex;align-items:center;padding:0 8px">▶ Path: PAR Submitted › PSV Done › App Review (active) › QC › PDA › Complete</div>
+            <div style="font-size:11px;color:#54698d;margin-bottom:4px;font-style:italic">← No warning. Specialist proceeds into review normally.</div>
+            <div style="background:#fce9e9;border:1px solid #f5c6c6;border-radius:4px;padding:8px;margin-top:8px">
+              <div style="font-size:11px;font-weight:700;color:#c23534;margin-bottom:4px">⚠ After clicking "Launch App Review" and completing the form:</div>
+              <div class="ba-error-screen">
+                <div class="err-line">ERROR: Required Fields Missing</div>
+                <div class="err-line" style="color:#aaa">PRMDRPPractitionerDataUpdate</div>
+                <div class="err-line" style="color:#aaa">EligibleForUpdate = true (false positive)</div>
+                <div class="err-line" style="color:#aaa">HCPF query returned 0 rows</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="ba-steps mt-16">
+          <div class="ba-step"><div class="ba-step-dot red">1</div><div class="ba-step-text"><strong>No warning on page.</strong> Specialist has no idea there is a problem.</div></div>
+          <div class="ba-step"><div class="ba-step-dot red">2</div><div class="ba-step-text"><strong>Specialist completes full review.</strong> Reviews all fields, enters data — work is lost.</div></div>
+          <div class="ba-step"><div class="ba-step-dot red">3</div><div class="ba-step-text"><strong>"Required Fields Missing" at submit.</strong> No actionable message. Specialist calls support.</div></div>
+          <div class="ba-step"><div class="ba-step-dot red">4</div><div class="ba-step-text"><strong>Escalation to IT.</strong> Root cause investigation. Case stalled.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="ba-card">
+      <div class="ba-card-head after">🟢 After — With US-ALERT-01</div>
+      <div class="ba-card-body">
+        <div class="ba-mini-sf">
+          <div class="ba-sf-top"><span style="background:#ff5f57"></span><span style="background:#febc2e"></span><span style="background:#28c840"></span><span style="font-size:11px;color:#aaa;margin-left:8px">IA-0000096229 · Case Manager</span></div>
+          <div class="ba-sf-content">
+            <div class="ba-mini-alert">⛔ Terminated Practice Location(s) — Review Required<div style="font-weight:400;margin-top:3px;font-size:10px">Regional Women's Health Group LLC · 247 Hurffville Crosskeys Rd · Terminated 12/15/2025</div></div>
+            <div style="background:#f3f2f2;height:28px;border-radius:4px;margin-bottom:8px;display:flex;align-items:center;padding:0 10px;font-size:11px;color:#54698d">🏥 Highlights Panel — Status: App Review</div>
+            <div style="background:#e8f4fb;height:18px;border-radius:4px;font-size:11px;color:#0070d2;display:flex;align-items:center;padding:0 8px">▶ Path: PAR Submitted › PSV Done › App Review (active) › ...</div>
+          </div>
+        </div>
+        <div class="ba-steps mt-16">
+          <div class="ba-step"><div class="ba-step-dot green">1</div><div class="ba-step-text"><strong>Alert fires on page load.</strong> Specialist sees terminated location before opening any review.</div></div>
+          <div class="ba-step"><div class="ba-step-dot green">2</div><div class="ba-step-text"><strong>Location name, address, termination date shown.</strong> Specialist has full context to decide.</div></div>
+          <div class="ba-step"><div class="ba-step-dot green">3</div><div class="ba-step-text"><strong>Specialist contacts supervisor.</strong> Informed decision: update location or close the case.</div></div>
+          <div class="ba-step"><div class="ba-step-dot green">4</div><div class="ba-step-text"><strong>Zero wasted time in broken review flow.</strong> No cryptic errors. No IT escalation needed.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3 Render States -->
+  <div class="states-grid">
+    <div class="state-card">
+      <div class="state-head" style="background:#ebf7ee;color:#2d7a4f;border-color:#8dc9a4">✅ State 1 — No Alert</div>
+      <div class="state-body" style="text-align:center;padding:28px 16px">
+        <div style="font-size:28px;margin-bottom:8px">🔲</div>
+        <div style="color:#3e3e3c;font-weight:600;margin-bottom:4px">Nothing Rendered</div>
+        <div>All locations active. Component has zero visual footprint. No noise for the specialist.</div>
+      </div>
+    </div>
+    <div class="state-card">
+      <div class="state-head" style="background:#fce9e9;color:#c23534;border-color:#f5c6c6">⛔ State 2 — Alert Active</div>
+      <div class="state-body">
+        <div style="border-left:4px solid #c23534;padding:8px 10px;background:#fff5f5;border-radius:4px;margin-bottom:8px;font-size:11px;color:#c23534;font-weight:600">Terminated Practice Location(s) — Review Required</div>
+        <div style="font-size:11px;color:#3e3e3c">Red border · Error icon · Location table with name, address, termination date · Singular or plural message · Footer advisory</div>
+      </div>
+    </div>
+    <div class="state-card">
+      <div class="state-head" style="background:#f3f2f2;color:#54698d;border-color:#dddbda">⚠ State 3 — DR Error Fallback</div>
+      <div class="state-body">
+        <div style="border-left:4px solid #e8a202;padding:8px 10px;background:#fff3cd;border-radius:4px;margin-bottom:8px;font-size:11px;color:#7a5700">⚠ Unable to verify practice location status at this time. Please check manually before opening a review flow.</div>
+        <div style="font-size:11px;color:#3e3e3c">Page never crashes. Neutral tone. Rest of record loads normally.</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="section-divider"></div>
+
+<!-- ARCHITECTURE -->
+<div id="architecture" class="section">
+  <div class="section-title">Solution Architecture</div>
+  <div class="section-subtitle">3 components · Zero changes to existing OmniScripts, Integration Procedures, or DataRaptors</div>
+  <div class="arch-diagram">
+    <div class="arch-row">
+      <div class="arch-node an-orange">IndividualApplication<div class="node-label">Record Page Load</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node an-new">prmTerminatedLocationAlert<div class="node-label">New LWC Component</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node an-blue">AccountId (PractitionerId)<div class="node-label">Passed imperatively on load</div></div>
+    </div>
+    <div class="arch-row"><div style="font-size:24px;color:#0070d2">↓</div></div>
+    <div class="arch-row">
+      <div class="arch-node an-grey">PractitionerId<div class="node-label">= AccountId from record</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node an-new">PRMDREPractitionerLocationsAlert<div class="node-label">New DataRaptor Extract</div></div>
+      <div class="arch-arrow">→</div>
+      <div class="arch-node an-blue" style="min-width:200px">HealthcarePractitionerFacility<div class="node-label">WHERE PractitionerId = :id AND RecordType = PRM_PractitionerLocationAffiliation · All rows returned · Component flags: EffectiveTo != null AND PRM_Active = false</div></div>
+    </div>
+    <div class="arch-row"><div style="font-size:24px;color:#0070d2">↓</div></div>
+    <div class="arch-row">
+      <div class="arch-node an-green">0 Results<div class="node-label">Render nothing</div></div>
+      <div style="font-size:13px;color:#54698d;font-weight:600;padding:0 8px">or</div>
+      <div class="arch-node an-red">1+ Results<div class="node-label">Render red alert banner</div></div>
+      <div style="font-size:13px;color:#54698d;font-weight:600;padding:0 8px">or</div>
+      <div class="arch-node an-grey">DR Error / Timeout<div class="node-label">Render neutral fallback</div></div>
+    </div>
+    <div class="arch-row"><div style="font-size:24px;color:#0070d2">↓</div></div>
+    <div class="arch-row">
+      <div class="arch-node an-new" style="min-width:320px">PRM_CaseManagerRecordPage.flexipage<div class="node-label">prmTerminatedLocationAlert added as TOP component · 1-line change</div></div>
+    </div>
+    <div class="arch-legend">
+      <div class="arch-legend-item"><div class="legend-dot" style="background:#0070d2"></div>New (US-ALERT-01)</div>
+      <div class="arch-legend-item"><div class="legend-dot" style="background:#a8490e"></div>Existing Salesforce object</div>
+      <div class="arch-legend-item"><div class="legend-dot" style="background:#2d7a4f"></div>No alert path</div>
+      <div class="arch-legend-item"><div class="legend-dot" style="background:#c23534"></div>Alert path</div>
+      <div class="arch-legend-item"><div class="legend-dot" style="background:#ecebea"></div>Unchanged</div>
+    </div>
+  </div>
+
+  <div class="mt-24" style="background:#fff;border-radius:8px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.1)">
+    <div style="font-size:14px;font-weight:700;color:#16325c;margin-bottom:14px">✅ What Is NOT Touched — Zero Regression Risk</div>
+    <div class="no-touch-grid">
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>PRM_InitialCredentialAppReview_English v28</strong> — not modified</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>PRM_PrimarySourceVerificationReview_English</strong> — not modified</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>PRM_InitialCredPDAQC_English v15</strong> — not modified</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>All Integration Procedures</strong> — not modified</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>All existing DataRaptors</strong> — not modified</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>HCPF.PRM_CaseManager__c field</strong> — not changed</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>PDM / Provider Change flows</strong> — not modified</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>PRM_CaseManagerAssociation__c</strong> — not involved</span></div>
+      <div class="no-touch-item"><span style="color:#2d7a4f;font-size:16px;flex-shrink:0;margin-top:-1px">✓</span><span><strong>All other page components</strong> — order and behavior unchanged</span></div>
+    </div>
+  </div>
+</div>
+<div class="section-divider"></div>
+
+<!-- SPRINT PLAN -->
+<div id="sprintplan" class="section">
+  <div class="section-title">Implementation Plan & Sprint Roadmap</div>
+  <div class="section-subtitle">Tactical fix now · Permanent architectural fix in subsequent sprints</div>
+
+  <table class="sprint-table">
+    <thead>
+      <tr>
+        <th style="width:120px">Sprint</th>
+        <th style="width:220px">What Gets Built</th>
+        <th>Components</th>
+        <th style="width:80px">Effort</th>
+        <th style="width:140px">Outcome</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="sprint-row-head"><td colspan="5">🏃 Sprint 1 — Tactical Fix (Deploy Immediately)</td></tr>
+      <tr>
+        <td><span class="sprint-badge sp-this">Sprint 1</span><br><span style="font-size:11px;color:#54698d">US-ALERT-01</span></td>
+        <td><strong>Case Manager Alert Component</strong><div style="font-size:11px;color:#54698d;margin-top:3px">Alert on IndividualApplication page when terminated HCPF found by PractitionerId</div></td>
+        <td><span class="comp-pill">LWC: prmTerminatedLocationAlert</span><span class="comp-pill">DR: PRMDREPractitionerLocationsAlert</span><span class="comp-pill">Flexipage: PRM_CaseManagerRecordPage</span></td>
+        <td><span class="sprint-badge sp-p0">P0 · S</span></td>
+        <td style="font-size:12px;color:#2d7a4f;font-weight:600">Specialists warned before entering broken review flows</td>
+      </tr>
+      <tr>
+        <td><span class="sprint-badge sp-this">Sprint 1</span><br><span style="font-size:11px;color:#54698d">US5</span></td>
+        <td><strong>Daily Script Guard</strong><div style="font-size:11px;color:#54698d;margin-top:3px">Add PRM_Active__c = true check before stamping CaseManager ID (bug 1331370)</div></td>
+        <td><span class="comp-pill apex">Apex: Daily Script (bug 1331370)</span></td>
+        <td><span class="sprint-badge sp-p0">P0 · XS</span></td>
+        <td style="font-size:12px;color:#2d7a4f;font-weight:600">Stops new cases from being linked to terminated locations</td>
+      </tr>
+      <tr class="sprint-row-head"><td colspan="5">🏗 Sprint 2 — Permanent Foundation (CMA Architecture)</td></tr>
+      <tr>
+        <td><span class="sprint-badge sp-next">Sprint 2</span><br><span style="font-size:11px;color:#54698d">US6 + US7</span></td>
+        <td><strong>PAR Form Creates CMA Records + CMA-Based DR</strong><div style="font-size:11px;color:#54698d;margin-top:3px">PRM_CaseManagerAssociation__c records created during PAR submission. All review flows query via CMA.</div></td>
+        <td><span class="comp-pill apex">Apex: CaseManagerAssociationService</span><span class="comp-pill ip">IP: PRM_CreatePractitionerAddressRecords</span><span class="comp-pill">DR: PRMDREGetPARCaseHCPFViaCMA</span><span class="comp-pill apex">Batch: PRM_PARCMABackfillBatch</span></td>
+        <td><span class="sprint-badge sp-p0">P0 · L</span></td>
+        <td style="font-size:12px;color:#54698d">Root cause fixed. HCPF resolution immune to PDM overwrites.</td>
+      </tr>
+      <tr class="sprint-row-head"><td colspan="5">🚦 Sprint 3 — In-Flow Hard Blocks</td></tr>
+      <tr>
+        <td><span class="sprint-badge sp-next">Sprint 3</span><br><span style="font-size:11px;color:#54698d">US8 · US9 · US10</span></td>
+        <td><strong>Step 1 Hard Block — App Review, PSV, QC</strong><div style="font-size:11px;color:#54698d;margin-top:3px">Warning on Step 1 with Update Locations / Close Case action buttons. Cannot bypass.</div></td>
+        <td><span class="comp-pill os">OmniScript: AppReview v28</span><span class="comp-pill os">OmniScript: PSV v47</span><span class="comp-pill os">OmniScript: QC</span><span class="comp-pill ip">IP: App Review Load</span></td>
+        <td><span class="sprint-badge sp-p0">P0 · L</span></td>
+        <td style="font-size:12px;color:#54698d">Enforcement at workflow entry. Specialist cannot bypass.</td>
+      </tr>
+      <tr>
+        <td><span class="sprint-badge sp-next">Sprint 3</span><br><span style="font-size:11px;color:#54698d">US11 · US12</span></td>
+        <td><strong>PDA + NMQC Informational Banners</strong><div style="font-size:11px;color:#54698d;margin-top:3px">Amber informational notice (not hard block). PDA and NMQC reviewers informed, can still submit.</div></td>
+        <td><span class="comp-pill os">OmniScript: PRM_InitialCredPDAQC_English v15</span><span class="comp-pill ip">IP: PRM_FetchFormPDAReview_Procedure_24</span></td>
+        <td><span class="sprint-badge" style="background:#f3eefb;color:#6b37bf">P1 · M</span></td>
+        <td style="font-size:12px;color:#54698d">All 5 review flows fully protected.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Timeline -->
+  <div class="mt-24" style="background:#fff;border-radius:8px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.1)">
+    <div style="font-size:14px;font-weight:700;color:#16325c;margin-bottom:20px">Visual Timeline</div>
+    <div class="timeline-grid">
+      <div style="border-right:2px dashed #dddbda;padding-right:20px">
+        <div style="background:#0070d2;color:#fff;border-radius:6px;padding:8px 12px;font-weight:700;font-size:13px;margin-bottom:12px;text-align:center">Sprint 1 · NOW</div>
+        <div style="font-size:12px;color:#3e3e3c;line-height:1.6">✅ <strong>Bleeding stopped</strong><br>• Alert on Case Manager page<br>• Daily script guard<br><span style="color:#2d7a4f;font-weight:600">🩹 Workaround in place</span></div>
+      </div>
+      <div style="border-right:2px dashed #dddbda;padding:0 20px">
+        <div style="background:#16325c;color:#fff;border-radius:6px;padding:8px 12px;font-weight:700;font-size:13px;margin-bottom:12px;text-align:center">Sprint 2 · FOUNDATION</div>
+        <div style="font-size:12px;color:#3e3e3c;line-height:1.6">🏗 <strong>Root cause addressed</strong><br>• CMA records for PAR<br>• Review flows query via CMA<br><span style="color:#0070d2;font-weight:600">🔧 Architecture fixed</span></div>
+      </div>
+      <div style="padding-left:20px">
+        <div style="background:#2d7a4f;color:#fff;border-radius:6px;padding:8px 12px;font-weight:700;font-size:13px;margin-bottom:12px;text-align:center">Sprint 3 · COMPLETE</div>
+        <div style="font-size:12px;color:#3e3e3c;line-height:1.6">🏁 <strong>Full enforcement</strong><br>• In-flow hard blocks (App/PSV/QC)<br>• PDA + NMQC informational<br><span style="color:#2d7a4f;font-weight:600">✅ All flows protected</span></div>
+      </div>
+    </div>
+    <div style="margin-top:20px;padding:14px 16px;background:#ebf7ee;border-radius:6px;border-left:4px solid #2d7a4f;font-size:13px;color:#1a5235">
+      <strong>Key point for business:</strong> Sprint 1 requires no OmniScript or Integration Procedure changes — just 1 new LWC, 1 new DataRaptor, and a flexipage update. Deployable in days. Sprints 2–3 (US6–US12) run in parallel as the proper permanent solution. Sprint 1 buys us the time to do it right.
+    </div>
+  </div>
+
+  <div style="margin-top:36px;text-align:center;font-size:11px;color:#54698d;padding-bottom:24px">
+    PAR Terminated Location Alert · US-ALERT-01 · IBX Provider Network Management · April 2026<br>
+    <span style="color:#0070d2">PAR_TerminatedLocation_CaseManagerAlert_UserStory.md</span>
+  </div>
+</div>
+
+<script>
+const links=document.querySelectorAll('.deck-nav a');
+const sections=[...document.querySelectorAll('[id]')];
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-100)cur=s.id});
+  links.forEach(l=>l.classList.toggle('active',l.getAttribute('href')==='#'+cur));
+});
+links.forEach(l=>l.addEventListener('click',e=>{
+  e.preventDefault();
+  const t=document.querySelector(l.getAttribute('href'));
+  if(t)t.scrollIntoView({behavior:'smooth'});
+}));
+</script>
+</body>
+</html>

@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBX PIE — 2027 Priorities: Grounded ROM & Roadmap</title>
+<style>
+  :root {
+    --ibx-blue:    #003087;
+    --ibx-med:     #0057B8;
+    --ibx-light:   #009CDE;
+    --ibx-teal:    #00B4C8;
+    --ibx-green:   #00A651;
+    --ibx-orange:  #F47920;
+    --ibx-red:     #E22C2C;
+    --ibx-gold:    #F5A623;
+    --ibx-purple:  #7A5CC0;
+    --ibx-bg:      #F4F7FB;
+    --ibx-card:    #FFFFFF;
+    --ibx-border:  #D0DFF0;
+    --ibx-text:    #1A2B45;
+    --ibx-muted:   #5A7090;
+    --ibx-shadow:  rgba(0,48,135,0.12);
+    --radius:      14px;
+    --radius-sm:   8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--ibx-bg);
+    color: var(--ibx-text);
+    line-height: 1.6;
+  }
+
+  /* ── SLIDE WRAPPER ── */
+  .deck { width: 100%; }
+  .slide {
+    min-height: 100vh;
+    padding: 56px 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    page-break-after: always;
+  }
+  .slide + .slide { border-top: 6px solid var(--ibx-blue); }
+
+  /* ── BACKGROUNDS ── */
+  .slide-hero {
+    background: linear-gradient(135deg, #001B4E 0%, var(--ibx-blue) 55%, var(--ibx-med) 100%);
+    color: #fff;
+  }
+  .slide-dark {
+    background: linear-gradient(150deg, #0A1F44 0%, #003087 100%);
+    color: #fff;
+  }
+  .slide-light { background: var(--ibx-bg); }
+  .slide-white { background: #fff; }
+
+  /* ── TYPOGRAPHY ── */
+  .overline {
+    font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
+    text-transform: uppercase; opacity: .75; margin-bottom: 12px;
+  }
+  h1 { font-size: 52px; font-weight: 800; line-height: 1.1; }
+  h2 { font-size: 36px; font-weight: 800; line-height: 1.15; }
+  h3 { font-size: 24px; font-weight: 700; }
+  h4 { font-size: 17px; font-weight: 700; }
+  .lead { font-size: 21px; opacity: .88; margin-top: 18px; max-width: 820px; }
+  .caption { font-size: 13px; color: var(--ibx-muted); }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--ibx-card);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 24px var(--ibx-shadow);
+    padding: 22px 26px;
+    border: 1px solid var(--ibx-border);
+  }
+  .card-dark {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    color: #fff;
+    backdrop-filter: blur(6px);
+  }
+  .card-accent { border-left: 5px solid var(--ibx-light); }
+  .card-green  { border-left: 5px solid var(--ibx-green); }
+  .card-orange { border-left: 5px solid var(--ibx-orange); }
+  .card-gold   { border-left: 5px solid var(--ibx-gold); }
+  .card-red    { border-left: 5px solid var(--ibx-red); }
+  .card-purple { border-left: 5px solid var(--ibx-purple); }
+
+  /* ── GRIDS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 22px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+  .grid-2-1 { display: grid; grid-template-columns: 1.9fr 1fr; gap: 24px; align-items: start; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 24px; }
+
+  /* ── BIG NUMBERS ── */
+  .big-num {
+    font-size: 56px; font-weight: 900; line-height: 1;
+    letter-spacing: -2px;
+  }
+  .big-num-sm {
+    font-size: 38px; font-weight: 900; line-height: 1.1;
+    letter-spacing: -1px;
+  }
+  .big-label { font-size: 12.5px; font-weight: 600; opacity: .7; margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* ── STAT BOXES ── */
+  .stat-box {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    box-shadow: 0 3px 16px var(--ibx-shadow);
+    text-align: center;
+    border-top: 4px solid var(--ibx-light);
+  }
+  .stat-box.green  { border-top-color: var(--ibx-green); }
+  .stat-box.orange { border-top-color: var(--ibx-orange); }
+  .stat-box.gold   { border-top-color: var(--ibx-gold); }
+  .stat-box.red    { border-top-color: var(--ibx-red); }
+  .stat-box.purple { border-top-color: var(--ibx-purple); }
+
+  /* ── BADGE ── */
+  .badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .6px;
+  }
+  .badge-blue   { background: #E0EEFF; color: var(--ibx-blue); }
+  .badge-green  { background: #E0F7EC; color: #006633; }
+  .badge-orange { background: #FFF0E0; color: #C05A00; }
+  .badge-gold   { background: #FFF8E0; color: #7A5000; }
+  .badge-red    { background: #FFE8E8; color: #990000; }
+  .badge-teal   { background: #E0F8FC; color: #006080; }
+  .badge-purple { background: #EEE8FB; color: #4B2E9E; }
+
+  /* ── EFFORT CARD ── */
+  .effort-card {
+    background: linear-gradient(150deg, #0A1F44, #003087);
+    color: #fff; border-radius: var(--radius);
+    padding: 22px 24px; text-align: center;
+    box-shadow: 0 6px 20px rgba(0,48,135,0.28);
+  }
+  .effort-card .ai-num { font-size: 46px; font-weight: 900; line-height: 1; color: #7CF0BE; letter-spacing: -1px; }
+  .effort-card .ai-lab { font-size: 11px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,.7); }
+  .effort-card .base   { font-size: 13px; color: rgba(255,255,255,.82); margin-top: 10px; }
+  .effort-card .chips  { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
+
+  /* ── TABLE ── */
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  thead tr { background: var(--ibx-blue); color: #fff; }
+  thead th { padding: 12px 14px; text-align: left; font-weight: 600; font-size: 12.5px; }
+  tbody tr:nth-child(even) { background: #F4F7FB; }
+  tbody tr:hover { background: #E8F0FA; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid #E2EBF8; vertical-align: middle; }
+  .td-green  { color: var(--ibx-green);  font-weight: 700; }
+  .td-red    { color: var(--ibx-red);    font-weight: 700; }
+  .td-orange { color: var(--ibx-orange); font-weight: 700; }
+  .td-blue   { color: var(--ibx-blue);   font-weight: 700; }
+
+  /* ── LISTS ── */
+  .check-list { display: flex; flex-direction: column; gap: 9px; }
+  .check-list .ci { display: flex; align-items: flex-start; gap: 10px; font-size: 13.5px; }
+  .check-list .ci .mk { font-size: 15px; margin-top: 1px; flex-shrink: 0; }
+  .mk-blue  { color: var(--ibx-med); }
+  .mk-green { color: var(--ibx-green); }
+
+  /* ── PILL LIST ── */
+  .pill-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .pill {
+    padding: 5px 13px; border-radius: 20px;
+    font-size: 12.5px; font-weight: 600;
+    background: var(--ibx-bg);
+    border: 1.5px solid var(--ibx-border);
+    color: var(--ibx-text);
+  }
+  .pill.new  { background: #E8F0FF; border-color: #99BBEE; color: var(--ibx-blue); }
+  .pill.reuse{ background: #E8FFF2; border-color: #99DDC0; color: #006633; }
+
+  /* ── SECTION HEADER ── */
+  .slide-header { margin-bottom: 28px; }
+  .slide-header .overline { color: var(--ibx-light); }
+
+  /* ── DIVIDER ── */
+  .divider { border: none; border-top: 2px solid var(--ibx-border); margin: 20px 0; }
+  .divider-light { border-color: rgba(255,255,255,0.2); }
+
+  /* ── ICON CIRCLE ── */
+  .icon-circle {
+    width: 50px; height: 50px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .icon-blue   { background: #E0EEFF; }
+  .icon-green  { background: #E0F7EC; }
+  .icon-orange { background: #FFF0E0; }
+  .icon-gold   { background: #FFF8E0; }
+  .icon-teal   { background: #E0F8FC; }
+  .icon-purple { background: #EEE8FB; }
+
+  /* ── HIGHLIGHT BOX ── */
+  .highlight {
+    background: linear-gradient(135deg, #EBF3FF, #F0F8FF);
+    border: 2px solid var(--ibx-light);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+  }
+  .highlight-gold {
+    background: linear-gradient(135deg, #FFFBE8, #FFF6D0);
+    border: 2px solid var(--ibx-gold);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+  }
+
+  /* ── FOOTER ── */
+  .slide-footer {
+    position: absolute; bottom: 22px; left: 72px; right: 72px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 11px; color: var(--ibx-muted);
+    border-top: 1px solid var(--ibx-border); padding-top: 10px;
+  }
+  .slide-footer.dark-footer { color: rgba(255,255,255,0.5); border-top-color: rgba(255,255,255,0.15); }
+
+  /* ── REUSE METER ── */
+  .reuse-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+  .reuse-label { min-width: 260px; font-size: 14px; font-weight: 600; }
+  .reuse-bar-wrap { flex: 1; background: #E2EBF8; border-radius: 8px; height: 22px; overflow: hidden; }
+  .reuse-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 700; color: #fff; }
+  .reuse-pct { min-width: 50px; font-size: 14px; font-weight: 800; text-align: right; }
+
+  /* ── FEATURE TAG ── */
+  .ftag {
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(255,255,255,0.14); color:#fff;
+    padding:4px 12px; border-radius:20px; font-size:12px; font-weight:700;
+  }
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 1 — TITLE / HERO
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-hero" id="s1">
+  <div style="max-width:940px">
+    <div class="overline" style="color:rgba(255,255,255,0.75)">IBX Provider Information Exchange (PIE) · Salesforce · July 2026</div>
+    <h1 style="color:#fff; margin-bottom:18px; font-size:54px;">
+      2027 Priorities<br>Grounded ROM &amp; Delivery Roadmap
+    </h1>
+    <div style="width:84px; height:5px; background:var(--ibx-teal); border-radius:3px; margin-bottom:26px;"></div>
+    <p class="lead" style="color:rgba(255,255,255,0.92);">
+      Nine business priorities, each estimated the honest way — <strong>audit the codebase → write a high-level TDD → size it in developer-days</strong>, baseline and AI-assisted. No FY2025 shortcuts.
+    </p>
+    <div style="margin-top:44px; display:flex; gap:40px; flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div class="big-num" style="color:var(--ibx-gold);">9</div>
+        <div class="big-label" style="color:rgba(255,255,255,0.7);">Business Priorities</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="big-num" style="color:#90FFD0;">990–1,444</div>
+        <div class="big-label" style="color:rgba(255,255,255,0.7);">AI-Assisted Dev-Days</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="big-num" style="color:var(--ibx-teal);">4.3–6.3</div>
+        <div class="big-label" style="color:rgba(255,255,255,0.7);">Developer-Years</div>
+      </div>
+      <div style="text-align:center;">
+        <div class="big-num" style="color:#fff;">5–7</div>
+        <div class="big-label" style="color:rgba(255,255,255,0.7);">Senior Engineers, Full Year</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer dark-footer">
+    <span>Independence Blue Cross · Provider Network Management · PIE on Salesforce</span>
+    <span>Confidential · For Internal Planning</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 2 — HOW WE ESTIMATED
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s2">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">How We Estimated</div>
+    <h2>Grounded, not guessed — audit → TDD → estimate, one feature at a time</h2>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:28px; align-items:start;">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">🔎 A repeatable method for every priority</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">1.</span><div><strong>Audit</strong> the real codebase, OmniStudio assets, and requirement docs — what exists today vs. what's net-new.</div></div>
+          <div class="ci"><span class="mk mk-blue">2.</span><div><strong>Write a high-level TDD</strong> — objects, services, flows, integration points, and the risky edges.</div></div>
+          <div class="ci"><span class="mk mk-blue">3.</span><div><strong>Confirm scope</strong> with the business through targeted clarifying questions before sizing.</div></div>
+          <div class="ci"><span class="mk mk-blue">4.</span><div><strong>Size in developer-days</strong> — a baseline number and an AI-assisted number, with a t-shirt size and a confidence rating.</div></div>
+        </div>
+      </div>
+      <div class="card card-orange">
+        <h4 style="margin-bottom:8px;">📈 Why this is higher than the first pass</h4>
+        <p style="font-size:13.5px; color:var(--ibx-muted);">
+          The FY2025-anchored first pass summed to ~600–1,100 story points. The grounded re-estimate is <strong>~1.6–2.7× higher</strong> on the big-ticket items — driven by work the anchors quietly omitted: all-5-flow tile redesign, real CAQH document retrieval, the versioning state-machine across ~30 objects, the async engine build, and the LexisNexis termination cascade.
+        </p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 style="margin-bottom:14px; color:var(--ibx-blue);">⚙️ AI-assisted multipliers (repo-calibrated)</h4>
+      <p style="font-size:13px; color:var(--ibx-muted); margin-bottom:16px;">The AI-assisted number applies realistic acceleration by work type — heavy on code &amp; tests, near-zero on UAT, integration, and OmniStudio publishing.</p>
+      <div class="reuse-row"><div class="reuse-label">Apex / service layer</div><div class="reuse-bar-wrap"><div class="reuse-fill" style="width:100%; background:linear-gradient(90deg,var(--ibx-green),var(--ibx-teal));">~3×</div></div></div>
+      <div class="reuse-row"><div class="reuse-label">Unit / integration tests</div><div class="reuse-bar-wrap"><div class="reuse-fill" style="width:100%; background:linear-gradient(90deg,var(--ibx-green),var(--ibx-teal));">~4×</div></div></div>
+      <div class="reuse-row"><div class="reuse-label">Lightning Web Components</div><div class="reuse-bar-wrap"><div class="reuse-fill" style="width:100%; background:linear-gradient(90deg,var(--ibx-green),var(--ibx-teal));">~3×</div></div></div>
+      <div class="reuse-row"><div class="reuse-label">OmniStudio (IP / DR / OS)</div><div class="reuse-bar-wrap"><div class="reuse-fill" style="width:50%; background:linear-gradient(90deg,var(--ibx-gold),var(--ibx-orange));">~1.5×</div></div></div>
+      <div class="reuse-row"><div class="reuse-label">Integration / E2E</div><div class="reuse-bar-wrap"><div class="reuse-fill" style="width:37%; background:linear-gradient(90deg,var(--ibx-orange),var(--ibx-red));">~1.1×</div></div></div>
+      <div class="reuse-row" style="margin-bottom:0;"><div class="reuse-label">UAT / business validation</div><div class="reuse-bar-wrap"><div class="reuse-fill" style="width:33%; background:linear-gradient(90deg,var(--ibx-orange),var(--ibx-red));">~1×</div></div></div>
+    </div>
+  </div>
+
+  <div class="highlight-gold">
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="icon-circle icon-gold" style="font-size:26px;">🧭</div>
+      <div>
+        <h4>Read the totals as a plan, not a shopping list</h4>
+        <p style="font-size:13.5px; color:var(--ibx-muted); margin-top:4px;">
+          Several priorities share foundations (async engine, versioned write model, QC routing, tile UI). Sequencing them foundation-first avoids paying twice — the overlap map on a later slide shows exactly where.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 2 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 3 — NINE PRIORITIES AT A GLANCE
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s3">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Portfolio Overview</div>
+    <h2>The nine priorities — scope, size, and effort at a glance</h2>
+  </div>
+
+  <table style="margin-bottom:18px;">
+    <thead>
+      <tr>
+        <th style="width:4%;">#</th>
+        <th style="width:24%;">Priority</th>
+        <th style="width:30%;">What it delivers</th>
+        <th style="text-align:center;">AI-Assisted</th>
+        <th style="text-align:center;">Baseline</th>
+        <th style="text-align:center;">Size</th>
+        <th style="text-align:center;">Confidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td class="td-blue">1</td><td><strong>PDM Efficiency + PEAR Self-Service</strong></td><td>Provider self-service edits + faster internal PDM</td><td class="td-green" style="text-align:center;">59–73</td><td style="text-align:center;">84–107</td><td style="text-align:center;"><span class="badge badge-orange">XL</span></td><td style="text-align:center;">Med</td></tr>
+      <tr><td class="td-blue">2</td><td><strong>Credentialing Enhancements</strong></td><td>5-flow tile redesign + CAQH documents + Agentic AI</td><td class="td-green" style="text-align:center;">211–281</td><td style="text-align:center;">322–421</td><td style="text-align:center;"><span class="badge badge-red">XXL</span></td><td style="text-align:center;">Mixed</td></tr>
+      <tr><td class="td-blue">3</td><td><strong>Enhanced Case Management</strong></td><td>Smart routing, defect fix, exception/hold + SLA</td><td class="td-green" style="text-align:center;">47–68</td><td style="text-align:center;">68–100</td><td style="text-align:center;"><span class="badge badge-orange">L–XL</span></td><td style="text-align:center;">Med</td></tr>
+      <tr><td class="td-blue">4</td><td><strong>Full Provider Data Versioning</strong></td><td>Effective-dated history across ~30 objects</td><td class="td-green" style="text-align:center;">220–270</td><td style="text-align:center;">475–490</td><td style="text-align:center;"><span class="badge badge-red">XXL</span></td><td style="text-align:center;">Med / High-risk</td></tr>
+      <tr><td class="td-blue">5</td><td><strong>Cred + PDM Integration</strong></td><td>Automated cred→PDM handoff + shared views</td><td class="td-green" style="text-align:center;">34–52</td><td style="text-align:center;">50–75</td><td style="text-align:center;"><span class="badge badge-gold">L</span></td><td style="text-align:center;">Med</td></tr>
+      <tr><td class="td-blue">6</td><td><strong>Inventory Management &amp; Reporting</strong></td><td>OOTB reports + integrity feeds + leadership views</td><td class="td-green" style="text-align:center;">44–74</td><td style="text-align:center;">61–110</td><td style="text-align:center;"><span class="badge badge-orange">L–XL</span></td><td style="text-align:center;">Low–Med</td></tr>
+      <tr><td class="td-blue">7</td><td><strong>Mass Data Load Capabilities</strong></td><td>Reusable async engine + 7+ mass operations</td><td class="td-green" style="text-align:center;">123–172</td><td style="text-align:center;">187–263</td><td style="text-align:center;"><span class="badge badge-red">XXL</span></td><td style="text-align:center;">Med</td></tr>
+      <tr><td class="td-blue">8</td><td><strong>Lexis Nexis + Compliance</strong></td><td>Inbound feeds, terminations + compliance envelope</td><td class="td-green" style="text-align:center;">82–134</td><td style="text-align:center;">117–185</td><td style="text-align:center;"><span class="badge badge-orange">XL</span></td><td style="text-align:center;">LN Med / Comp Low</td></tr>
+      <tr><td class="td-blue">9</td><td><strong>Stabilization &amp; Tech Debt</strong></td><td>Defect burn-down + reserved capacity envelope</td><td class="td-green" style="text-align:center;">170–320</td><td style="text-align:center;">230–400</td><td style="text-align:center;"><span class="badge badge-orange">L–XL</span></td><td style="text-align:center;">Med</td></tr>
+    </tbody>
+  </table>
+
+  <div class="grid-4" style="gap:16px;">
+    <div class="stat-box green"><div class="big-num-sm" style="color:var(--ibx-green);">990–1,444</div><div class="big-label">AI-assisted dev-days across all nine</div></div>
+    <div class="stat-box"><div class="big-num-sm" style="color:var(--ibx-blue);">1,594–2,151</div><div class="big-label">baseline dev-days (no AI assist)</div></div>
+    <div class="stat-box red"><div class="big-num-sm" style="color:var(--ibx-red);">3</div><div class="big-label">XXL programs (F2, F4, F7) run in parallel</div></div>
+    <div class="stat-box gold"><div class="big-num-sm" style="color:var(--ibx-gold);">~1.6–2.7×</div><div class="big-label">higher than the FY2025-anchored first pass</div></div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 3 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 4 — PRIORITY 1
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s4">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 1 · XL · Confidence: Medium</div>
+    <h2>PDM Efficiency + PEAR Provider Self-Service</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div>Balanced internal <strong>PDM efficiency</strong> + external <strong>PEAR self-service</strong>.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>PEAR: providers <strong>add / term locations, networks, and demographics</strong> themselves.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>PDM: <strong>self-serve simple field edits</strong> — cut the admin-ticket queue.</div></div>
+        </div>
+        <div class="pill-list">
+          <span class="pill">Locations</span><span class="pill">Networks</span><span class="pill">Demographics</span><span class="pill">Phone / Hours</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div>External edits route through <strong>mandatory QC</strong> (Case / Case Manager / CDM + CMA).</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Harden <strong>community FLS / security</strong> for provider-facing writes.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Extend existing <strong>PEAR OmniScripts + DataRaptors</strong> rather than rebuild.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Dev-Days</div>
+        <div class="ai-num">59–73</div>
+        <div class="base">Baseline: 84–107 dev-days</div>
+        <div class="chips"><span class="badge badge-orange">XL</span><span class="badge badge-blue">Confidence: Med</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">External self-service must enforce QC routing and a <strong>full audit trail</strong> — no direct provider writes to golden records.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">Consumes the <strong>F7 async engine</strong> for PEAR QC intake. Sequence after F7 starts.</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 4 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 5 — PRIORITY 2
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s5">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 2 · XXL · Confidence: Mixed</div>
+    <h2>Credentialing Enhancements — Tiles, CAQH Documents &amp; Agentic AI</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div>All <strong>5 credentialing flows</strong> re-platformed to the tile experience (~55 tiles).</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>Retrieve <strong>real CAQH document files</strong> — not just structured data.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Agentic AI</strong>: Phase 0 foundation + 2 pilot agents (human-in-the-loop).</div></div>
+        </div>
+        <div class="pill-list">
+          <span class="pill">App Review</span><span class="pill">PSV</span><span class="pill">QC</span><span class="pill">ReCred</span><span class="pill">PDA QC</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Shared <strong>tile + session framework</strong> across all flows (autosave, resume-anywhere).</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>CAQH document API</strong> → Salesforce Files + audit linkage.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Einstein <strong>Trust Layer</strong>, RAG grounding, human-in-loop, and an eval harness.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Dev-Days</div>
+        <div class="ai-num">211–281</div>
+        <div class="base">Baseline: 322–421 dev-days</div>
+        <div class="chips"><span class="badge badge-red">XXL</span><span class="badge badge-gold">Tile High / CAQH Low / Agentic Med</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">This is a <strong>multi-team program</strong>, not one feature. CAQH <strong>document</strong> API entitlement is unverified.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">The <strong>tile framework</strong> is reused across all flows and by the mass-update grid (F7).</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 5 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 6 — PRIORITY 3
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s6">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 3 · L–XL · Confidence: Medium</div>
+    <h2>Enhanced Case Management</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Smart + configurable</strong> case routing and assignment.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>Fix the <strong>duplicate-QC-case defect</strong>; fix queue &amp; owner-change permissions.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Exception / hold tracking</strong> + in-case tracker, worklists, and SLA aging.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Idempotent</strong> case creation to kill duplicates; skill + workload assignment engine.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Hold / exception model</strong> with reason codes and re-entry rules.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>SLA aging alerts</strong> + supervisor worklist views.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Dev-Days</div>
+        <div class="ai-num">47–68</div>
+        <div class="base">Baseline: 68–100 dev-days</div>
+        <div class="chips"><span class="badge badge-orange">L–XL</span><span class="badge badge-blue">Confidence: Med</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">Touches the <strong>shared review IP write path</strong> — meaningful regression surface across credentialing.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">Routing &amp; worklists are <strong>reused by F5</strong> (shared views) and <strong>F6</strong> (leadership inventory).</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 6 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 7 — PRIORITY 4
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s7">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 4 · XXL · Confidence: Med (High Risk)</div>
+    <h2>Full Provider Data Versioning</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Effective-dated versioning</strong> across ~30 provider objects.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>Drivers: <strong>compliance, point-in-time history, future &amp; back-dated</strong> changes.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Pinned-current</strong> model with version-up / version-down.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Version state-machine: <strong>pinned-current + version down/up + back-date + natural-key error-out</strong>.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Point-in-time query API</strong>; phased object tiers.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Heavy <strong>regression harness</strong> to protect the existing write paths.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Dev-Days</div>
+        <div class="ai-num">220–270</div>
+        <div class="base">Baseline: 475–490 dev-days</div>
+        <div class="chips"><span class="badge badge-red">XXL</span><span class="badge badge-red">High Risk</span></div>
+      </div>
+      <div class="card card-red"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">Regression blast radius of <strong>~501 Apex classes / 1,338 DataRaptors</strong>, plus <strong>7 business pre-conditions</strong> still open.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">The versioned write model <strong>underpins F5</strong> (no re-entry), <strong>F6</strong> (history feeds), and <strong>F8</strong> (terminations).</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 7 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 8 — PRIORITY 5
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s8">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 5 · L · Confidence: Medium</div>
+    <h2>Cred + PDM Integration</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Automated cred → PDM handoff</strong> — no manual re-entry.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Shared cross-team views</strong> + a unified data model.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>One-way direction; covers <strong>ReCred + Initial Cred</strong>.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Generalize <strong>RCAT eligibility → PDM push</strong>.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Cross-team worklist</strong> + shared record views.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Cred → PDM field mapping</strong> + de-duplication.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Net-New Dev-Days</div>
+        <div class="ai-num">34–52</div>
+        <div class="base">Baseline (net): 50–75 · gross 49–74 / 73–106</div>
+        <div class="chips"><span class="badge badge-gold">L</span><span class="badge badge-blue">Confidence: Med</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">Overlaps F3 &amp; F4 — <strong>booked net-new</strong> to avoid double-counting shared foundations.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">Builds directly on <strong>F3 worklists</strong> and the <strong>F4 versioned model</strong>. Sequence after both.</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 8 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 9 — PRIORITY 6
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s9">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 6 · L–XL · Confidence: Low–Medium</div>
+    <h2>Inventory Management &amp; Reporting</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>OOTB reports + dashboards</strong> for leadership and operations.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Integrity / operational feed</strong> automation.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Work-inventory &amp; backlog</strong> visibility for leadership.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Field-change extract engine</strong> for granular deltas.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Per-feed parity</strong> validation against source systems.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Throughput / backlog / aging</strong> dashboards.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Dev-Days</div>
+        <div class="ai-num">44–74</div>
+        <div class="base">Baseline: 61–110 dev-days</div>
+        <div class="chips"><span class="badge badge-orange">L–XL</span><span class="badge badge-gold">Confidence: Low–Med</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">The <strong>integrity-feed count is unknown</strong> — a discovery inventory gates the upper end of the range.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">Field-history source comes from <strong>F4</strong>; worklists / inventory from <strong>F3</strong>.</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 9 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 10 — PRIORITY 7
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s10">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 7 · XXL · Confidence: Medium · Foundational</div>
+    <h2>Mass Data Load Capabilities</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div>Build the <strong>reusable async mass-load engine</strong>.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Refactor 3 high-volume flows</strong> onto the engine.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>7+ distinct mass operations</strong> (CSV / bulk + QC routing).</div></div>
+        </div>
+        <div class="pill-list">
+          <span class="pill">Locations</span><span class="pill">Networks</span><span class="pill">Providers</span><span class="pill">NPI / Tax ID</span><span class="pill new">+ more</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>PRM_AsyncJob engine</strong>: orchestrator, batch, dead-letter queue, progress LWC.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Per-operation: <strong>payload validator + batch + QC routing</strong>.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Metadata-driven sequencing</strong>, halt-on-failure, and retry.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Dev-Days</div>
+        <div class="ai-num">123–172</div>
+        <div class="base">Baseline: 187–263 dev-days</div>
+        <div class="chips"><span class="badge badge-red">XXL</span><span class="badge badge-teal">Foundational</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">Engine is <strong>designed-not-built</strong>; the <strong>number of operations</strong> dominates effort — confirm the exact 7+ list.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">The engine is <strong>consumed by F1, F5, and F8</strong>. Build this first.</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 10 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 11 — PRIORITY 8
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s11">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 8 · XL · Confidence: LN Med / Compliance Low</div>
+    <h2>Lexis Nexis Integration + Compliance Mandates</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div>LexisNexis inbound: <strong>phone update, directory suppression</strong>.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Practitioner terminations</strong> + roster attestation.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>Compliance mandates: a <strong>discovery spike + reserved envelope</strong>.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Reuse <strong>PRM_AsyncProcess</strong> staging → Platform Event → batch → outbound.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Termination cascade</strong> (Full / Non-Par / Last-Man-Standing).</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div>Compliance <strong>sized after the discovery spike</strong>.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Dev-Days</div>
+        <div class="ai-num">82–134</div>
+        <div class="base">Baseline: 117–185 dev-days</div>
+        <div class="chips"><span class="badge badge-orange">XL</span><span class="badge badge-gold">LN Med / Comp Low</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">The <strong>termination cascade</strong> is a large hidden chunk; <strong>compliance scope is undefined</strong> until the spike.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">Uses the <strong>F4 versioned model</strong> for terminations and the <strong>F7 async engine</strong> for feeds.</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 11 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 12 — PRIORITY 9
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s12">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Priority 9 · L–XL · Confidence: Medium · Continuous</div>
+    <h2>System Stabilization &amp; Technical Debt Reduction</h2>
+  </div>
+
+  <div class="grid-2-1">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:10px;">✅ What we're delivering</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div>Burn down <strong>~40 documented defects / debt items</strong>.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>Reserve a <strong>~15–20% annual capacity envelope</strong>.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>Root-cause fixes</strong> for recurring failure classes.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:10px; color:var(--ibx-blue);">🛠️ How we'll build it (high-level TDD)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Triage &amp; register</strong>; prioritized burn-down.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Regression tests</strong> around every fix.</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Exclude items owned by F3 / F4 / F7</strong> to avoid double-counting.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:14px;">
+      <div class="effort-card">
+        <div class="ai-lab">AI-Assisted · Reserved Envelope</div>
+        <div class="ai-num">170–320</div>
+        <div class="base">Baseline: 230–400 · known backlog floor 59–108 / 94–171</div>
+        <div class="chips"><span class="badge badge-orange">L–XL</span><span class="badge badge-blue">Continuous</span></div>
+      </div>
+      <div class="card card-orange"><h4 style="margin-bottom:6px;">⚠️ Top risk</h4><p style="font-size:13px; color:var(--ibx-muted);">A continuous cost that <strong>competes directly with feature capacity</strong> — must be reserved, not assumed.</p></div>
+      <div class="card card-green"><h4 style="margin-bottom:6px;">🔁 Reuse / dependency</h4><p style="font-size:13px; color:var(--ibx-muted);">Runs <strong>across all four quarters</strong> alongside every other workstream.</p></div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 12 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 13 — OVERLAP / SHARED FOUNDATIONS
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-dark" id="s13">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-teal)">Read Before Summing</div>
+    <h2 style="color:#fff;">Shared foundations — don't pay for the same thing twice</h2>
+  </div>
+
+  <p style="font-size:16px; color:rgba(255,255,255,0.82); max-width:900px; margin-bottom:26px;">
+    Several priorities depend on the same building blocks. We book each foundation once with its <strong>primary owner</strong>, and the consumers reuse it. Sequencing foundation-first turns overlap into savings.
+  </p>
+
+  <table style="margin-bottom:24px; background:rgba(255,255,255,0.04); border-radius:10px; overflow:hidden;">
+    <thead>
+      <tr>
+        <th style="width:36%;">Shared foundation</th>
+        <th style="width:18%;">Primary owner</th>
+        <th>Also consumed by</th>
+      </tr>
+    </thead>
+    <tbody style="color:rgba(255,255,255,0.9);">
+      <tr style="background:rgba(255,255,255,0.03);"><td style="border-color:rgba(255,255,255,.1);"><strong>Async / bulk engine</strong> (PRM_AsyncJob__c)</td><td style="border-color:rgba(255,255,255,.1);"><span class="badge badge-teal">F7</span></td><td style="border-color:rgba(255,255,255,.1);">F1 (PEAR QC intake), F5</td></tr>
+      <tr><td style="border-color:rgba(255,255,255,.1);"><strong>External-submission QC routing</strong> (Case / CM / CDM + CMA)</td><td style="border-color:rgba(255,255,255,.1);"><span class="badge badge-teal">F1 / F7</span></td><td style="border-color:rgba(255,255,255,.1);">F3, F5, F8</td></tr>
+      <tr style="background:rgba(255,255,255,0.03);"><td style="border-color:rgba(255,255,255,.1);"><strong>Versioned / effective-dated write model</strong></td><td style="border-color:rgba(255,255,255,.1);"><span class="badge badge-teal">F4</span></td><td style="border-color:rgba(255,255,255,.1);">F5 (no re-entry), F6 (history feeds), F8 (termination)</td></tr>
+      <tr><td style="border-color:rgba(255,255,255,.1);"><strong>Analyst worklists / routing</strong></td><td style="border-color:rgba(255,255,255,.1);"><span class="badge badge-teal">F3</span></td><td style="border-color:rgba(255,255,255,.1);">F5 (shared views), F6 (leadership inventory)</td></tr>
+      <tr style="background:rgba(255,255,255,0.03);"><td style="border-color:rgba(255,255,255,.1);"><strong>Field-history data source</strong></td><td style="border-color:rgba(255,255,255,.1);"><span class="badge badge-teal">F4</span></td><td style="border-color:rgba(255,255,255,.1);">F6 (integrity feeds)</td></tr>
+      <tr><td style="border-color:rgba(255,255,255,.1);"><strong>Tile + session UI framework</strong></td><td style="border-color:rgba(255,255,255,.1);"><span class="badge badge-teal">F2</span></td><td style="border-color:rgba(255,255,255,.1);">F7 mass-update grid cells</td></tr>
+    </tbody>
+  </table>
+
+  <div class="grid-3" style="gap:18px;">
+    <div class="card-dark"><div style="font-size:26px; margin-bottom:8px;">🧱</div><h4 style="color:var(--ibx-teal); margin-bottom:6px;">Build foundations first</h4><p style="font-size:13px; color:rgba(255,255,255,0.75);">F7 async engine and F4 versioning are the two spines. Nearly everything else attaches to them.</p></div>
+    <div class="card-dark"><div style="font-size:26px; margin-bottom:8px;">🔗</div><h4 style="color:var(--ibx-gold); margin-bottom:6px;">Net-new is already deducted</h4><p style="font-size:13px; color:rgba(255,255,255,0.75);">F5 is booked net-of-overlap; F9 excludes items owned by F3/F4/F7. The totals won't double-count.</p></div>
+    <div class="card-dark"><div style="font-size:26px; margin-bottom:8px;">💸</div><h4 style="color:var(--ibx-orange); margin-bottom:6px;">Sequencing saves real effort</h4><p style="font-size:13px; color:rgba(255,255,255,0.75);">F7→F1, F4→(F5/F6/F8), F3→(F5/F6) reuse work already paid for elsewhere.</p></div>
+  </div>
+
+  <div class="slide-footer dark-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:rgba(255,255,255,0.7);">Slide 13 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 14 — TIMELINE / SEQUENCING
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s14">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Roadmap</div>
+    <h2>2027 delivery timeline &amp; sequencing — foundations first</h2>
+  </div>
+
+  <div style="margin-bottom:28px;">
+    <div style="display:grid; grid-template-columns: 150px repeat(4,1fr); gap:0; position:relative;">
+      <!-- Header row -->
+      <div></div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-blue); color:#fff; font-weight:700; font-size:13px; border-radius:8px 0 0 0;">Q1 2027<br><span style="font-weight:400; font-size:11px;">Foundations</span></div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-med); color:#fff; font-weight:700; font-size:13px;">Q2 2027<br><span style="font-weight:400; font-size:11px;">Build</span></div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-light); color:#fff; font-weight:700; font-size:13px;">Q3 2027<br><span style="font-weight:400; font-size:11px;">Scale</span></div>
+      <div style="text-align:center; padding:10px; background:var(--ibx-teal); color:#fff; font-weight:700; font-size:13px; border-radius:0 8px 0 0;">Q4 2027<br><span style="font-weight:400; font-size:11px;">Harden &amp; Cut Over</span></div>
+
+      <!-- Row 1: Async & Mass Load -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-blue); border-right:2px solid var(--ibx-border);">Async &amp; Mass Load</div>
+      <div style="padding:8px; background:#E8F4FF; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-blue); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F7 engine build</div></div>
+      <div style="padding:8px; background:#E8F4FF; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-med); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F7 first ops + F1 PEAR</div></div>
+      <div style="padding:8px; background:#E8F4FF; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-light); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F7 remaining mass ops</div></div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+
+      <!-- Row 2: Versioning -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-purple); border-right:2px solid var(--ibx-border);">Versioning</div>
+      <div style="padding:8px; background:#F3EFFC; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-purple); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F4 architecture</div></div>
+      <div style="padding:8px; background:#F3EFFC; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-purple); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F4 Tier-1 objects</div></div>
+      <div style="padding:8px; background:#F3EFFC; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-purple); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F4 Tier-2 / 3 objects</div></div>
+      <div style="padding:8px; background:#F3EFFC; border:1px solid var(--ibx-border);"><div style="background:#4B2E9E; color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F4 parity + cutover</div></div>
+
+      <!-- Row 3: Credentialing -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-orange); border-right:2px solid var(--ibx-border);">Credentialing</div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+      <div style="padding:8px; background:#FFF8F0; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-orange); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F2 tile framework (parallel team)</div></div>
+      <div style="padding:8px; background:#FFF8F0; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-orange); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F2 CAQH docs + flow migrations</div></div>
+      <div style="padding:8px; background:#FFF8F0; border:1px solid var(--ibx-border);"><div style="background:#C05A00; color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F2 Agentic pilots go-live</div></div>
+
+      <!-- Row 4: Case / Integration / Reporting -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-green); border-right:2px solid var(--ibx-border);">Case / Integ / Report</div>
+      <div style="padding:8px; background:#F0FFF8; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-green); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F3 routing + defect fix</div></div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+      <div style="padding:8px; background:#F0FFF8; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-green); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F5 integration + F6 reports</div></div>
+      <div style="padding:8px; background:#F0FFF8; border:1px solid var(--ibx-border);"><div style="background:#00874A; color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F6 integrity feeds + dashboards</div></div>
+
+      <!-- Row 5: Feeds & Compliance -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-teal); border-right:2px solid var(--ibx-border);">Feeds &amp; Compliance</div>
+      <div style="padding:8px; background:#F4F7FB; border:1px solid var(--ibx-border);"></div>
+      <div style="padding:8px; background:#E6F9FC; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-teal); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F8 LexisNexis on engine</div></div>
+      <div style="padding:8px; background:#E6F9FC; border:1px solid var(--ibx-border);"><div style="background:var(--ibx-teal); color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F8 terminations + spike</div></div>
+      <div style="padding:8px; background:#E6F9FC; border:1px solid var(--ibx-border);"><div style="background:#006E80; color:#fff; border-radius:6px; padding:7px 9px; font-size:11.5px; font-weight:600;">F8 compliance build</div></div>
+
+      <!-- Row 6: Stabilization (continuous) -->
+      <div style="display:flex; align-items:center; padding:8px; font-size:12px; font-weight:700; color:var(--ibx-muted); border-right:2px solid var(--ibx-border);">Stabilization (F9)</div>
+      <div style="grid-column: span 4; padding:8px; background:#FFFBF0; border:1px solid var(--ibx-border); border-radius:0 0 8px 8px;">
+        <div style="background:linear-gradient(90deg,var(--ibx-gold),var(--ibx-orange)); color:#fff; border-radius:6px; padding:8px 12px; font-size:11.5px; font-weight:700; text-align:center;">F9 — continuous ~15–20% reserved capacity across all four quarters</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="gap:16px;">
+    <div class="card card-accent"><h4 style="margin-bottom:8px;">🧱 Q1 — Foundations</h4><p style="font-size:13px; color:var(--ibx-muted);">Stand up the F7 async engine, start F4 architecture and F3 routing. Everything downstream depends on these.</p></div>
+    <div class="card card-green"><h4 style="margin-bottom:8px;">🚀 Q2–Q3 — Build &amp; Scale</h4><p style="font-size:13px; color:var(--ibx-muted);">F1 + F8 on the engine; F4 object tiers; F2 tiles on a parallel team; F5/F6 as F3/F4 land.</p></div>
+    <div class="card card-gold"><h4 style="margin-bottom:8px;">🎯 Q4 — Harden &amp; Cut Over</h4><p style="font-size:13px; color:var(--ibx-muted);">Versioning parity + cutover, Agentic pilots (post F2 foundation), and the compliance build (post spike).</p></div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 14 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 15 — TOTAL EFFORT & RESOURCE MIX
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-light" id="s15">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">The Bottom Line</div>
+    <h2>Total effort &amp; resource mix</h2>
+  </div>
+
+  <div class="grid-2-1" style="margin-bottom:26px;">
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      <div class="card card-accent">
+        <h4 style="margin-bottom:12px; color:var(--ibx-blue);">📊 Grand total — all nine priorities (indicative)</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>Baseline:</strong> ~1,594–2,151 dev-days</div></div>
+          <div class="ci"><span class="mk mk-green">▹</span><div><strong>AI-assisted:</strong> ~990–1,444 dev-days</div></div>
+          <div class="ci"><span class="mk mk-blue">▹</span><div><strong>≈ 4.3–6.3 developer-years</strong> (AI-assisted, ~230 productive days/dev-year)</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:12px; color:var(--ibx-blue);">👥 Team &amp; resource mix</h4>
+        <div class="check-list">
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>~5–7 senior engineers</strong> sustained across the full year.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div>Roles: Apex / Platform, OmniStudio, LWC, QA, Data / Integration, PM / BA.</div></div>
+          <div class="ci"><span class="mk mk-green">✓</span><div><strong>F2, F4, and F7</strong> are three concurrent multi-quarter programs — plan for parallel teams.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="effort-card" style="justify-content:center;">
+      <div class="ai-lab">AI-Assisted Program Total</div>
+      <div class="ai-num" style="font-size:40px;">990–1,444</div>
+      <div style="font-size:13px; color:rgba(255,255,255,.8); margin-top:6px;">developer-days</div>
+      <hr class="divider divider-light" style="margin:16px 0;">
+      <div style="font-size:26px; font-weight:900; color:#fff;">≈ 4.3–6.3</div>
+      <div style="font-size:12px; color:rgba(255,255,255,.7);">developer-years</div>
+      <div style="margin-top:14px; font-size:12px; color:rgba(255,255,255,.7);">Baseline (no AI): 1,594–2,151 dev-days</div>
+    </div>
+  </div>
+
+  <div class="highlight-gold">
+    <p style="font-size:13.5px; color:var(--ibx-muted);">
+      <strong>Read the total as indicative.</strong> F9 is shown as a reserved envelope and F5 as net-new; if F9 is counted at its known-backlog floor instead, the program is ~1,458–1,922 baseline / ~879–1,232 AI-assisted dev-days. Sequence foundations first — don't sum naively.
+    </p>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 15 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 16 — RISKS & OPEN QUESTIONS
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-white" id="s16">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-blue)">Risks &amp; Open Questions</div>
+    <h2>What could move the numbers — and what we need to confirm</h2>
+  </div>
+
+  <div class="grid-2" style="align-items:start;">
+    <div class="card card-red">
+      <h4 style="margin-bottom:12px;">🚩 Top program risks</h4>
+      <div class="check-list">
+        <div class="ci"><span class="mk" style="color:var(--ibx-red);">•</span><div><strong>CAQH document API entitlement (F2)</strong> — unverified; blocks real document retrieval.</div></div>
+        <div class="ci"><span class="mk" style="color:var(--ibx-red);">•</span><div><strong>Versioning blast radius (F4)</strong> — ~501 classes / 1,338 DataRaptors + 7 open pre-conditions.</div></div>
+        <div class="ci"><span class="mk" style="color:var(--ibx-red);">•</span><div><strong>Compliance scope (F8)</strong> — undefined until the discovery spike.</div></div>
+        <div class="ci"><span class="mk" style="color:var(--ibx-red);">•</span><div><strong>Not AI-compressible</strong> — OmniStudio publish, UAT, shadow parity, and integration testing.</div></div>
+      </div>
+    </div>
+
+    <div class="card card-accent">
+      <h4 style="margin-bottom:12px;">❓ Open questions carried forward</h4>
+      <div class="check-list">
+        <div class="ci"><span class="mk mk-blue">▹</span><div><strong>F2:</strong> confirm CAQH document entitlement; all-5-flows in one year needs parallel teams.</div></div>
+        <div class="ci"><span class="mk mk-blue">▹</span><div><strong>F4:</strong> resolve the 7 pre-conditions + final object list / natural keys; phased vs single-year.</div></div>
+        <div class="ci"><span class="mk mk-blue">▹</span><div><strong>F5:</strong> confirm cred tracks (ReCred / Initial / PAR) + outcome→PDM matrix.</div></div>
+        <div class="ci"><span class="mk mk-blue">▹</span><div><strong>F6:</strong> run the integrity-feed discovery inventory (count unknown).</div></div>
+        <div class="ci"><span class="mk mk-blue">▹</span><div><strong>F7:</strong> confirm the exact 7+ mass-operation list.</div></div>
+        <div class="ci"><span class="mk mk-blue">▹</span><div><strong>F8:</strong> define the compliance mandate(s) + deadline.</div></div>
+        <div class="ci"><span class="mk mk-blue">▹</span><div><strong>F9:</strong> confirm reserved % (15–20% proposed) and the double-count boundary.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide-footer">
+    <span>IBX PIE · 2027 Priorities ROM</span>
+    <span style="font-weight:700; color:var(--ibx-blue);">Slide 16 of 17</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     SLIDE 17 — NEXT STEPS / DECISIONS
+═══════════════════════════════════════════════════ -->
+<section class="slide slide-dark" id="s17">
+  <div class="slide-header">
+    <div class="overline" style="color:var(--ibx-teal)">Next Steps &amp; Decisions</div>
+    <h2 style="color:#fff;">What we need to move forward</h2>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:32px;">
+    <div class="card-dark">
+      <h4 style="color:var(--ibx-teal); margin-bottom:12px;">✅ Decisions to make now</h4>
+      <div class="check-list" style="color:#fff;">
+        <div class="ci"><span class="mk" style="color:#7CF0BE;">1.</span><div>Confirm the <strong>per-feature scope decisions</strong> captured in the nine TDDs.</div></div>
+        <div class="ci"><span class="mk" style="color:#7CF0BE;">2.</span><div>Decide: fund <strong>F2 / F4 / F7 as parallel programs</strong>, or phase them across the year.</div></div>
+        <div class="ci"><span class="mk" style="color:#7CF0BE;">3.</span><div>Approve the <strong>reserved stabilization capacity</strong> (~15–20%).</div></div>
+      </div>
+    </div>
+    <div class="card-dark">
+      <h4 style="color:var(--ibx-gold); margin-bottom:12px;">🔬 Discovery spikes to schedule</h4>
+      <div class="check-list" style="color:#fff;">
+        <div class="ci"><span class="mk" style="color:var(--ibx-gold);">▹</span><div><strong>CAQH document API</strong> entitlement &amp; access.</div></div>
+        <div class="ci"><span class="mk" style="color:var(--ibx-gold);">▹</span><div><strong>Integrity-feed inventory</strong> (count &amp; parity rules).</div></div>
+        <div class="ci"><span class="mk" style="color:var(--ibx-gold);">▹</span><div><strong>Compliance mandate(s)</strong> definition &amp; deadline.</div></div>
+        <div class="ci"><span class="mk" style="color:var(--ibx-gold);">▹</span><div><strong>Mass-operation catalog</strong> — confirm the exact 7+ list.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding:20px;">
+    <div style="width:84px; height:5px; background:var(--ibx-teal); border-radius:3px; margin:0 auto 20px;"></div>
+    <h2 style="color:#fff; font-size:34px;">What questions do you have?</h2>
+    <p style="font-size:15px; color:rgba(255,255,255,0.75); margin-top:12px;">Each priority has a standalone TDD + estimation doc in <code style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:6px;">requirements/2027_ROM_TDD/</code></p>
+  </div>
+
+  <div class="slide-footer dark-footer">
+    <span>IBX PIE · 2027 Priorities ROM · Grounded, feature-by-feature</span>
+    <span style="font-weight:700; color:rgba(255,255,255,0.7);">Slide 17 of 17</span>
+  </div>
+</section>
+
+</div><!-- end .deck -->
+</body>
+</html>

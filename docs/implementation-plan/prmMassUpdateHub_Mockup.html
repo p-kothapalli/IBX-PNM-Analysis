@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>prmMassUpdateHub — Mass Update Hub (Tile Launcher · SLDS Mockup)</title>
+<style>
+  :root{
+    --brand:#0176d3; --brand-dark:#014486; --brand-100:#eef4ff; --brand-200:#d8edff;
+    --page-bg:#f3f3f3; --card:#fff; --border:#e5e5e5; --border-2:#c9c9c9;
+    --txt:#181818; --txt-2:#5c5c5c; --txt-3:#747474;
+    --green:#2e844a; --green-bg:#d7f1de; --green-bd:#91db8b;
+    --red:#ea001e;   --red-bg:#feded8;  --red-bd:#fe9a91;
+    --orange:#dd7a01;--orange-bg:#fef0e6;--orange-bd:#fec574;
+    --blue:#0176d3;  --blue-bg:#d8edff; --blue-bd:#90d0fe;
+    --purple:#730394;--purple-bg:#f6e0ff;--purple-bd:#e2abff;
+    --radius:.25rem; --shadow:0 2px 2px rgba(0,0,0,.05),0 0 1px rgba(0,0,0,.12);
+    --shadow-lg:0 4px 16px rgba(0,0,0,.16);
+    font-family:'Salesforce Sans','Segoe UI',Arial,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--page-bg);color:var(--txt);font-size:13px;line-height:1.4;}
+  a{color:var(--brand);text-decoration:none;font-weight:600;} a:hover{text-decoration:underline;}
+  .muted{color:var(--txt-3);} .mono{font-family:'SF Mono',Consolas,monospace;font-size:.74rem;color:var(--txt-2);}
+
+  /* ---- App header ---- */
+  .appbar{display:flex;align-items:center;gap:.9rem;padding:.5rem 1rem;background:linear-gradient(90deg,var(--brand-dark),var(--brand));color:#fff;}
+  .appbar .waffle{width:1.1rem;height:1.1rem;display:grid;grid-template-columns:repeat(3,1fr);gap:2px;opacity:.9;}
+  .appbar .waffle span{background:#fff;border-radius:1px;}
+  .appbar .word{font-weight:700;font-size:.95rem;letter-spacing:.01em;}
+  .appbar .crumb{font-size:.78rem;color:var(--brand-200);}
+  .appbar .spacer{flex:1;}
+  .appbar .gsearch{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:999px;color:#fff;padding:.35rem .8rem;font-size:.8rem;width:280px;}
+  .appbar .gsearch::placeholder{color:#e6f0fb;}
+  .appbar .avatar{width:1.7rem;height:1.7rem;border-radius:50%;background:#fff;color:var(--brand-dark);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:1.25rem 1rem 3rem;}
+
+  /* ---- Object header ---- */
+  .objhead{display:flex;align-items:center;gap:.9rem;padding:.2rem 0 1rem;}
+  .objhead .oicon{width:2.6rem;height:2.6rem;border-radius:.4rem;background:var(--brand);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .objhead .oicon svg{width:1.5rem;height:1.5rem;fill:#fff;}
+  .objhead .eyebrow{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--txt-3);}
+  .objhead h1{margin:.1rem 0 0;font-size:1.35rem;}
+  .objhead .sub{color:var(--txt-2);margin-top:.15rem;font-size:.85rem;}
+
+  /* ---- Hub toolbar ---- */
+  .hubbar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;margin:.2rem 0 1.2rem;}
+  .hubsearch{border:1px solid var(--border-2);border-radius:var(--radius);padding:.45rem .7rem;font-size:.85rem;min-width:260px;font-family:inherit;}
+  .hubsearch:focus{outline:2px solid var(--brand);outline-offset:-1px;}
+  .chip{border:1px solid var(--border-2);background:#fff;border-radius:999px;padding:.3rem .8rem;font-size:.78rem;font-weight:600;color:var(--txt-2);cursor:pointer;}
+  .chip.on{background:var(--brand-100);border-color:var(--blue-bd);color:var(--brand-dark);}
+  .hubbar .spacer{flex:1;}
+
+  /* ---- Group section ---- */
+  .group{margin:0 0 1.6rem;}
+  .group h2{font-size:.92rem;margin:0 0 .1rem;display:flex;align-items:center;gap:.5rem;}
+  .group .gcount{font-size:.72rem;color:var(--txt-3);font-weight:600;}
+  .group .gdesc{color:var(--txt-3);font-size:.78rem;margin:.05rem 0 .75rem;}
+
+  .tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:.75rem;}
+  .tile{border:1px solid var(--border);border-radius:.4rem;background:#fff;box-shadow:var(--shadow);padding:.85rem .9rem;cursor:pointer;transition:box-shadow .12s,transform .12s,border-color .12s;position:relative;display:flex;flex-direction:column;min-height:132px;}
+  .tile:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px);border-color:var(--blue-bd);}
+  .tile.soon{cursor:default;opacity:.92;}
+  .tile.soon:hover{transform:none;box-shadow:var(--shadow);border-color:var(--border);}
+  .tile .top{display:flex;align-items:flex-start;gap:.6rem;}
+  .ticon{width:2.1rem;height:2.1rem;border-radius:.35rem;display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .ticon svg{width:1.15rem;height:1.15rem;fill:#fff;}
+  .t-identity{background:#0176d3;} .t-contact{background:#2e844a;} .t-network{background:#730394;} .t-roster{background:#dd7a01;}
+  .tile .tname{font-weight:700;font-size:.92rem;line-height:1.2;}
+  .tile .tdesc{color:var(--txt-2);font-size:.78rem;margin-top:.45rem;flex:1;}
+  .tile .tfoot{display:flex;align-items:center;justify-content:space-between;margin-top:.7rem;padding-top:.55rem;border-top:1px solid #f0f0f0;}
+  .tile .jobs{font-size:.73rem;color:var(--txt-3);}
+  .tile .jobs b{color:var(--txt);}
+  .tile .go{font-size:.78rem;color:var(--brand);font-weight:700;}
+
+  .badge{display:inline-flex;align-items:center;gap:.3rem;padding:.1rem .5rem;border-radius:12px;font-size:.68rem;font-weight:700;border:1px solid transparent;white-space:nowrap;}
+  .badge .dot{width:.5rem;height:.5rem;border-radius:50%;display:inline-block;}
+  .b-avail{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);} .b-avail .dot{background:var(--green);}
+  .b-soon{background:#eef0f2;color:var(--txt-3);border-color:var(--border-2);} .b-soon .dot{background:var(--txt-3);}
+  .b-warn{background:var(--orange-bg);color:var(--orange);border-color:var(--orange-bd);}
+  .b-info{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);}
+  .b-running{background:var(--blue-bg);color:var(--blue);border-color:var(--blue-bd);} .b-running .dot{background:var(--blue);animation:pulse 1.2s infinite;}
+  .b-completed{background:var(--green-bg);color:var(--green);border-color:var(--green-bd);}
+  @keyframes pulse{0%{opacity:1;}50%{opacity:.3;}100%{opacity:1;}}
+
+  /* ---- Overlay / wizard modal ---- */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:flex-start;justify-content:center;padding:2.5rem 1rem;z-index:50;overflow:auto;}
+  .overlay.show{display:flex;}
+  .modal{background:var(--card);border-radius:.4rem;box-shadow:var(--shadow-lg);width:100%;max-width:940px;overflow:hidden;}
+  .modal-head{display:flex;align-items:center;gap:.75rem;padding:.85rem 1.1rem;border-bottom:1px solid var(--border);}
+  .mh-icon{width:2.2rem;height:2.2rem;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;color:#fff;flex:0 0 auto;}
+  .mh-icon svg{width:1.2rem;height:1.2rem;fill:#fff;}
+  .mh-main{flex:1 1 auto;min-width:0;}
+  .mh-eyebrow{font-size:.7rem;letter-spacing:.04em;text-transform:uppercase;color:var(--txt-3);}
+  .mh-title{font-size:1.05rem;font-weight:700;}
+  .mh-close{border:none;background:none;color:var(--txt-3);font-size:1.4rem;cursor:pointer;line-height:1;}
+
+  .path{display:flex;gap:0;padding:.6rem 1.1rem;border-bottom:1px solid var(--border);background:#fafaf9;overflow-x:auto;}
+  .pstep{display:flex;align-items:center;gap:.45rem;padding:.25rem .8rem .25rem .3rem;color:var(--txt-2);font-weight:600;font-size:.8rem;white-space:nowrap;border:none;background:none;}
+  .pstep .pnum{width:1.4rem;height:1.4rem;border-radius:50%;border:2px solid var(--border-2);display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;color:var(--txt-3);background:#fff;}
+  .pstep.done .pnum{background:var(--green);border-color:var(--green);color:#fff;}
+  .pstep.active{color:var(--brand);}
+  .pstep.active .pnum{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .pstep .arrow{color:var(--border-2);margin-left:.4rem;}
+
+  .ctxbar{display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;padding:.7rem 1.1rem;border-bottom:1px solid var(--border);background:#fff;align-items:center;}
+  .ctx{display:flex;flex-direction:column;gap:.1rem;}
+  .ctx .k{font-size:.66rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);}
+  .ctx .v{font-size:.84rem;font-weight:600;}
+
+  .modal-body{padding:1.1rem;min-height:380px;}
+  .modal-foot{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1.1rem;border-top:1px solid var(--border);background:#fafaf9;flex-wrap:wrap;gap:.5rem;}
+
+  .btn{border:1px solid var(--border-2);background:#fff;color:var(--brand);border-radius:var(--radius);padding:.45rem .95rem;font-size:.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;}
+  .btn:hover{background:#f3f8ff;}
+  .btn--brand{background:var(--brand);border-color:var(--brand);color:#fff;} .btn--brand:hover{background:var(--brand-dark);}
+  .btn--neutral{color:var(--txt);}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;}
+
+  .banner{display:flex;align-items:flex-start;gap:.6rem;padding:.6rem .85rem;border-radius:var(--radius);font-size:.82rem;margin-top:1rem;border:1px solid transparent;}
+  .banner.ok{background:var(--green-bg);border-color:var(--green-bd);color:#0a5a2a;}
+  .banner.info{background:var(--blue-bg);border-color:var(--blue-bd);color:#014486;}
+  .banner.warn{background:var(--orange-bg);border-color:var(--orange-bd);color:#8a4b00;}
+
+  .fldgrid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem 1rem;max-width:660px;}
+  .fld{display:flex;flex-direction:column;gap:.25rem;}
+  .fld.full{grid-column:1/-1;}
+  .fld label{font-size:.72rem;color:var(--txt-3);text-transform:uppercase;letter-spacing:.02em;font-weight:600;}
+  .fld label .req{color:var(--red);}
+  .fld input,.fld select{border:1px solid var(--border-2);border-radius:var(--radius);padding:.5rem .6rem;font-size:.9rem;font-family:inherit;}
+  .fld input:focus,.fld select:focus{outline:2px solid var(--brand);outline-offset:-1px;}
+  .sec-title{font-weight:700;font-size:.92rem;margin:0 0 .2rem;}
+  .sec-sub{color:var(--txt-3);font-size:.8rem;margin:0 0 .8rem;}
+
+  .resolve{display:flex;gap:1.6rem;flex-wrap:wrap;background:var(--brand-100);border:1px solid var(--blue-bd);border-radius:var(--radius);padding:.7rem 1rem;margin-bottom:.8rem;}
+  .resolve .stat .n{font-size:1.5rem;font-weight:800;color:var(--brand-dark);line-height:1;}
+  .resolve .stat .l{font-size:.7rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);margin-top:.2rem;}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;margin:.2rem 0 .5rem;gap:.5rem;flex-wrap:wrap;}
+  .toolbar .search{border:1px solid var(--border-2);border-radius:var(--radius);padding:.35rem .6rem;font-size:.8rem;min-width:200px;}
+  .scroll{overflow:auto;max-height:300px;border:1px solid var(--border);border-radius:var(--radius);}
+  table{width:100%;border-collapse:collapse;font-size:.8rem;}
+  thead th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);font-weight:600;padding:.5rem .7rem;border-bottom:1px solid var(--border);background:#fafaf9;white-space:nowrap;position:sticky;top:0;}
+  tbody td{padding:.5rem .7rem;border-bottom:1px solid #f0f0f0;vertical-align:middle;}
+  tbody tr.bundle{box-shadow:inset 3px 0 0 var(--orange);}
+  .diff .old{color:var(--txt-3);text-decoration:line-through;}
+  .diff .arw{color:var(--txt-3);margin:0 .3rem;}
+  .diff .new{color:var(--green);font-weight:700;}
+
+  .progress-wrap{max-width:640px;margin:.4rem auto;}
+  .bar{height:.7rem;border-radius:999px;background:var(--border);overflow:hidden;}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--brand),#4aa3ec);transition:width .3s;}
+  .stat-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:.6rem;margin-top:1rem;}
+  .stat-tiles .st{border:1px solid var(--border);border-radius:var(--radius);padding:.6rem;text-align:center;}
+  .stat-tiles .st .n{font-size:1.25rem;font-weight:800;}
+  .stat-tiles .st .l{font-size:.66rem;text-transform:uppercase;letter-spacing:.03em;color:var(--txt-3);margin-top:.2rem;}
+
+  .soon-body{text-align:center;padding:2.5rem 1rem;color:var(--txt-2);}
+  .soon-body .big{font-size:1.05rem;font-weight:700;color:var(--txt);margin-bottom:.4rem;}
+
+  .footnote{margin-top:2rem;color:var(--txt-3);font-size:.75rem;border-top:1px solid var(--border);padding-top:.8rem;}
+  @media(max-width:640px){.fldgrid,.stat-tiles{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="appbar">
+  <div class="waffle"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="word">IBX Provider Operations</div>
+  <div class="crumb">&nbsp;›&nbsp; Mass Update Hub</div>
+  <div class="spacer"></div>
+  <input class="gsearch" placeholder="Search Salesforce…" />
+  <div class="avatar">PK</div>
+</div>
+
+<div class="wrap">
+
+  <div class="objhead">
+    <div class="oicon">
+      <svg viewBox="0 0 24 24"><path d="M4 5h16v3H4V5zm0 5.5h16v3H4v-3zM4 16h10v3H4v-3z"/></svg>
+    </div>
+    <div>
+      <div class="eyebrow">Provider Data Management</div>
+      <h1>Mass Update Hub</h1>
+      <div class="sub">Update many records at once by request type — one Tax ID / roster fans out to hundreds of records, processed asynchronously with after-the-fact QC.</div>
+    </div>
+  </div>
+
+  <div class="hubbar">
+    <input id="tileSearch" class="hubsearch" placeholder="Search request types (e.g. address, network, NPI)…" oninput="filterTiles()" />
+    <button class="chip on" data-f="all" onclick="setFilter(this)">All</button>
+    <button class="chip" data-f="avail" onclick="setFilter(this)">Available</button>
+    <button class="chip" data-f="soon" onclick="setFilter(this)">Coming soon</button>
+    <div class="spacer"></div>
+    <span class="muted" id="tileCount"></span>
+  </div>
+
+  <div id="groups"></div>
+
+  <div class="footnote">
+    Mockup · <b>prmMassUpdateHub</b> — tile launcher fronting one shared 5-step wizard (Identify → Review → Confirm → Progress → QC).
+    Each tile is a request-type <i>config</i>, not a separate app. Backbone reused from <span class="mono">prm_verificationDashboard</span> /
+    the async staging + dispatcher + <span class="mono">PRM_PDMJobStatusCard</span> framework. Ref:
+    <span class="mono">MassGrid_Reuse_And_CrossFlow_Analysis.md</span>, <span class="mono">PNM_MassAddressUpdate_FullStack_Architecture.md</span>.
+  </div>
+</div>
+
+<!-- Wizard overlay -->
+<div class="overlay" id="overlay">
+  <!-- Generic config-driven wizard (used by most tiles) -->
+  <div class="modal" id="genericModal">
+    <div class="modal-head">
+      <div class="mh-icon" id="wIcon"></div>
+      <div class="mh-main">
+        <div class="mh-eyebrow" id="wEyebrow">Mass Update</div>
+        <div class="mh-title" id="wTitle">—</div>
+      </div>
+      <button class="mh-close" onclick="closeWizard()">&times;</button>
+    </div>
+    <div class="path" id="wPath"></div>
+    <div class="ctxbar" id="wCtx"></div>
+    <div class="modal-body" id="wBody"></div>
+    <div class="modal-foot">
+      <button class="btn btn--neutral" id="wBack" onclick="prevStep()">‹ Back</button>
+      <div style="flex:1"></div>
+      <button class="btn btn--brand" id="wNext" onclick="nextStep()">Continue ›</button>
+    </div>
+  </div>
+
+  <!-- Embedded full-fidelity wizard (Billing / Mailing tiles reuse prmMassBillingUpdate) -->
+  <div class="modal" id="iframeModal" style="display:none;max-width:1100px;">
+    <div class="modal-head">
+      <div class="mh-icon t-contact" id="ifIcon"></div>
+      <div class="mh-main">
+        <div class="mh-eyebrow" id="ifEyebrow">Mass Update · Contact &amp; Hours</div>
+        <div class="mh-title" id="ifTitle">—</div>
+      </div>
+      <button class="mh-close" onclick="closeWizard()">&times;</button>
+    </div>
+    <iframe id="ifFrame" title="Mass address update wizard"
+            style="width:100%;height:74vh;border:0;display:block;background:var(--page-bg);"></iframe>
+  </div>
+</div>
+
+<script>
+/* ---------------- Icon set ---------------- */
+const ICONS = {
+  tag:'<path d="M12 2 2 12l8 8 10-10V2h-8zm5 5a1.6 1.6 0 1 1 0-3.2A1.6 1.6 0 0 1 17 7z"/>',
+  building:'<path d="M4 3h9v18H4V3zm11 6h5v12h-5V9zM6 6h2v2H6V6zm3 0h2v2H9V6zM6 9h2v2H6V9zm3 0h2v2H9V9zm-3 3h2v2H6v-2zm3 0h2v2H9v-2z"/>',
+  id:'<path d="M3 5h18v14H3V5zm2 2v10h14V7H5zm2 2h4v2H7V9zm0 3h4v1.5H7V12zm7-3h4v1.5h-4V9zm0 3h4v1.5h-4V12z"/>',
+  hash:'<path d="M9 3 8 8H4v2h3.6l-.8 4H3v2h3.4L5.5 21H7.6l.9-5h4l-.9 5h2.1l.9-5H19v-2h-3.6l.8-4H21V8h-3.6l.9-5H16.2l-.9 5h-4l.9-5H9zm.9 7h4l-.8 4h-4l.8-4z"/>',
+  mail:'<path d="M3 5h18v14H3V5zm2.5 2L12 12l6.5-5H5.5zM19 8.2l-7 5.4-7-5.4V17h14V8.2z"/>',
+  phone:'<path d="M6.6 2 3 5.6c0 8.9 6.5 15.4 15.4 15.4L22 17.4l-4.6-2.2-2.3 2.3c-2.9-1.2-5.4-3.7-6.6-6.6l2.3-2.3L8.6 4 6.6 2z"/>',
+  clock:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 10.4 4 2.3-1 1.7-5-2.9V6h2v6.4z"/>',
+  pin:'<path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>',
+  network:'<path d="M12 2a3 3 0 0 0-1 5.8V10H6a2 2 0 0 0-2 2v1.2a3 3 0 1 0 2 0V12h12v1.2a3 3 0 1 0 2 0V12a2 2 0 0 0-2-2h-5V7.8A3 3 0 0 0 12 2z"/>',
+  cap:'<path d="M12 3 2 8l10 5 8-4v6h2V8L12 3zM6 13.2V17c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.8l-6 3-6-3z"/>',
+  panel:'<path d="M4 4h16v4H4V4zm0 6h16v4H4v-4zm0 6h10v4H4v-4z"/>',
+  flag:'<path d="M6 2v20H4V2h2zm2 1h11l-2 4 2 4H8V3z"/>',
+  link:'<path d="M10.6 13.4a3 3 0 0 0 4.2 0l3-3a3 3 0 0 0-4.2-4.2l-1.3 1.3 1.4 1.4 1.3-1.3a1 1 0 1 1 1.4 1.4l-3 3a1 1 0 0 1-1.4 0l-1.4 1.4zm2.8-2.8a3 3 0 0 0-4.2 0l-3 3a3 3 0 1 0 4.2 4.2l1.3-1.3-1.4-1.4-1.3 1.3a1 1 0 1 1-1.4-1.4l3-3a1 1 0 0 1 1.4 0l1.4-1.4z"/>',
+  usermin:'<path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 9c0-3.3 3.1-6 7-6s7 2.7 7 6H2zm13-8h7v2h-7v-2z"/>'
+};
+function svg(name){return '<svg viewBox="0 0 24 24">'+(ICONS[name]||ICONS.tag)+'</svg>';}
+
+/* ---------------- Request-type catalog ---------------- */
+/* status: 'avail' | 'soon'. resolveBy drives the Identify step; edit is what changes;
+   cols/rows drive the Review grid; unit is what gets fanned out. */
+const GROUPS = [
+  {
+    key:'identity', label:'Group Identity', cls:'t-identity',
+    desc:'Rename or re-key the group and its practice locations.',
+    tiles:[
+      {id:'groupName', name:'Group Name', icon:'tag', status:'avail', jobs:12,
+        desc:'Rename a group; cascades to all HealthcareFacility names.',
+        resolveBy:['Tax ID'], edit:'New Group Name', unit:'locations',
+        cols:['Practice Location','PL #','Group Name'],
+        rows:[['Cedar Valley Primary','PL-40021','Cedar Valley Family Medicine'],['Cedar Valley — North','PL-40022','Cedar Valley Family Medicine'],['Cedar Valley Peds','PL-40023','Cedar Valley Family Medicine']]},
+      {id:'dbaName', name:'DBA Name', icon:'id', status:'avail', jobs:5,
+        desc:'Update the Doing-Business-As name across the group.',
+        resolveBy:['Tax ID'], edit:'New DBA Name', unit:'locations',
+        cols:['Practice Location','PL #','DBA Name'],
+        rows:[['Cedar Valley Primary','PL-40021','Cedar Valley Care'],['Cedar Valley — North','PL-40022','Cedar Valley Care']]},
+      {id:'taxId', name:'Tax ID', icon:'hash', status:'soon', jobs:0,
+        desc:'Re-key a group to a new EIN; cascades cross-reference records.',
+        resolveBy:['Current Tax ID','Group NPI'], edit:'New Tax ID (EIN)', unit:'locations',
+        cols:['Practice Location','PL #','Tax ID'], rows:[]},
+      {id:'npi', name:'NPI', icon:'hash', status:'soon', jobs:0,
+        desc:'Bulk NPI update with Luhn + uniqueness validation.',
+        resolveBy:['Tax ID'], edit:'New Group NPI', unit:'locations',
+        cols:['Practice Location','PL #','NPI'], rows:[]}
+    ]
+  },
+  {
+    key:'contact', label:'Contact & Hours', cls:'t-contact',
+    desc:'Change how the group is reached and when it is open.',
+    tiles:[
+      {id:'billing', name:'Billing Address', icon:'mail', status:'avail', jobs:28,
+        desc:'Fan out a new Billing / check-remit address to every location under a Tax ID + Group NPI.',
+        iframe:'prmMassBillingUpdate_Mockup.html', mode:'billing'},
+      {id:'mailing', name:'Mailing Address', icon:'mail', status:'avail', jobs:16,
+        desc:'Fan out a new Mailing address to every location under a Tax ID + Group NPI.',
+        iframe:'prmMassBillingUpdate_Mockup.html', mode:'mailing'},
+      {id:'phone', name:'Phone Number', icon:'phone', status:'avail', jobs:9,
+        desc:'Normalize and mass-update phone/fax across locations.',
+        resolveBy:['Tax ID'], edit:'New Phone Number', unit:'locations',
+        cols:['Practice Location','PL #','Phone'],
+        rows:[['Cedar Valley Primary','PL-40021','(215) 555-0101 → (215) 555-0900'],['Cedar Valley — North','PL-40022','(215) 555-0102 → (215) 555-0900']]},
+      {id:'officeHours', name:'Office Hours', icon:'clock', status:'soon', jobs:0,
+        desc:'Set a weekly schedule across many locations (7 days × slots).',
+        resolveBy:['Tax ID'], edit:'Weekly Schedule', unit:'locations',
+        cols:['Practice Location','PL #','Hours'], rows:[]}
+    ]
+  },
+  {
+    key:'network', label:'Location & Network', cls:'t-network',
+    desc:'Add, terminate, and re-flag locations and their network participation.',
+    tiles:[
+      {id:'locations', name:'Add / Terminate Locations', icon:'pin', status:'avail', jobs:17,
+        desc:'Bulk add or terminate practice locations for a group.',
+        resolveBy:['Tax ID'], edit:'Action + Effective Date', unit:'locations',
+        cols:['Practice Location','PL #','Action'],
+        rows:[['Cedar Valley West','PL-40025','Terminate · 07/31/2026'],['Cedar Valley East','PL-40026','Terminate · 07/31/2026']]},
+      {id:'networks', name:'Add / Remove Networks', icon:'network', status:'avail', jobs:23,
+        desc:'Add or remove network participation with closed-network checks.',
+        resolveBy:['Tax ID'], edit:'Networks to Add / Remove', unit:'locations',
+        cols:['Practice Location','PL #','Network Change'],
+        rows:[['Cedar Valley Primary','PL-40021','+ Keystone HMO'],['Cedar Valley — North','PL-40022','+ Keystone HMO · − Legacy PPO']]},
+      {id:'capSites', name:'Capitation Sites', icon:'cap', status:'soon', jobs:0,
+        desc:'Assign capitation sites (PCP/Dual roles) in bulk.',
+        resolveBy:['Tax ID'], edit:'Cap Site', unit:'locations',
+        cols:['Practice Location','PL #','Cap Site'], rows:[]},
+      {id:'panelStatus', name:'Panel Status', icon:'panel', status:'avail', jobs:6,
+        desc:'Flip Accepting-New-Patients / Closed-Panel flags across a group.',
+        resolveBy:['Tax ID'], edit:'Panel Status', unit:'locations',
+        cols:['Practice Location','PL #','Panel Status'],
+        rows:[['Cedar Valley Primary','PL-40021','Closed → Accepting'],['Cedar Valley Peds','PL-40023','Closed → Accepting']]},
+      {id:'infoIndicator', name:'Info Indicator', icon:'flag', status:'soon', jobs:0,
+        desc:'Bulk-set directory info codes at location / network / practitioner level.',
+        resolveBy:['Tax ID'], edit:'Info Code', unit:'locations',
+        cols:['Practice Location','PL #','Info Code'], rows:[]}
+    ]
+  },
+  {
+    key:'roster', label:'Practitioner Roster', cls:'t-roster',
+    desc:'Link or term many practitioners against a group in one submission.',
+    tiles:[
+      {id:'linking', name:'Linking Providers', icon:'link', status:'avail', jobs:14,
+        desc:'Link a roster of practitioners to a practice location (UPHS-style mass load).',
+        resolveBy:['Tax ID','Roster (CSV)'], edit:'Practitioners to Link', unit:'practitioners',
+        cols:['Practitioner','NPI','Link To'],
+        rows:[['Dr. A. Rivera','1568740021','Cedar Valley Primary'],['Dr. B. Chen','1568740108','Cedar Valley Primary'],['Dr. C. Okafor','1568740244','Cedar Valley — North']]},
+      {id:'terming', name:'Terming Practitioners', icon:'usermin', status:'avail', jobs:8,
+        desc:'Bulk-terminate practitioner-facility or practitioner-network records.',
+        resolveBy:['Tax ID','Roster (CSV)'], edit:'Term Date', unit:'practitioners',
+        cols:['Practitioner','NPI','Term'],
+        rows:[['Dr. D. Meyer','1568740390','07/31/2026'],['Dr. E. Santos','1568740411','07/31/2026']]}
+    ]
+  }
+];
+
+const STEPS = ['Identify','Review','Confirm','Progress','QC'];
+let current = null, step = 0, barTimer = null;
+
+/* ---------------- Render hub ---------------- */
+function renderGroups(){
+  const host = document.getElementById('groups');
+  host.innerHTML = GROUPS.map(g=>`
+    <div class="group" data-group="${g.key}">
+      <h2>${g.label} <span class="gcount">${g.tiles.length}</span></h2>
+      <div class="gdesc">${g.desc}</div>
+      <div class="tiles">
+        ${g.tiles.map(t=>tileHtml(g,t)).join('')}
+      </div>
+    </div>`).join('');
+  updateCount();
+}
+function tileHtml(g,t){
+  const avail = t.status==='avail';
+  const badge = avail
+    ? '<span class="badge b-avail"><span class="dot"></span>Available</span>'
+    : '<span class="badge b-soon"><span class="dot"></span>Coming soon</span>';
+  return `<div class="tile ${avail?'':'soon'}" data-status="${t.status}" data-name="${t.name.toLowerCase()} ${t.desc.toLowerCase()}"
+              onclick="${avail?`openWizard('${t.id}')`:''}">
+      <div class="top">
+        <div class="ticon ${g.cls}">${svg(t.icon)}</div>
+        <div style="flex:1">
+          <div class="tname">${t.name}</div>
+        </div>
+        ${badge}
+      </div>
+      <div class="tdesc">${t.desc}</div>
+      <div class="tfoot">
+        <span class="jobs"><b>${t.jobs}</b> jobs · 30d</span>
+        <span class="go">${avail?'Start ›':'&nbsp;'}</span>
+      </div>
+    </div>`;
+}
+
+/* ---------------- Filter / search ---------------- */
+let filter='all';
+function setFilter(el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on'); filter=el.dataset.f; filterTiles();
+}
+function filterTiles(){
+  const q=document.getElementById('tileSearch').value.trim().toLowerCase();
+  document.querySelectorAll('.group').forEach(gEl=>{
+    let shown=0;
+    gEl.querySelectorAll('.tile').forEach(t=>{
+      const okF = filter==='all' || t.dataset.status===filter;
+      const okQ = !q || t.dataset.name.includes(q);
+      const vis = okF && okQ; t.style.display = vis?'':'none'; if(vis) shown++;
+    });
+    gEl.style.display = shown?'':'none';
+  });
+  updateCount();
+}
+function updateCount(){
+  const vis=[...document.querySelectorAll('.tile')].filter(t=>t.style.display!=='none').length;
+  document.getElementById('tileCount').textContent = vis+' request type'+(vis===1?'':'s');
+}
+
+/* ---------------- Wizard ---------------- */
+function findTile(id){ for(const g of GROUPS){ const t=g.tiles.find(x=>x.id===id); if(t) return {g,t}; } }
+function openWizard(id){
+  const {g,t}=findTile(id); current={g,t}; step=0;
+  if(t.iframe){ openIframeWizard(g,t); return; }
+  document.getElementById('iframeModal').style.display='none';
+  document.getElementById('genericModal').style.display='';
+  document.getElementById('wIcon').className='mh-icon '+g.cls;
+  document.getElementById('wIcon').innerHTML=svg(t.icon);
+  document.getElementById('wEyebrow').textContent='Mass Update · '+g.label;
+  document.getElementById('wTitle').textContent=t.name;
+  document.getElementById('overlay').classList.add('show');
+  renderStep();
+}
+function openIframeWizard(g,t){
+  document.getElementById('genericModal').style.display='none';
+  document.getElementById('iframeModal').style.display='';
+  document.getElementById('ifIcon').className='mh-icon '+g.cls;
+  document.getElementById('ifIcon').innerHTML=svg(t.icon);
+  document.getElementById('ifEyebrow').textContent='Mass Update · '+g.label;
+  document.getElementById('ifTitle').textContent=t.name;
+  document.getElementById('ifFrame').src=t.iframe+'?embed=1&mode='+t.mode;
+  document.getElementById('overlay').classList.add('show');
+}
+function closeWizard(){
+  document.getElementById('overlay').classList.remove('show');
+  clearInterval(barTimer);
+  document.getElementById('ifFrame').src='about:blank';
+}
+document.getElementById('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeWizard(); });
+
+function renderPath(){
+  document.getElementById('wPath').innerHTML = STEPS.map((s,i)=>`
+    <span class="pstep ${i<step?'done':''} ${i===step?'active':''}">
+      <span class="pnum">${i<step?'✓':i+1}</span>${s}${i<STEPS.length-1?'<span class="arrow">›</span>':''}
+    </span>`).join('');
+}
+function renderCtx(){
+  const {t}=current;
+  const parts=[
+    ['Request Type',t.name],
+    ['Resolve by',t.resolveBy.join(' + ')],
+    ['Group','Cedar Valley Family Medicine'],
+    [t.unit==='practitioners'?'Practitioners':'Locations resolved', t.rows.length? (t.unit==='practitioners'?'128':'1,284') : '—']
+  ];
+  document.getElementById('wCtx').innerHTML = parts.map(p=>`<div class="ctx"><span class="k">${p[0]}</span><span class="v">${p[1]}</span></div>`).join('');
+}
+function renderStep(){
+  renderPath(); renderCtx();
+  const body=document.getElementById('wBody');
+  const back=document.getElementById('wBack'), next=document.getElementById('wNext');
+  clearInterval(barTimer);
+  back.disabled = step===0;
+  next.style.display='';
+  next.textContent = ['Resolve Locations ›','Continue to Confirm ›','Submit Mass Update','','Approve & Close Case'][step];
+
+  const {t}=current;
+  if(step===0){ // Identify
+    body.innerHTML=`
+      <div class="sec-title">Identify the group</div>
+      <div class="sec-sub">Enter the resolution key. One submission fans out to every matching ${t.unit}.</div>
+      <div class="fldgrid">
+        ${t.resolveBy.map(r=>`<div class="fld"><label>${r} <span class="req">*</span></label><input placeholder="${r.includes('Tax')?'23-1234567':r.includes('NPI')?'1568740000':r.includes('CSV')?'Upload roster.csv…':''}" value="${r==='Tax ID'?'23-1234567':r==='Group NPI'?'1568740000':''}"/></div>`).join('')}
+        <div class="fld"><label>Group Name</label><input value="Cedar Valley Family Medicine" readonly style="background:#fafaf9"/></div>
+        <div class="fld"><label>Status Filter</label><select><option>Active only</option><option>All</option></select></div>
+      </div>
+      <div class="sec-title" style="margin-top:1.2rem">What to update?</div>
+      <div class="fldgrid">
+        <div class="fld full"><label>${t.edit} <span class="req">*</span></label><input placeholder="Enter ${t.edit.toLowerCase()}…"/></div>
+      </div>
+      <div class="banner info">This value is validated once, then applied to every selected ${t.unit}. Nothing is written until you submit.</div>`;
+  }
+  else if(step===1){ // Review
+    const n = t.unit==='practitioners'?'128':'1,284';
+    const bundle = t.bundle?`<div class="stat"><div class="n">37</div><div class="l">In bundle</div></div>`:'';
+    body.innerHTML=`
+      <div class="resolve">
+        <div class="stat"><div class="n">${n}</div><div class="l">${t.unit==='practitioners'?'Practitioners':'Locations'} resolved</div></div>
+        <div class="stat"><div class="n">${n}</div><div class="l">Selected</div></div>
+        ${bundle}
+        <div class="stat"><div class="n">0</div><div class="l">Already match</div></div>
+      </div>
+      ${t.bundle?'<div class="banner warn">37 locations are in a capitated bundle — flagged (⚠) below; they route to a Provider Contracting child case.</div>':''}
+      <div class="toolbar"><input class="search" placeholder="Search ${t.unit}…"/><span class="muted">Showing ${t.rows.length} of ${n} · all pre-selected</span></div>
+      <div class="scroll"><table><thead><tr><th style="width:34px"><input type="checkbox" checked></th>${t.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+        <tbody>${t.rows.map((r,i)=>rowHtml(r,i,t)).join('')}</tbody></table></div>
+      <div class="banner info" style="margin-top:.7rem">At scale the grid sends only <b>deselected</b> rows; the batch resolves “all minus deselected” server-side.</div>`;
+  }
+  else if(step===2){ // Confirm
+    const n = t.unit==='practitioners'?'128':'1,284';
+    body.innerHTML=`
+      <div class="sec-title">Confirm the mass update</div>
+      <div class="sec-sub">Review the summary, then submit. Records go Active on completion; QC verifies after the fact.</div>
+      <div class="fldgrid">
+        <div class="fld"><label>Request Type</label><input value="${t.name}" readonly style="background:#fafaf9"/></div>
+        <div class="fld"><label>Group</label><input value="Cedar Valley Family Medicine" readonly style="background:#fafaf9"/></div>
+        <div class="fld"><label>${t.unit==='practitioners'?'Practitioners':'Locations'} affected</label><input value="${n}" readonly style="background:#fafaf9"/></div>
+        <div class="fld"><label>Effective Date</label><input value="07/16/2026"/></div>
+        <div class="fld full"><label>Reason for change <span class="req">*</span></label><input placeholder="Enter a mandatory change reason…"/></div>
+      </div>
+      <div class="banner info">Creates <b>1</b> QC case + <b>${n}</b> Case Manager Association records to verify.</div>
+      ${t.bundle?'<div class="banner warn">37 bundle members → 1 Provider Contracting child case.</div>':''}
+      <div class="banner ok">Submit returns in &lt; 2s with a job id; the fan-out runs asynchronously.</div>`;
+  }
+  else if(step===3){ // Progress
+    next.style.display='none';
+    body.innerHTML=`
+      <div class="progress-wrap">
+        <div class="sec-title" style="text-align:center">Mass update in progress</div>
+        <div class="sec-sub" style="text-align:center">Job <span class="mono">MAU-01042</span> · <span class="badge b-running"><span class="dot"></span>Processing</span></div>
+        <div class="bar"><i id="pbar"></i></div>
+        <div class="muted" style="text-align:center;margin-top:.4rem" id="pcap">Queued…</div>
+        <div class="stat-tiles">
+          <div class="st"><div class="n" style="color:var(--green)" id="s-done">0</div><div class="l">Updated</div></div>
+          <div class="st"><div class="n" style="color:var(--orange)">${t.bundle?37:0}</div><div class="l">→ Contracting</div></div>
+          <div class="st"><div class="n" style="color:var(--red)" id="s-err">0</div><div class="l">Errors</div></div>
+          <div class="st"><div class="n" style="color:var(--brand)" id="s-left">—</div><div class="l">In progress</div></div>
+        </div>
+        <div class="banner info" style="justify-content:center">Safe to leave — you’ll get an email summary and the QC case link.</div>
+      </div>`;
+    runProgress(t);
+  }
+  else if(step===4){ // QC
+    next.textContent='Approve & Close Case';
+    const n = t.unit==='practitioners'?'128':'1,284';
+    body.innerHTML=`
+      <div class="resolve" style="background:var(--purple-bg);border-color:var(--purple-bd)">
+        <div class="stat"><div class="n" style="color:var(--purple)">${n}</div><div class="l">Associations</div></div>
+        <div class="stat"><div class="n" style="color:var(--purple)">0</div><div class="l">Verified</div></div>
+        <div class="stat"><div class="n" style="color:var(--purple)">0</div><div class="l">Flagged</div></div>
+      </div>
+      <div class="banner info">QC case <span class="mono">00012977</span> — each row is a <span class="mono">PRM_CaseManagerAssociation__c</span> to verify.</div>
+      <div class="toolbar">
+        <input class="search" placeholder="Search associations…"/>
+        <div><button class="btn" >Verify selected</button> <button class="btn">Flag selected</button></div>
+      </div>
+      <div class="scroll"><table><thead><tr><th style="width:34px"><input type="checkbox"></th><th>Assoc #</th>${t.cols.slice(0,2).map(c=>`<th>${c}</th>`).join('')}<th>Change</th><th>Verdict</th></tr></thead>
+        <tbody>${t.rows.map((r,i)=>`<tr><td><input type="checkbox"></td><td class="mono">CMA-${1042+i}</td><td>${r[0]}</td><td>${r[1]}</td><td class="diff">${diffCell(r[2])}</td><td><span class="badge b-warn">Pending</span></td></tr>`).join('')}</tbody></table></div>`;
+  }
+}
+function rowHtml(r,i,t){
+  const bundle = t.bundle && i===1;
+  return `<tr class="${bundle?'bundle':''}"><td><input type="checkbox" checked></td><td>${r[0]}${bundle?' <span class="badge b-warn" style="margin-left:.3rem">⚠ Bundle</span>':''}</td><td class="mono">${r[1]}</td><td class="diff">${diffCell(r[2])}</td></tr>`;
+}
+function diffCell(v){
+  if(v && v.includes('→')){ const [a,b]=v.split('→'); return `<span class="old">${a.trim()}</span><span class="arw">→</span><span class="new">${b.trim()}</span>`; }
+  return `<span class="new">${v}</span>`;
+}
+function runProgress(t){
+  const total = t.unit==='practitioners'?128:1284;
+  let done=0; const bar=document.getElementById('pbar');
+  document.getElementById('s-left').textContent=total;
+  barTimer=setInterval(()=>{
+    done=Math.min(total, done+Math.ceil(total/22));
+    const pct=Math.round(done/total*100);
+    bar.style.width=pct+'%';
+    document.getElementById('pcap').textContent=`Processing ${done.toLocaleString()} of ${total.toLocaleString()} (${pct}%)`;
+    document.getElementById('s-done').textContent=done.toLocaleString();
+    document.getElementById('s-left').textContent=(total-done).toLocaleString();
+    if(done>=total){
+      clearInterval(barTimer);
+      document.getElementById('pcap').innerHTML=`<span class="badge b-completed"><span class="dot"></span>Completed</span> — QC case 00012977 created`;
+      const nx=document.getElementById('wNext'); nx.style.display=''; nx.textContent='Open QC Case ›';
+    }
+  },260);
+}
+function nextStep(){ if(step<STEPS.length-1){ step++; renderStep(); } else { closeWizard(); } }
+function prevStep(){ if(step>0){ step--; renderStep(); } }
+
+renderGroups();
+</script>
+</body>
+</html>
